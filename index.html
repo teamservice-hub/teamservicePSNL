@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Service Management Pro - NextGen Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-light: #f8fafc;
+            --secondary: #6366f1;
+            --secondary-hover: #4f46e5;
+            --accent: #10b981;
+            --accent-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(99, 102, 241, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --primary: #f8fafc;
+            --primary-light: #1e293b;
+            --secondary: #818cf8;
+            --secondary-hover: #6366f1;
+            --accent: #34d399;
+            --accent-bg: #064e3b;
+            --bg: #030712;
+            --card: #111827;
+            --text: #f9fafb;
+            --text-sub: #9ca3af;
+            --border: #1f2937;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 50px; transition: var(--transition); }
+
+        .screen { display: none; padding: 20px; max-width: 720px; margin: auto; min-height: 100vh; animation: fadeIn 0.4s ease; }
+        .screen.active { display: block; }
+        .admin-layout { display: none; max-width: 1400px; margin: auto; min-height: 100vh; animation: fadeIn 0.4s ease; }
+        .admin-layout.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card { background: var(--card); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 22px; border: 1px solid var(--border); transition: var(--transition); }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 20px 30px -10px rgba(0,0,0,0.08); }
+        
+        h1, h2, h3 { color: var(--text); margin-top: 0; font-weight: 700; letter-spacing: -0.02em; }
+        label { display: block; font-weight: 600; font-size: 13px; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        input, select, textarea { width: 100%; padding: 14px 18px; margin: 0 0 16px 0; border: 1.5px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--card); color: var(--text); outline: none; transition: var(--transition); }
+        input:focus, select:focus, textarea:focus { border-color: var(--secondary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
+        
+        button { background: var(--secondary); color: white; border: none; padding: 14px 22px; border-radius: 12px; font-size: 15px; cursor: pointer; width: 100%; font-weight: 700; transition: var(--transition); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        button:hover { background: var(--secondary-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
+        .btn-success { background: var(--accent); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        .btn-secondary { background: var(--text-sub); box-shadow: none; }
+
+        .badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 30px; font-size: 12px; font-weight: 700; gap: 6px; letter-spacing: 0.02em; }
+        .badge-success { background: var(--accent-bg); color: var(--accent); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        .top-bar { display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 20px 30px; max-width: 1400px; margin: auto; }
+        .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); font-size: 20px; transition: var(--transition); }
+        .icon-btn:hover { transform: scale(1.05); }
+
+        .sidebar { width: 280px; background: var(--card); border-right: 1px solid var(--border); padding: 28px; height: 100vh; position: fixed; box-shadow: var(--shadow); }
+        .sidebar h2 { font-size: 20px; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; color: var(--secondary); }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { padding: 14px 18px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; font-size: 14px; color: var(--text-sub); transition: var(--transition); display: flex; align-items: center; gap: 14px; font-weight: 600; }
+        .sidebar li:hover, .sidebar li.active { background: rgba(99, 102, 241, 0.1); color: var(--secondary); }
+        .main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 16px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; }
+        th { background: var(--primary-light); color: var(--text); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+
+        .flex { display: flex; gap: 14px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        .stat-card { background: var(--card); padding: 24px; border-radius: var(--radius); border-left: 6px solid var(--secondary); box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .stat-card h3 { font-size: 12px; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); padding: 16px 20px; border-radius: 14px; margin-bottom: 24px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+        
+        /* New UI Elements */
+        .map-box { background: var(--primary-light); border: 2px dashed var(--border); border-radius: 14px; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 14px; margin-bottom: 15px; font-weight: 600; }
+        .signature-pad { border: 2px dashed var(--border); border-radius: 14px; background: var(--primary-light); width: 100%; height: 160px; cursor: crosshair; touch-action: none; }
+        .star-rating { display: flex; gap: 10px; font-size: 32px; cursor: pointer; justify-content: center; margin: 15px 0; }
+        .star { color: var(--border); transition: var(--transition); }
+        .star.active { color: var(--warning); transform: scale(1.1); }
+
+        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+        .toast { background: var(--card); color: var(--text); padding: 16px 22px; border-radius: 14px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid var(--border); display: flex; align-items: center; gap: 14px; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s ease 2.7s forwards; font-size: 15px; font-weight: 600; }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(12px); } }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div class="top-bar">
+        <button class="icon-btn" onclick="toggleTheme()" title="สลับธีมแสงสว่าง/มืด">🌙</button>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="screen-login" class="screen active">
+        <div class="card" style="margin-top: 80px; text-align: center; padding: 48px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">⚡</div>
+            <h2 style="margin-bottom: 8px; font-size: 28px;">Field Service Pro</h2>
+            <p style="color: var(--text-sub); margin-bottom: 35px; font-weight: 500;">ระบบปฏิบัติการงานช่างภาคสนามอัจฉริยะยุคใหม่</p>
+            <div style="text-align: left;">
+                <label>เบอร์โทรศัพท์ / รหัสพนักงาน</label>
+                <input type="text" id="login-user" value="0812345678" placeholder="กรอกเบอร์โทร">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="login-pass" value="1234" placeholder="กรอกรหัสผ่าน">
+                <button onclick="handleLogin()" style="margin-top: 12px;">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. SELECT COMPANY & TEAM -->
+    <div id="screen-team" class="screen">
+        <div class="card" style="margin-top: 60px;">
+            <h2>🏢 เลือกสังกัดและทีมปฏิบัติงาน</h2>
+            <label>บริษัท</label>
+            <select id="sel-company">
+                <option value="บริษัท แอร์เซอร์วิส แอนด์ โซลูชั่น จำกัด">บริษัท แอร์เซอร์วิส แอนด์ โซลูชั่น จำกัด</option>
+            </select>
+            <label>ทีมปฏิบัติงาน</label>
+            <select id="sel-team">
+                <option value="ทีมติดตั้งและซ่อมบำรุงแอร์ A">ทีมติดตั้งและซ่อมบำรุงแอร์ A</option>
+                <option value="ทีมระบบไฟฟ้าแรงต่ำ B">ทีมระบบไฟฟ้าแรงต่ำ B</option>
+            </select>
+            <button class="btn-success" onclick="goToDashboard()" style="margin-top: 15px;">ยืนยันและเข้าสู่หน้าหลัก</button>
+        </div>
+    </div>
+
+    <!-- 3. FIELD WORKER DASHBOARD -->
+    <div id="screen-tech-dashboard" class="screen" style="max-width: 760px;">
+        <div id="tech-alert-banner" class="alert-banner" style="display: none;">
+            <span>📢 <strong>ประกาศด่วน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
+            <button onclick="document.getElementById('tech-alert-banner').style.display='none'" style="width: auto; padding: 6px 12px; font-size: 12px; background: var(--danger);">ปิด</button>
+        </div>
+
+        <div class="card">
+            <div class="flex-between">
+                <div>
+                    <h3 id="display-team-name" style="margin:0; font-size: 20px;">ทีมแอร์ A</h3>
+                    <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px; font-weight: 600;">ผู้ใช้งาน: ช่างสมชาย (หัวหน้าทีม)</p>
+                </div>
+                <button class="btn-secondary" style="width: auto; padding: 10px 16px; font-size: 13px;" onclick="switchToAdmin()">โหมดแอดมิน 📊</button>
+            </div>
+        </div>
+
+        <!-- Check-in Card -->
+        <div class="card">
+            <div class="flex-between">
+                <div>
+                    <h3 style="margin-bottom: 6px;">📍 สถานะการเข้างาน</h3>
+                    <span id="checkin-status" class="badge badge-warning">ยังไม่ได้เช็คอินวันนี้</span>
+                </div>
+                <button class="btn-success" id="btn-checkin" onclick="toggleCheckin()" style="width: auto; padding: 12px 20px;">เช็คอินเข้างาน</button>
+            </div>
+        </div>
+
+        <!-- Active Task & 🗺️ NEW FUNCTION 1: GPS Live Tracking -->
+        <div class="card" style="border-left: 6px solid var(--warning);">
+            <div class="flex-between" style="margin-bottom: 12px;">
+                <h3>⚡ งานปัจจุบัน: บ้านคุณวิชัย (ซอย 5)</h3>
+                <span id="task-badge" class="badge badge-warning">กำลังดำเนินการ</span>
+            </div>
+            <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 15px; font-weight: 500;">รายละเอียด: ล้างแอร์ขนาด 18,000 BTU และตรวจสอบน้ำยา</p>
+            
+            <div class="map-box">
+                <span>🛰️ พิกัดปัจจุบัน: ลาดยาว, กรุงเทพฯ (GPS แม่นยำสูง)</span>
+                <button class="btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px; margin-top: 4px;" onclick="openGPSNavigation()">🗺️ เปิดนำทาง Google Maps</button>
+            </div>
+
+            <div class="flex">
+                <button onclick="updateTaskStatus('งานเสร็จสิ้น', 'success')" style="flex:1; padding:14px;" class="btn-success">✅ ปิดจ๊อบงานนี้</button>
+            </div>
+        </div>
+
+        <!-- 🎙️ NEW FUNCTION 2: Voice-to-Text Quick Report -->
+        <div class="card">
+            <h3>🎙️ บันทึกสรุปงานด้วยเสียง (Voice Report)</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">กดปุ่มแล้วพูดสรุปผลงาน ระบบจะพิมพ์ข้อความอัตโนมัติ</p>
+            <div class="flex" style="margin-bottom: 10px;">
+                <button id="btn-mic" onclick="toggleVoiceRecord()" class="btn-danger" style="flex: 1;">🎙️ เริ่มอัดเสียงสรุปงาน</button>
+            </div>
+            <textarea id="voice-text-output" rows="3" placeholder="ข้อความสรุปงานจะปรากฏที่นี่อัตโนมัติ..." style="margin-bottom: 0;"></textarea>
+        </div>
+
+        <!-- 📦 Spare Parts Inventory Stock -->
+        <div class="card">
+            <h3>📦 เบิกอะไหล่จากคลังรถ (Inventory)</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">เลือกใช้อะไหล่ประจำรถเพื่อตัดสต็อกอัตโนมัติ</p>
+            <div class="flex">
+                <select id="part-item" style="flex: 2;">
+                    <option value="น้ำยาแอร์ R32 (ถัง)">น้ำยาแอร์ R32 (เหลือ 3 ถัง)</option>
+                    <option value="ฟิวส์กันไฟตก 15A">ฟิวส์กันไฟตก 15A (เหลือ 10 ชิ้น)</option>
+                    <option value="ท่อทองแดง 4 หุน">ท่อทองแดง 4 หุน (เหลือ 15 เมตร)</option>
+                </select>
+                <input type="number" id="part-qty" value="1" min="1" style="flex: 1;" placeholder="จำนวน">
+                <button onclick="useSparePart()" style="flex: 1; height: 52px;">เบิกใช้</button>
+            </div>
+        </div>
+
+        <!-- 📸 AI OCR Receipt Scanner -->
+        <div class="card">
+            <h3>📸 AI สแกนบิล/สลิปค่าน้ำมันอัตโนมัติ (OCR)</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">อัปโหลดรูปใบเสร็จ/สลิปน้ำมัน เพื่อให้ AI อ่านยอดเงินอัตโนมัติ</p>
+            <input type="file" id="ocr-file" accept="image/*" style="padding: 10px;" onchange="simulateAIOCR(event)">
+            <div id="ocr-result-box" style="display:none; margin-top: 10px; background: var(--accent-bg); color: var(--accent); padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 600;">
+                ✨ <strong>AI อ่านผลสำเร็จ:</strong> ตรวจพบยอดเงิน <span id="ocr-extracted-amount">520</span> บาท | บันทึกเข้าระบบเบิกจ่ายทันที!
+            </div>
+        </div>
+
+        <!-- ✍️ Digital Signature -->
+        <div class="card">
+            <h3>✍️ ลายเซ็นลูกค้าดิจิทัล (Digital Signature)</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 10px; font-weight: 500;">ให้ลูกค้าเซ็นชื่อยืนยันการรับมอบงานด้านล่างนี้:</p>
+            <canvas id="sig-canvas" class="signature-pad"></canvas>
+            <div class="flex" style="margin-top: 12px;">
+                <button class="btn-secondary" onclick="clearSignature()" style="flex:1;">ล้างลายเซ็น</button>
+                <button class="btn-success" onclick="saveSignature()" style="flex:1;">บันทึกลายเซ็น & ปิดงาน</button>
+            </div>
+        </div>
+
+        <!-- ⭐ Customer Satisfaction (CSAT) -->
+        <div class="card" style="text-align: center;">
+            <h3>⭐ ประเมินความพึงพอใจลูกค้า (CSAT)</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 5px; font-weight: 500;">ให้คะแนนการให้บริการของช่างในวันนี้</p>
+            <div class="star-rating" id="star-container">
+                <span class="star" onclick="setRating(1)">★</span>
+                <span class="star" onclick="setRating(2)">★</span>
+                <span class="star" onclick="setRating(3)">★</span>
+                <span class="star" onclick="setRating(4)">★</span>
+                <span class="star" onclick="setRating(5)">★</span>
+            </div>
+            <input type="text" id="csat-comment" placeholder="ความคิดเห็นเพิ่มเติมจากลูกค้า (ถ้ามี)..." style="margin-top: 10px;">
+            <button onclick="submitCSAT()" style="margin-top: 5px;">ส่งผลการประเมิน</button>
+        </div>
+    </div>
+
+    <!-- 4. ADMIN BACK-OFFICE -->
+    <div id="screen-admin" class="admin-layout">
+        <div class="sidebar">
+            <h2>📊 ผู้ประกอบการ</h2>
+            <ul>
+                <li class="active" onclick="switchAdminTab('tab-dashboard', this)"><span>📈</span> ภาพรวมธุรกิจ</li>
+                <li onclick="switchAdminTab('tab-finance', this)"><span>💰</span> รายรับ - รายจ่าย</li>
+                <li onclick="switchAdminTab('tab-reviews', this)"><span>⭐</span> รีวิวและความพึงพอใจ</li>
+                <li onclick="switchToTech()" style="background: var(--danger); color: white; justify-content: center; margin-top: 20px;">กลับสู่โหมดช่าง</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div id="tab-dashboard" class="admin-tab">
+                <h1>ภาพรวมธุรกิจ</h1>
+                <div class="stat-grid">
+                    <div class="stat-card"><h3>รายรับรวมเดือนนี้</h3><p style="font-size: 26px; font-weight: 800; color: var(--accent);">฿ 125,000</p></div>
+                    <div class="stat-card" style="border-left-color: var(--danger);"><h3>รายจ่ายรวมเดือนนี้</h3><p style="font-size: 26px; font-weight: 800; color: var(--danger);">฿ 45,520</p></div>
+                    <div class="stat-card" style="border-left-color: var(--warning);"><h3>คะแนนรีวิวเฉลี่ย</h3><p style="font-size: 26px; font-weight: 800; color: var(--warning);" id="admin-avg-score">⭐ 4.9 / 5.0</p></div>
+                </div>
+
+                <!-- 📊 NEW FUNCTION 3: Analytics Summary Card -->
+                <div class="card">
+                    <h3>📊 กราฟสรุปประสิทธิภาพการทำงานประจำสัปดาห์</h3>
+                    <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 20px; font-weight: 500;">สถิติงานบริการและอัตราการปิดจ๊อบของทีมภาคสนาม</p>
+                    <div style="background: var(--primary-light); padding: 30px; border-radius: 12px; text-align: center; color: var(--text-sub); font-weight: 600;">
+                        📈 [Interactive Dashboard Analytics Visualizer Loaded Successfully] <br>
+                        <span style="font-size: 12px; color: var(--accent);">งานเสร็จสิ้นรวมสัปดาห์นี้: 42 งาน (อัตราความสำเร็จ 98.4%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-finance" class="admin-tab" style="display: none;">
+                <h1>ระบบรายรับ - รายจ่าย</h1>
+                <div class="card">
+                    <h3>ประวัติบัญชีอัจฉริยะ (รวม AI OCR & เบิกอะไหล่)</h3>
+                    <table>
+                        <thead><tr><th>วันที่</th><th>ประเภท</th><th>รายละเอียด</th><th>จำนวนเงิน</th></tr></thead>
+                        <tbody id="finance-table-body">
+                            <tr><td>18/08/2026</td><td><span class="badge badge-success">รายรับ</span></td><td>ค่าบริการล้างแอร์ บ้านคุณวิชัย</td><td style="color:var(--accent); font-weight:700;">+1,500 ฿</td></tr>
+                            <tr><td>18/08/2026</td><td><span class="badge badge-danger">รายจ่าย</span></td><td>AI OCR สแกนสลิปค่าน้ำมัน (ปั๊ม ปตท.)</td><td style="color:var(--danger); font-weight:700;">-520 ฿</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-reviews" class="admin-tab" style="display: none;">
+                <h1>รีวิวและความพึงพอใจจากลูกค้า</h1>
+                <div class="card">
+                    <table>
+                        <thead><tr><th>ลูกค้า</th><th>คะแนน</th><th>ความคิดเห็น</th><th>วันที่</th></tr></thead>
+                        <tbody id="review-table-body">
+                            <tr><td>คุณวิชัย มั่นคง</td><td><span style="color:var(--warning); font-weight:700;">★★★★★ (5/5)</span></td><td>ช่างบริการดีมาก สุภาพเรียบร้อย ทำงานเร็ว</td><td>18/08/2026</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>✨</span> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            showToast(`เปลี่ยนเป็นธีม ${newTheme === 'dark' ? 'Dark Mode 🌙' : 'Light Mode ☀️'}`);
+        }
+
+        function handleLogin() {
+            document.getElementById('screen-login').classList.remove('active');
+            document.getElementById('screen-team').classList.add('active');
+            showToast('เข้าสู่ระบบสำเร็จ');
+        }
+
+        function goToDashboard() {
+            const teamName = document.getElementById('sel-team').value;
+            document.getElementById('display-team-name').innerText = teamName;
+            document.getElementById('screen-team').classList.remove('active');
+            document.getElementById('screen-tech-dashboard').classList.add('active');
+            showToast('ยินดีต้อนรับสู่หน้าจอภาคสนาม');
+        }
+
+        function switchToAdmin() {
+            document.getElementById('screen-tech-dashboard').classList.remove('active');
+            document.getElementById('screen-admin').classList.add('active');
+        }
+
+        function switchToTech() {
+            document.getElementById('screen-admin').classList.remove('active');
+            document.getElementById('screen-tech-dashboard').classList.add('active');
+        }
+
+        let isCheckedIn = false;
+        function toggleCheckin() {
+            isCheckedIn = !isCheckedIn;
+            const statusEl = document.getElementById('checkin-status');
+            const btnEl = document.getElementById('btn-checkin');
+            if(isCheckedIn) {
+                statusEl.className = 'badge badge-success';
+                statusEl.innerText = 'เข้างานแล้ว (08:30 น.)';
+                btnEl.innerText = 'เช็คอินออกงาน';
+                btnEl.className = 'btn-danger';
+                showToast('เช็คอินเข้างานสำเร็จ บันทึกพิกัดเรียบร้อย');
+            } else {
+                statusEl.className = 'badge badge-warning';
+                statusEl.innerText = 'ยังไม่ได้เช็คอินวันนี้';
+                btnEl.innerText = 'เช็คอินเข้างาน';
+                btnEl.className = 'btn-success';
+                showToast('เช็คเอาท์ออกงานเรียบร้อย');
+            }
+        }
+
+        function updateTaskStatus(statusText, badgeType) {
+            const badge = document.getElementById('task-badge');
+            badge.innerText = statusText;
+            badge.className = `badge badge-${badgeType}`;
+            showToast(`อัปเดตสถานะงานเป็น: "${statusText}"`);
+        }
+
+        // 🗺️ 1. GPS Navigation Simulator
+        function openGPSNavigation() {
+            showToast('กำลังเปิดเส้นทางนำทางไปยังบ้านคุณวิชัย...');
+            window.open('https://maps.google.com/?q=Bangkok', '_blank');
+        }
+
+        // 🎙️ 2. Voice-to-Text Simulation Logic
+        let isRecording = false;
+        function toggleVoiceRecord() {
+            isRecording = !isRecording;
+            const btn = document.getElementById('btn-mic');
+            const textArea = document.getElementById('voice-text-output');
+            if(isRecording) {
+                btn.innerText = '⏹️ กำลังฟังเสียงพูด... (กดเพื่อหยุด)';
+                btn.className = 'btn-success';
+                showToast('เริ่มบันทึกเสียงแล้ว กรุณาพูดสรุปงาน...');
+            } else {
+                btn.innerText = '🎙️ เริ่มอัดเสียงสรุปงาน';
+                btn.className = 'btn-danger';
+                textArea.value = "ล้างแอร์ 18,000 BTU เรียบร้อย ล้างคอยล์เย็นและเช็คน้ำยาแอร์ปกติ ลูกค้าพึงพอใจดีมากครับ";
+                showToast('ถอดเสียงพูดเป็นข้อความสำเร็จ!');
+            }
+        }
+
+        // 📦 3. Spare Parts Stock Logic
+        function useSparePart() {
+            const item = document.getElementById('part-item').value;
+            const qty = document.getElementById('part-qty').value;
+            showToast(`ตัดสต็อกสำเร็จ: เบิกใช้ "${item}" จำนวน ${qty} หน่วย`);
+        }
+
+        // 📸 4. AI OCR Receipt Scanner Logic
+        function simulateAIOCR(event) {
+            if(event.target.files && event.target.files[0]) {
+                showToast('AI กำลังประมวลผลสแกนสลิป...');
+                setTimeout(() => {
+                    const randomAmount = Math.floor(Math.random() * 400) + 300;
+                    document.getElementById('ocr-extracted-amount').innerText = randomAmount;
+                    document.getElementById('ocr-result-box').style.display = 'block';
+
+                    const tbody = document.getElementById('finance-table-body');
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>18/08/2026</td><td><span class="badge badge-danger">รายจ่าย</span></td><td>AI OCR สแกนสลิปค่าน้ำมันอัตโนมัติ</td><td style="color:var(--danger); font-weight:700;">-${randomAmount} ฿</td>`;
+                    tbody.prepend(row);
+                    showToast(`AI อ่านสลิปสำเร็จ บันทึกรายจ่าย ${randomAmount} บาทเรียบร้อย`);
+                }, 1500);
+            }
+        }
+
+        // ✍️ 5. Digital Signature Logic
+        const canvas = document.getElementById('sig-canvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+
+        function resizeCanvas() {
+            if(canvas) {
+                canvas.width = canvas.parentElement.clientWidth - 52;
+                canvas.height = 160;
+            }
+        }
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
+
+        if(canvas) {
+            canvas.addEventListener('pointerdown', (e) => { painting = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+            canvas.addEventListener('pointermove', (e) => { if (!painting) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); });
+            canvas.addEventListener('pointerup', () => painting = false);
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            showToast('ล้างลายเซ็นเรียบร้อย');
+        }
+
+        function saveSignature() {
+            showToast('บันทึกลายเซ็นและส่งมอบงานสำเร็จ!');
+        }
+
+        // ⭐ 6. CSAT Rating Logic
+        let currentRating = 5;
+        function setRating(score) {
+            currentRating = score;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < score) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+            showToast(`ให้คะแนน ${score} ดาว`);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(s => s.classList.add('active'));
+            resizeCanvas();
+        });
+
+        function submitCSAT() {
+            const comment = document.getElementById('csat-comment').value || 'ไม่มีความคิดเห็นเพิ่มเติม';
+            const reviewTbody = document.getElementById('review-table-body');
+            const row = document.createElement('tr');
+            let starsStr = '★'.repeat(currentRating) + '☆'.repeat(5 - currentRating);
+            row.innerHTML = `<td>คุณวิชัย มั่นคง</td><td><span style="color:var(--warning); font-weight:700;">${starsStr} (${currentRating}/5)</span></td><td>${comment}</td><td>18/08/2026</td>`;
+            reviewTbody.prepend(row);
+            document.getElementById('csat-comment').value = '';
+            showToast('ส่งผลประเมินความพึงพอใจสำเร็จ ขอบคุณครับ!');
+        }
+
+        function switchAdminTab(tabId, element) {
+            document.querySelectorAll('.admin-tab').forEach(el => el.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+            document.querySelectorAll('.sidebar li').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
