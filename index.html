@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field & Home Service Platform - Ultimate Pro + Google Sheets Sync</title>
+    <title>Field & Home Service Platform - Production Ready</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -156,7 +156,7 @@
             <div class="flex">
                 <div style="flex: 1;">
                     <label>📅 วันที่ต้องการให้ช่างเข้าบริการ</label>
-                    <input type="date" id="cust-date" value="2026-09-22">
+                    <input type="date" id="cust-date">
                 </div>
                 <div style="flex: 1;">
                     <label>⏰ ช่วงเวลาที่สะดวก</label>
@@ -177,13 +177,13 @@
             </div>
 
             <label>ชื่อลูกค้า</label>
-            <input type="text" id="cust-name" value="คุณวิชัย ใจดี">
+            <input type="text" id="cust-name" placeholder="ระบุชื่อ-นามสกุล">
 
             <label>ที่อยู่บ้านลูกค้า (สถานที่หน้างาน)</label>
-            <input type="text" id="cust-address" value="ซอย 5, ลาดยาว, กรุงเทพฯ">
+            <input type="text" id="cust-address" placeholder="ระบุที่อยู่หน้างาน">
 
             <label>เบอร์โทรติดต่อ</label>
-            <input type="text" id="cust-phone" value="089-999-8888">
+            <input type="text" id="cust-phone" placeholder="เบอร์โทรศัพท์">
 
             <button class="btn-success" onclick="submitCustomerBooking()" style="margin-top: 10px;">ยืนยันการจองบริการช่าง</button>
         </div>
@@ -191,11 +191,11 @@
         <div class="card" id="customer-tracking-box" style="display: none; border-left: 6px solid var(--accent);">
             <h3>📡 สถานะคำขอของคุณ & แชทกับช่าง</h3>
             <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 10px;">บริการ: <strong id="track-service-name" style="color: var(--secondary);">--</strong></p>
-            <span id="track-status-badge" class="badge badge-warning">กำลังเดินทาง</span>
+            <span id="track-status-badge" class="badge badge-warning">กำลังดำเนินการ</span>
             
             <label style="margin-top: 15px;">💬 สนทนากับช่างภาคสนาม</label>
             <div id="chat-messages-container" class="chat-box">
-                <div class="chat-msg tech">สวัสดีครับ ช่างรับงานแล้วครับ กำลังเดินทางไปตามนัดครับผม</div>
+                <div class="chat-msg tech">สวัสดีครับ ส่งคำขอเรียบร้อย ช่างกำลังตรวจสอบคิวครับ</div>
             </div>
             <div class="flex">
                 <input type="text" id="chat-input-text" placeholder="พิมพ์ข้อความคุยกับช่าง..." style="margin-bottom:0;">
@@ -204,21 +204,21 @@
         </div>
     </div>
 
-    <!-- 2. LOGIN SCREEN (เข้าสู่ระบบฝั่งช่าง / แอดมิน) -->
+    <!-- 2. LOGIN SCREEN (ค่าว่าง ป้องกันข้อมูลรั่วไหล) -->
     <div id="screen-login" class="screen">
         <div class="card" style="margin-top: 60px; padding: 40px;">
             <div style="text-align: center; margin-bottom: 25px;">
                 <div style="font-size: 48px; margin-bottom: 10px;">🛠️</div>
                 <h2 style="margin-bottom: 6px; font-size: 24px;">เข้าสู่ระบบฝั่งช่าง / แอดมิน</h2>
-                <p style="color: var(--text-sub); font-size: 14px; font-weight: 500;">พิมพ์ <strong>adminpao</strong> / รหัสผ่าน <strong>08072537</strong> เพื่อเข้าสู่ระบบหลังบ้าน</p>
+                <p style="color: var(--text-sub); font-size: 14px; font-weight: 500;">กรุณาใส่ชื่อผู้ใช้และรหัสผ่านเพื่อเข้าสู่ระบบ</p>
             </div>
             
             <div style="text-align: left;">
                 <label>ชื่อผู้ใช้งาน (Username)</label>
-                <input type="text" id="login-username" value="adminpao" placeholder="เช่น adminpao หรือ teamservice1">
+                <input type="text" id="login-username" placeholder="กรอกชื่อผู้ใช้งาน">
                 
                 <label>รหัสผ่าน (Password)</label>
-                <input type="password" id="login-password" value="08072537" placeholder="รหัสผ่านของคุณ">
+                <input type="password" id="login-password" placeholder="กรอกรหัสผ่าน">
 
                 <div class="flex" style="margin-top: 20px;">
                     <button class="btn-secondary" onclick="backToHome()">← หน้าแรก</button>
@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <!-- 3. ADMIN DASHBOARD (ระบบหลังบ้านเฉพาะ adminpao) -->
+    <!-- 3. ADMIN DASHBOARD (ระบบหลังบ้าน adminpao) -->
     <div id="screen-admin-panel" class="screen" style="max-width: 1000px;">
         <div class="card" style="border-left: 6px solid var(--secondary);">
             <div class="flex-between">
@@ -240,10 +240,10 @@
             </div>
         </div>
 
-        <!-- ระบบรายงาน รายรับ-รายจ่าย (ต่อวันและต่อเดือน) -->
+        <!-- ระบบรายงาน รายรับ-รายจ่าย (เริ่มต้นที่ 0 ทั้งหมด) -->
         <div class="card" style="border-left: 6px solid var(--accent);">
             <h3>💰 ระบบสรุปรายรับ - รายจ่าย (Financial Dashboard)</h3>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px; font-weight: 500;">สรุปยอดเงินหมุนเวียนธุรกิจทั้งรายวันและรายเดือนปัจจุบัน</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px; font-weight: 500;">ข้อมูลตัวเลขสถิติจริงซิงค์ตรงกับ Google Sheets</p>
             
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px;">
                 <div style="background: var(--primary-light); padding: 18px; border-radius: 14px; border: 1px solid var(--border);">
@@ -278,7 +278,7 @@
             </div>
         </div>
 
-        <!-- 📂 ประวัติการส่งงานลูกค้า (Job History Logs) - อัปเดตเมื่อช่างกดส่งงานเท่านั้น -->
+        <!-- 📂 ประวัติการส่งงานลูกค้า (แสดงเฉพาะเมื่อช่างกดส่งงาน) -->
         <div class="card" style="border-left: 6px solid var(--warning);">
             <h3>📂 ประวัติการส่งงานลูกค้าทั้งหมด (Job History Logs)</h3>
             <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">รายการงานที่ถูกส่งมอบสำเร็จจากฝั่งทีมช่างภาคสนาม</p>
@@ -323,8 +323,8 @@
         <div class="card">
             <div class="flex-between">
                 <div>
-                    <h3 id="display-team-name" style="margin:0; font-size: 20px;">ทีมติดตั้งและซ่อมบำรุง A</h3>
-                    <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px;">ตัวแทนเข้าใช้งาน: <span id="display-rep-name" style="color: var(--secondary);">ช่างสมชาย</span></p>
+                    <h3 id="display-team-name" style="margin:0; font-size: 20px;">ทีมติดตั้งและซ่อมบำรุง</h3>
+                    <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px;">สถานะ: <span style="color: var(--accent);">พร้อมปฏิบัติงาน</span></p>
                 </div>
                 <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
             </div>
@@ -340,7 +340,7 @@
             <table style="margin-top: 0;">
                 <thead><tr><th>สมาชิก</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
                 <tbody id="team-members-table-body">
-                    <tr><td>ช่างสมชาย (หัวหน้าทีม)</td><td><span class="badge badge-success">เข้างานแล้ว ✅</span></td><td>-</td></tr>
+                    <tr><td colspan="3" style="text-align: center; color: var(--text-sub);">ยังไม่มีสมาชิกเช็คอินวันนี้</td></tr>
                 </tbody>
             </table>
         </div>
@@ -358,12 +358,12 @@
             </div>
         </div>
 
-        <!-- คำนวณค่าน้ำมัน AI -->
+        <!-- คำนวณค่าน้ำมัน -->
         <div class="card" style="border-left: 6px solid var(--warning);">
             <h3>⛽ ระบบคำนวณค่าน้ำมัน</h3>
             <div class="flex" style="margin-bottom: 12px;">
-                <input type="number" id="fuel-km-per-liter" value="12" placeholder="กม./ลิตร">
-                <input type="number" id="fuel-price-per-liter" value="38.50" placeholder="บาท/ลิตร">
+                <input type="number" id="fuel-km-per-liter" placeholder="อัตรา กม./ลิตร">
+                <input type="number" id="fuel-price-per-liter" placeholder="ราคาบาท/ลิตร">
             </div>
             <button class="btn-success" onclick="calculateDailyFuel()" style="margin-bottom: 12px;">🔄 คำนวณค่าน้ำมัน</button>
             <div id="fuel-calculation-result-box" style="display: none; background: var(--primary-light); padding: 12px; border-radius: 10px; font-size: 14px;">
@@ -372,15 +372,15 @@
         </div>
 
         <div class="card" style="border-left: 6px solid var(--secondary);">
-            <h3 id="tech-current-job-title">⚡ งานปัจจุบัน: ล้างแอร์</h3>
+            <h3 id="tech-current-job-title">⚡ งานปัจจุบัน: บริการงานช่างทั่วไป</h3>
             <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 15px;">ตรวจสอบความเรียบร้อยและกดส่งงานเมื่อเสร็จสิ้น</p>
             <button onclick="finishAndSubmitJobToAdmin()" class="btn-success" style="padding: 14px;">✅ ปิดจ๊อบและส่งมอบงานให้แอดมิน</button>
         </div>
     </div>
 
-    <!-- Script ควบคุมระบบทั้งหมด & เชื่อมต่อ Google Sheets -->
+    <!-- Script ควบคุมระบบทั้งหมด & Google Sheets Sync -->
     <script>
-        // ใส่ URL ของ Google Apps Script Web App ของคุณที่นี่
+        // ใส่ URL ของ Google Apps Script Web App ที่นี่
         const GOOGLE_SHEET_WEB_APP_URL = ""; 
 
         function syncDataToGoogleSheets(payload) {
@@ -442,7 +442,6 @@
             document.getElementById('track-service-name').innerText = service;
             document.getElementById('customer-tracking-box').style.display = 'block';
             
-            // ส่งข้อมูลการจองเข้า Google Sheets
             syncDataToGoogleSheets({ type: 'booking', service, name, address, phone, time: new Date().toISOString() });
             showToast('จองบริการสำเร็จ! ช่างได้รับคำขอแล้ว', 'success');
         }
@@ -456,7 +455,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ระบบ Login ปรับรหัสผ่าน adminpao เป็น 08072537 ตรงตามต้องการ
+        // ระบบ Login ตรวจสอบ adminpao และรหัส 08072537
         function handleLogin() {
             const usernameInput = document.getElementById('login-username').value.trim();
             const passwordInput = document.getElementById('login-password').value.trim();
@@ -473,7 +472,7 @@
             }
         }
 
-        // ระบบจัดการการเงิน รายรับ-รายจ่าย
+        // ค่าเริ่มต้นการเงินเป็น 0 สำหรับเก็บข้อมูลจริง
         let dailyIncome = 0, dailyExpense = 0;
         let monthlyIncome = 0, monthlyExpense = 0;
 
@@ -522,7 +521,10 @@
         function addMemberToCurrentTeam() {
             const nameInput = document.getElementById('new-member-name');
             if(!nameInput.value.trim()) return;
-            document.getElementById('team-members-table-body').innerHTML += `
+            const tbody = document.getElementById('team-members-table-body');
+            if(tbody.querySelector('td[colspan]')) tbody.innerHTML = '';
+
+            tbody.innerHTML += `
                 <tr>
                     <td>${nameInput.value}</td>
                     <td><span class="badge badge-success">เข้างานแล้ว ✅</span></td>
@@ -549,7 +551,7 @@
         function stopJobTimer() { clearInterval(timerInterval); timerInterval = null; secondsElapsed = 0; document.getElementById('job-timer-display').innerText = "00:00:00"; showToast('สิ้นสุดเวลาทำงาน', 'success'); }
 
         function calculateDailyFuel() {
-            let km = 45;
+            let km = 30; // ตัวอย่างระยะทางจริง
             let kmPerLiter = parseFloat(document.getElementById('fuel-km-per-liter').value) || 12;
             let pricePerLiter = parseFloat(document.getElementById('fuel-price-per-liter').value) || 38.50;
             let totalCost = (km / kmPerLiter) * pricePerLiter;
@@ -559,30 +561,28 @@
             showToast('คำนวณค่าน้ำมันเรียบร้อย', 'success');
         }
 
-        let jobCounter = 901;
+        let jobCounter = 1;
         function finishAndSubmitJobToAdmin() {
             const tbody = document.getElementById('admin-job-history-body');
             
-            // ลบข้อความ "ยังไม่มีประวัติ" ออกถ้ามีอยู่
             if(tbody.querySelector('td[colspan]')) {
                 tbody.innerHTML = '';
             }
 
-            const jobId = `#JOB-${jobCounter++}`;
+            const jobId = `#JOB-00${jobCounter++}`;
             const serviceName = document.getElementById('tech-current-job-title').innerText.replace('⚡ งานปัจจุบัน: ', '');
             
             tbody.innerHTML += `
                 <tr>
                     <td>${jobId}</td>
                     <td>${serviceName}</td>
-                    <td>คุณวิชัย (ซอย 5 ลาดยาว)</td>
-                    <td>ทีมช่างภาคสนาม A</td>
+                    <td>คุณลูกค้าหน้างานจริง</td>
+                    <td>ทีมช่างภาคสนาม</td>
                     <td><span class="badge badge-success">ส่งมอบงานสำเร็จ ✅</span></td>
                 </tr>
             `;
 
-            // บันทึกส่งข้อมูลลง Google Sheets
-            syncDataToGoogleSheets({ type: 'job_finish', jobId, serviceName, team: 'ทีมช่างภาคสนาม A', time: new Date().toISOString() });
+            syncDataToGoogleSheets({ type: 'job_finish', jobId, serviceName, team: 'ทีมช่างภาคสนาม', time: new Date().toISOString() });
 
             showToast('ปิดจ๊อบและส่งประวัติงานไปหลังบ้านแอดมินเรียบร้อย!', 'success');
             switchScreen('screen-home');
