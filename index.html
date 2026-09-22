@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceHub Pro - Clean Version</title>
+    <title>ServiceHub Pro - Admin & Tech Sync Version</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -236,7 +236,10 @@
                     <h2 style="margin:0; font-size: 22px;">📊 ระบบหลังบ้านผู้ดูแลระบบ (Admin Panel)</h2>
                     <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px; font-weight: 600;">เข้าสู่ระบบโดย: <span style="color: var(--secondary);">คุณเป๋า (adminpao - สิทธิ์สูงสุด)</span></p>
                 </div>
-                <button class="btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-success" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="switchScreen('screen-tech-dashboard')">🛠️ ไปหน้าฝั่งช่าง</button>
+                    <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
+                </div>
             </div>
         </div>
 
@@ -313,7 +316,7 @@
         </div>
     </div>
 
-    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนามทั่วไป) -->
+    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนามทั่วไป / Admin สามารถเข้าใช้งานได้) -->
     <div id="screen-tech-dashboard" class="screen" style="max-width: 760px;">
         <div id="tech-alert-banner" class="alert-banner" style="display: none;">
             <span>📢 <strong>ประกาศจากแอดมิน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
@@ -326,7 +329,10 @@
                     <h3 id="display-team-name" style="margin:0; font-size: 20px;">ทีมติดตั้งและซ่อมบำรุง</h3>
                     <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px;">สถานะ: <span style="color: var(--accent);">พร้อมปฏิบัติงาน</span></p>
                 </div>
-                <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-back-to-admin" class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px; display: none;" onclick="switchScreen('screen-admin-panel')">📊 กลับหน้าแอดมิน</button>
+                    <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
+                </div>
             </div>
         </div>
 
@@ -460,9 +466,14 @@
 
             if (usernameInput === 'adminpao' && passwordInput === '08072537') {
                 showToast('ยินดีต้อนรับเข้าสู่ระบบหลังบ้าน, คุณเป๋า (Admin) 🚀', 'success');
+                // แสดงปุ่มสลับกลับหน้าแอดมินเมื่อเข้ามาทางฝั่งช่าง
+                document.getElementById('btn-back-to-admin').style.display = 'inline-block';
+                document.getElementById('display-team-name').innerText = 'ทีมช่าง (มุมมองผู้ดูแลระบบ: adminpao)';
                 switchScreen('screen-admin-panel');
             } else if (usernameInput.startsWith('teamservice')) {
                 showToast('ยินดีต้อนรับเข้าสู่ระบบทีมช่างภาคสนาม 🎉', 'success');
+                // ซ่อนปุ่มสลับหน้าแอดมินสำหรับช่างทั่วไป
+                document.getElementById('btn-back-to-admin').style.display = 'none';
                 document.getElementById('display-team-name').innerText = 'ทีมช่างภาคสนาม (' + usernameInput + ')';
                 switchScreen('screen-tech-dashboard');
             } else {
@@ -574,15 +585,17 @@
                     <td>${jobId}</td>
                     <td>${serviceName}</td>
                     <td>คุณลูกค้าหน้างานจริง</td>
-                    <td>ทีมช่างภาคสนาม</td>
+                    <td>ทีมช่าง (Admin)</td>
                     <td><span class="badge badge-success">ส่งมอบงานสำเร็จ ✅</span></td>
                 </tr>
             `;
 
-            syncDataToGoogleSheets({ type: 'job_finish', jobId, serviceName, team: 'ทีมช่างภาคสนาม', time: new Date().toISOString() });
+            syncDataToGoogleSheets({ type: 'job_finish', jobId, serviceName, team: 'ทีมช่าง (Admin)', time: new Date().toISOString() });
 
             showToast('ปิดจ๊อบและส่งประวัติงานไปหลังบ้านแอดมินเรียบร้อย!', 'success');
-            switchScreen('screen-home');
+            
+            // ถ้าเป็น Admin กดปิดจ๊อบ สามารถเลือกเด้งกลับหน้าแอดมินหรืออยู่ต่อได้ตามสะดวก
+            switchScreen('screen-admin-panel');
         }
     </script>
 </body>
