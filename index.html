@@ -3,645 +3,477 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceHub Pro - Ultimate Sync Version</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>ServiceHub Pro - ระบบจัดการงานบริการและช่างภาคสนาม</title>
+    <!-- Tailwind CSS สำหรับดีไซน์ที่สวยงามและใช้งานบนมือถือได้ดี -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #0f172a;
-            --primary-light: #f8fafc;
-            --secondary: #6366f1;
-            --secondary-hover: #4f46e5;
-            --accent: #10b981;
-            --accent-bg: #ecfdf5;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #0f172a;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
-            --radius: 16px;
-            --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(99, 102, 241, 0.04);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        [data-theme="dark"] {
-            --primary: #f8fafc;
-            --primary-light: #1e293b;
-            --secondary: #818cf8;
-            --secondary-hover: #6366f1;
-            --accent: #34d399;
-            --accent-bg: #064e3b;
-            --bg: #030712;
-            --card: #111827;
-            --text: #f9fafb;
-            --text-sub: #9ca3af;
-            --border: #1f2937;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 50px; transition: var(--transition); }
-
-        .screen { display: none; padding: 20px; max-width: 950px; margin: auto; min-height: 100vh; animation: fadeIn 0.4s ease; }
-        .screen.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card { background: var(--card); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 22px; border: 1px solid var(--border); transition: var(--transition); }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 20px 30px -10px rgba(0,0,0,0.08); }
-        
-        h1, h2, h3 { color: var(--text); margin-top: 0; font-weight: 700; letter-spacing: -0.02em; }
-        label { display: block; font-weight: 600; font-size: 13px; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-        input, select, textarea { width: 100%; padding: 14px 18px; margin: 0 0 16px 0; border: 1.5px solid var(--border); border-radius: 12px; font-size: 15px; background: var(--card); color: var(--text); outline: none; transition: var(--transition); }
-        input:focus, select:focus, textarea:focus { border-color: var(--secondary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); }
-        
-        button { background: var(--secondary); color: white; border: none; padding: 14px 22px; border-radius: 12px; font-size: 15px; cursor: pointer; width: 100%; font-weight: 700; transition: var(--transition); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-        button:hover { background: var(--secondary-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
-        .btn-success { background: var(--accent); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-        .btn-success:hover { background: #059669; }
-        .btn-danger { background: var(--danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
-        .btn-secondary { background: var(--text-sub); box-shadow: none; }
-        .btn-warning { background: var(--warning); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
-
-        .badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 30px; font-size: 12px; font-weight: 700; gap: 6px; letter-spacing: 0.02em; }
-        .badge-success { background: var(--accent-bg); color: var(--accent); }
-        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-
-        .top-bar { display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 20px 30px; max-width: 1400px; margin: auto; }
-        .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); font-size: 20px; transition: var(--transition); }
-        .icon-btn:hover { transform: scale(1.05); }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 16px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; }
-        th { background: var(--primary-light); color: var(--text); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
-
-        .flex { display: flex; gap: 14px; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); padding: 16px 20px; border-radius: 14px; margin-bottom: 24px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        
-        .thumbnail-preview { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); margin-top: 10px; background: var(--primary-light); }
-
-        .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
-        .service-card { border: 2px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: var(--transition); background: var(--card); }
-        .service-card:hover, .service-card.selected { border-color: var(--secondary); background: rgba(99, 102, 241, 0.05); }
-        .service-card span { font-size: 28px; display: block; margin-bottom: 8px; }
-        .service-card h4 { margin: 0; font-size: 14px; color: var(--text); }
-
-        .chat-box { background: var(--primary-light); border: 1px solid var(--border); border-radius: 14px; padding: 15px; height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-        .chat-msg { padding: 8px 12px; border-radius: 10px; font-size: 13px; max-width: 80%; }
-        .chat-msg.cust { background: var(--secondary); color: white; align-self: flex-end; }
-        .chat-msg.tech { background: var(--card); border: 1px solid var(--border); color: var(--text); align-self: flex-start; }
-
-        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
-        .toast { background: var(--card); color: var(--text); padding: 16px 22px; border-radius: 14px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid var(--border); display: flex; align-items: center; gap: 14px; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s ease 2.7s forwards; font-size: 15px; font-weight: 600; }
-        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateY(12px); } }
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Prompt', sans-serif; }
     </style>
 </head>
-<body data-theme="light">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
 
-    <div class="top-bar">
-        <button class="icon-btn" onclick="toggleTheme()" title="สลับธีมแสงสว่าง/มืด">🌙</button>
-    </div>
+    <!-- Navbar -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showScreen('homeScreen')">
+                <span class="text-2xl">🛠️</span>
+                <span class="font-bold text-lg text-blue-600 dark:text-blue-400">ServiceHub Pro</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-sm">🌓</button>
+                <div id="navUserBadge" class="hidden text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full font-medium"></div>
+                <button id="btnLogout" onclick="logout()" class="hidden text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 px-3 py-1 rounded-full font-medium">ออกจากระบบ</button>
+            </div>
+        </div>
+    </header>
 
-    <div id="toast-container"></div>
+    <main class="max-w-4xl mx-auto p-4 pb-20">
 
-    <!-- 0. หน้าแรกสุด (Role Selector) -->
-    <div id="screen-home" class="screen active">
-        <div class="card" style="margin-top: 60px; text-align: center; padding: 40px;">
-            <div style="font-size: 56px; margin-bottom: 15px;">🏠⚡</div>
-            <h2 style="font-size: 26px; margin-bottom: 8px;">ยินดีต้อนรับสู่ ServiceHub Pro (Ver. 2026)</h2>
-            <p style="color: var(--text-sub); margin-bottom: 30px; font-weight: 500;">แพลตฟอร์มกลางเชื่อมต่อช่างมืออาชีพและบริการงานบ้านครบวงจร</p>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
-                <div class="card" onclick="goToCustomerScreen()" style="cursor: pointer; border: 2px solid var(--secondary); background: rgba(99, 102, 241, 0.03);">
-                    <span style="font-size: 40px;">👤</span>
-                    <h3 style="margin: 10px 0 5px 0;">ฝั่งลูกค้า</h3>
-                    <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">จองบริการ, เลือกวันเวลานัดหมาย, แนบรูป และแชทกับช่าง</p>
+        <!-- 1. หน้าแรก (Home Screen: เลือกลงชื่อเข้าใช้) -->
+        <div id="homeScreen" class="screen space-y-6 py-6">
+            <div class="text-center space-y-2">
+                <h1 class="text-2xl font-bold">ยินดีต้อนรับสู่ ServiceHub Pro</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">ระบบจัดการงานบริการลูกค้าและทีมช่างภาคสนาม</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <!-- ปุ่มเข้าฝั่งลูกค้า -->
+                <div onclick="showScreen('customerLoginScreen')" class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 cursor-pointer transition text-center space-y-3">
+                    <div class="text-4xl">🧑‍💻</div>
+                    <h2 class="font-bold text-lg">เข้าสู่ระบบ / จองบริการ</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">สำหรับลูกค้าใช้จองคิวบริการและติดตามสถานะงาน</p>
                 </div>
-                <div class="card" onclick="goToTechLoginScreen()" style="cursor: pointer; border: 2px solid var(--accent); background: rgba(16, 185, 129, 0.03);">
-                    <span style="font-size: 40px;">🛠️</span>
-                    <h3 style="margin: 10px 0 5px 0;">ฝั่งช่าง / แอดมิน</h3>
-                    <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">ล็อกอินตัวแทนทีม, จัดการสมาชิก, เช็คอิน และระบบหลังบ้าน</p>
+
+                <!-- ปุ่มเข้าฝั่งช่าง / แอดมิน -->
+                <div onclick="showScreen('staffLoginScreen')" class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 cursor-pointer transition text-center space-y-3">
+                    <div class="text-4xl">👨‍🔧</div>
+                    <h2 class="font-bold text-lg">ทีมช่าง / แอดมิน</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">สำหรับทีมช่างภาคสนามและผู้ดูแลระบบจัดการบัญชี</p>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- 1. หน้าจอฝั่งลูกค้า -->
-    <div id="screen-customer" class="screen">
-        <div class="card">
-            <div class="flex-between" style="margin-bottom: 15px;">
-                <h2>🛒 จองบริการงานช่างมืออาชีพ</h2>
-                <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">← หน้าแรก</button>
-            </div>
-            
-            <label>เลือกประเภทบริการ</label>
-            <div class="service-grid">
-                <div class="service-card selected" onclick="selectService(this, 'ล้างแอร์')"><span>❄️</span><h4>ล้างแอร์</h4></div>
-                <div class="service-card" onclick="selectService(this, 'ติดตั้งแอร์ใหม่')"><span>🔌</span><h4>ติดตั้งแอร์ใหม่</h4></div>
-                <div class="service-card" onclick="selectService(this, 'ซ่อมแอร์ / เติมน้ำยา')"><span>🔧</span><h4>ซ่อมแอร์ / เติมน้ำยา</h4></div>
-                <div class="service-card" onclick="selectService(this, 'ระบบไฟฟ้า / ซ่อมไฟ')"><span>⚡</span><h4>ระบบไฟฟ้า / ซ่อมไฟ</h4></div>
-                <div class="service-card" onclick="selectService(this, 'ติดตั้งกล้องวงจรปิด')"><span>📷</span><h4>ติดกล้องวงจรปิด</h4></div>
-                <div class="service-card" onclick="selectService(this, 'งานบริการอื่นๆ')"><span>🛠️</span><h4>งานบริการอื่นๆ</h4></div>
-            </div>
-
-            <input type="hidden" id="selected-service-type" value="ล้างแอร์">
-
-            <div class="flex">
-                <div style="flex: 1;">
-                    <label>📅 วันที่ต้องการให้ช่างเข้าบริการ</label>
-                    <input type="date" id="cust-date">
-                </div>
-                <div style="flex: 1;">
-                    <label>⏰ ช่วงเวลาที่สะดวก</label>
-                    <select id="cust-timeslot">
-                        <option value="09:00 - 12:00 น. (ช่วงเช้า)">09:00 - 12:00 น. (ช่วงเช้า)</option>
-                        <option value="13:00 - 16:00 น. (ช่วงบ่าย)">13:00 - 16:00 น. (ช่วงบ่าย)</option>
-                    </select>
-                </div>
-            </div>
-
-            <label>รายละเอียดอาการ / ขนาดงาน</label>
-            <textarea id="cust-desc" rows="3" placeholder="ระบุรายละเอียด..."></textarea>
-
-            <label>📸 แนบรูปถ่ายหน้างาน</label>
-            <input type="file" id="cust-upload-photo" accept="image/*" style="padding: 10px; margin-bottom: 16px;" onchange="previewCustImage(event)">
-            <div id="cust-image-preview-container" style="display: none; margin-bottom: 16px;">
-                <img id="cust-img-preview" class="thumbnail-preview" alt="Customer Upload Preview">
-            </div>
-
-            <label>ชื่อลูกค้า</label>
-            <input type="text" id="cust-name" placeholder="ระบุชื่อ-นามสกุล">
-
-            <label>ที่อยู่บ้านลูกค้า (สถานที่หน้างาน)</label>
-            <input type="text" id="cust-address" placeholder="ระบุที่อยู่หน้างาน">
-
-            <label>เบอร์โทรติดต่อ</label>
-            <input type="text" id="cust-phone" placeholder="เบอร์โทรศัพท์">
-
-            <button class="btn-success" onclick="submitCustomerBooking()" style="margin-top: 10px;">ยืนยันการจองบริการช่าง</button>
-        </div>
-
-        <div class="card" id="customer-tracking-box" style="display: none; border-left: 6px solid var(--accent);">
-            <h3>📡 สถานะคำขอของคุณ & แชทกับช่าง</h3>
-            <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 10px;">บริการ: <strong id="track-service-name" style="color: var(--secondary);">--</strong></p>
-            <span id="track-status-badge" class="badge badge-warning">กำลังดำเนินการ</span>
-            
-            <label style="margin-top: 15px;">💬 สนทนากับช่างภาคสนาม</label>
-            <div id="chat-messages-container" class="chat-box">
-                <div class="chat-msg tech">สวัสดีครับ ส่งคำขอเรียบร้อย ช่างกำลังตรวจสอบคิวครับ</div>
-            </div>
-            <div class="flex">
-                <input type="text" id="chat-input-text" placeholder="พิมพ์ข้อความคุยกับช่าง..." style="margin-bottom:0;">
-                <button onclick="sendCustomerChatMessage()" style="width: auto; padding: 0 20px;">ส่ง</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. LOGIN SCREEN -->
-    <div id="screen-login" class="screen">
-        <div class="card" style="margin-top: 60px; padding: 40px;">
-            <div style="text-align: center; margin-bottom: 25px;">
-                <div style="font-size: 48px; margin-bottom: 10px;">🛠️</div>
-                <h2 style="margin-bottom: 6px; font-size: 24px;">เข้าสู่ระบบฝั่งช่าง / แอดมิน</h2>
-                <p style="color: var(--text-sub); font-size: 14px; font-weight: 500;">กรุณาใส่ชื่อผู้ใช้และรหัสผ่านเพื่อเข้าสู่ระบบ</p>
-            </div>
-            
-            <div style="text-align: left;">
-                <label>ชื่อผู้ใช้งาน (Username)</label>
-                <input type="text" id="login-username" value="" placeholder="กรอกชื่อผู้ใช้งาน">
+        <!-- 2. หน้า Login ฝั่งลูกค้า (ด้วยเบอร์โทร) -->
+        <div id="customerLoginScreen" class="screen hidden space-y-6 max-w-md mx-auto py-8">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm space-y-4">
+                <h2 class="text-xl font-bold text-center">เข้าสู่ระบบ (ฝั่งลูกค้า)</h2>
                 
-                <label>รหัสผ่าน (Password)</label>
-                <input type="password" id="login-password" value="" placeholder="กรอกรหัสผ่าน">
+                <!-- กล่องข้อความชี้แจงโปร่งใส -->
+                <div class="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 p-3 rounded-xl text-xs text-blue-800 dark:text-blue-300 space-y-1">
+                    <p class="font-semibold">ℹ️ นโยบายการใช้เบอร์โทรศัพท์:</p>
+                    <p>ระบบขอเบอร์โทรศัพท์มือถือของคุณ เพื่อใช้ในการติดต่อประสานงาน แจ้งสถานะ และให้ช่างโทรหาเมื่อถึงหน้างานเท่านั้น</p>
+                </div>
 
-                <div class="flex" style="margin-top: 20px;">
-                    <button class="btn-secondary" onclick="backToHome()">← หน้าแรก</button>
-                    <button onclick="handleLogin()" style="flex: 2;">เข้าสู่ระบบ</button>
+                <div class="space-y-2">
+                    <label class="text-xs font-medium">เบอร์โทรศัพท์มือถือของคุณ</label>
+                    <input type="tel" id="customerPhoneInput" placeholder="0812345678" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm" maxlength="10">
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- 3. ADMIN DASHBOARD -->
-    <div id="screen-admin-panel" class="screen" style="max-width: 1000px;">
-        <div class="card" style="border-left: 6px solid var(--secondary);">
-            <div class="flex-between">
-                <div>
-                    <h2 style="margin:0; font-size: 22px;">📊 ระบบหลังบ้านผู้ดูแลระบบ (Admin Panel)</h2>
-                    <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px; font-weight: 600;">เข้าสู่ระบบโดย: <span style="color: var(--secondary);">คุณเป๋า (adminpao - สิทธิ์สูงสุด)</span></p>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-success" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="switchScreen('screen-tech-dashboard')">🛠️ ไปหน้าฝั่งช่าง</button>
-                    <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
-                </div>
+                <button onclick="customerLogin()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-medium hover:bg-blue-700 transition">ถัดไป (จองบริการ)</button>
+                <button onclick="showScreen('homeScreen')" class="w-full text-gray-500 text-xs py-2">ย้อนกลับหน้าหลัก</button>
             </div>
         </div>
 
-        <div class="card" style="border-left: 6px solid var(--accent);">
-            <h3>💰 ระบบสรุปรายรับ - รายจ่าย (Financial Dashboard)</h3>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px; font-weight: 500;">ข้อมูลตัวเลขสถิติจริงซิงค์ตรงกับ Google Sheets</p>
-            
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px;">
-                <div style="background: var(--primary-light); padding: 18px; border-radius: 14px; border: 1px solid var(--border);">
-                    <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">📅 รายรับรายจ่ายประจำวัน (วันนี้)</span>
-                    <div style="margin-top: 10px; font-size: 15px;">
-                        - รายรับรวม: <strong style="color: var(--accent);" id="admin-daily-income">0 ฿</strong><br>
-                        - รายจ่าย (ค่าน้ำมัน/อื่นๆ): <strong style="color: var(--danger);" id="admin-daily-expense">0 ฿</strong><br>
-                        <hr style="border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
-                        - กำไรสุทธิวันนี้: <strong style="color: var(--secondary); font-size: 18px;" id="admin-daily-net">0 ฿</strong>
+        <!-- 3. หน้าจองบริการ (Customer Booking Screen) -->
+        <div id="customerBookingScreen" class="screen hidden space-y-6 max-w-md mx-auto py-4">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-bold">1-Click Booking (จองบริการ)</h2>
+                    <span id="displayCustomerPhone" class="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-md"></span>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs font-medium">ประเภทบริการ</label>
+                        <select id="serviceType" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
+                            <option value="ล้างแอร์">ล้างแอร์</option>
+                            <option value="ซ่อมแอร์ / ตรวจเช็ก">ซ่อมแอร์ / ตรวจเช็ก</option>
+                            <option value="งานระบบไฟฟ้า">งานระบบไฟฟ้า</option>
+                            <option value="ติดตั้งกล้องวงจรปิด">ติดตั้งกล้องวงจรปิด</option>
+                            <option value="งานบริการอื่นๆ">งานบริการอื่นๆ</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium">วันที่สะดวก</label>
+                        <input type="date" id="serviceDate" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium">ที่อยู่หน้างาน / รายละเอียดอาการ</label>
+                        <textarea id="serviceAddress" rows="3" placeholder="ระบุบ้านเลขที่ ซอย ถนน แขวง/ตำบล และอาการเสียเบื้องต้น" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium">แนบรูปถ่ายหน้างานหลายรูป (สำหรับให้ช่างดูประเมิน - ไม่เก็บบันทึกถาวร)</label>
+                        <input type="file" id="servicePhotos" multiple accept="image/*" class="w-full p-2 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-xs mt-1">
+                        <div id="photoPreviewContainer" class="flex flex-wrap gap-2 mt-2"></div>
                     </div>
                 </div>
 
-                <div style="background: var(--primary-light); padding: 18px; border-radius: 14px; border: 1px solid var(--border);">
-                    <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">🗓️ รายรับรายจ่ายประจำเดือน (เดือนนี้)</span>
-                    <div style="margin-top: 10px; font-size: 15px;">
-                        - รายรับรวมทั้งเดือน: <strong style="color: var(--accent);" id="admin-monthly-income">0 ฿</strong><br>
-                        - รายจ่ายรวมทั้งเดือน: <strong style="color: var(--danger);" id="admin-monthly-expense">0 ฿</strong><br>
-                        <hr style="border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
-                        - กำไรสุทธิเดือนนี้: <strong style="color: var(--secondary); font-size: 18px;" id="admin-monthly-net">0 ฿</strong>
+                <button onclick="submitBooking()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-medium hover:bg-blue-700 transition">ยืนยันการจองบริการ</button>
+            </div>
+        </div>
+
+        <!-- 4. หน้า Login ช่าง / แอดมิน (Username & Password) -->
+        <div id="staffLoginScreen" class="screen hidden space-y-6 max-w-md mx-auto py-8">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm space-y-4">
+                <h2 class="text-xl font-bold text-center">เข้าสู่ระบบ (ทีมช่าง / แอดมิน)</h2>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs font-medium">Username</label>
+                        <input type="text" id="loginUsername" placeholder="เช่น adminpao หรือ teamservice1" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium">Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
+                    </div>
+                </div>
+
+                <button onclick="staffLogin()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-medium hover:bg-blue-700 transition">เข้าสู่ระบบ</button>
+                <button onclick="showScreen('homeScreen')" class="w-full text-gray-500 text-xs py-2">ย้อนกลับหน้าหลัก</button>
+            </div>
+        </div>
+
+        <!-- 5. หน้าจอฝั่งช่าง (Field Tech Dashboard) -->
+        <div id="techScreen" class="screen hidden space-y-6">
+            <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-sm flex justify-between items-center">
+                <div>
+                    <h2 class="font-bold text-lg" id="techWelcomeName">ทีมช่างภาคสนาม</h2>
+                    <p class="text-xs opacity-80">พร้อมปฏิบัติงานหน้างาน</p>
+                </div>
+                <div class="text-2xl">👷‍♂️</div>
+            </div>
+
+            <!-- แบนเนอร์ประกาศด่วนจากแอดมิน -->
+            <div id="techBroadcastBanner" class="hidden bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 p-4 rounded-2xl text-amber-800 dark:text-amber-200 text-xs space-y-1">
+                <p class="font-bold flex items-center gap-1">📢 ประกาศด่วนจากแอดมิน:</p>
+                <p id="techBroadcastText"></p>
+            </div>
+
+            <!-- รายการงานที่ต้องไปทำ -->
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-4">
+                <h3 class="font-bold text-sm border-b pb-2 dark:border-gray-700">📋 รายการงานปัจจุบัน</h3>
+                <div id="techCurrentJob" class="text-xs space-y-2 text-gray-600 dark:text-gray-300">
+                    <p>ยังไม่มีคิวงานใหม่ในขณะนี้ (ระบบพร้อมรับงานอัปเดต)</p>
+                </div>
+            </div>
+
+            <!-- ระบบเช็คอินรายวัน & เครื่องมือช่าง -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm">⏱️ ระบบจับเวลาทำงาน</h3>
+                    <div class="text-center py-2 bg-gray-50 dark:bg-gray-700 rounded-xl font-mono text-xl" id="timerDisplay">00:00:00</div>
+                    <div class="flex gap-2">
+                        <button onclick="startTimer()" class="flex-1 bg-green-600 text-white py-2 rounded-xl text-xs font-medium">เริ่ม</button>
+                        <button onclick="pauseTimer()" class="flex-1 bg-amber-500 text-white py-2 rounded-xl text-xs font-medium">พัก</button>
+                        <button onclick="stopTimer()" class="flex-1 bg-red-600 text-white py-2 rounded-xl text-xs font-medium">เสร็จสิ้น</button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm">🚗 คำนวณค่าน้ำมัน</h3>
+                    <div class="space-y-2 text-xs">
+                        <input type="number" id="calcKm" placeholder="ระยะทาง (กิโลเมตร)" class="w-full p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+                        <button onclick="calcFuel()" class="w-full bg-blue-600 text-white py-2 rounded-xl font-medium">คำนวณค่าน้ำมัน (อัตรา 10 กม./ลิตร)</button>
+                        <p id="fuelResult" class="font-bold text-center text-blue-600 dark:text-blue-400"></p>
                     </div>
                 </div>
             </div>
-
-            <div class="flex">
-                <input type="text" id="new-trans-title" placeholder="รายการ เช่น รับเงินค่าบริการ / ค่าน้ำมัน" style="margin-bottom:0; flex: 2;">
-                <select id="new-trans-type" style="margin-bottom:0; width: 140px;">
-                    <option value="income">รายรับ (+)</option>
-                    <option value="expense">รายจ่าย (-)</option>
-                </select>
-                <input type="number" id="new-trans-amount" placeholder="จำนวนเงิน" style="margin-bottom:0; width: 140px;">
-                <button class="btn-success" onclick="addNewTransaction()" style="width: auto; padding: 0 20px;">+ บันทึกรายการ</button>
-            </div>
         </div>
 
-        <div class="card" style="border-left: 6px solid var(--warning);">
-            <h3>📂 ประวัติการส่งงานลูกค้าทั้งหมด (Job History Logs)</h3>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">รายการงานที่ถูกส่งมอบสำเร็จจากฝั่งทีมช่างภาคสนาม</p>
-            
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>รหัสงาน</th>
-                            <th>ประเภทบริการ</th>
-                            <th>ชื่อลูกค้า / ที่อยู่</th>
-                            <th>ทีมช่างผู้รับผิดชอบ</th>
-                            <th>สถานะการส่งงาน</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-job-history-body">
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-sub);">ยังไม่มีประวัติการส่งงานจากช่าง (ข้อมูลจะแสดงเมื่อช่างกดปิดจ๊อบ)</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="card" style="border-left: 6px solid var(--warning);">
-            <h3>📢 ประกาศด่วนถึงทีมช่างภาคสนาม</h3>
-            <div class="flex">
-                <input type="text" id="admin-broadcast-msg" placeholder="ระบุข้อความประกาศ..." style="margin-bottom: 0; flex: 2;">
-                <button class="btn-warning" onclick="sendAdminBroadcast()" style="width: auto; padding: 0 20px;">📢 ส่งประกาศ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. FIELD WORKER DASHBOARD -->
-    <div id="screen-tech-dashboard" class="screen" style="max-width: 760px;">
-        <div id="tech-alert-banner" class="alert-banner" style="display: none;">
-            <span>📢 <strong>ประกาศจากแอดมิน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
-            <button onclick="document.getElementById('tech-alert-banner').style.display='none'" style="width: auto; padding: 6px 12px; font-size: 12px; background: var(--danger);">ปิด</button>
-        </div>
-
-        <div class="card">
-            <div class="flex-between">
+        <!-- 6. หน้าจอฝั่งแอดมิน (Admin Panel) -->
+        <div id="adminScreen" class="screen hidden space-y-6">
+            <div class="bg-purple-600 text-white p-4 rounded-2xl shadow-sm flex justify-between items-center">
                 <div>
-                    <h3 id="display-team-name" style="margin:0; font-size: 20px;">ทีมติดตั้งและซ่อมบำรุง</h3>
-                    <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px;">สถานะ: <span style="color: var(--accent);">พร้อมปฏิบัติงาน</span></p>
+                    <h2 class="font-bold text-lg">แผงควบคุมแอดมิน (adminpao)</h2>
+                    <p class="text-xs opacity-80">จัดการบัญชีรายรับ-รายจ่าย และประวัติงาน</p>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button id="btn-back-to-admin" class="btn-success" style="width: auto; padding: 8px 14px; font-size: 13px; display: inline-block;" onclick="switchScreen('screen-admin-panel')">📊 กลับหน้าแอดมิน</button>
-                    <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
+                <div class="text-2xl">⚙️</div>
+            </div>
+
+            <!-- สรุปการเงิน -->
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm">
+                    <p class="text-xs text-gray-500">รายรับรวม</p>
+                    <p id="adminTotalIncome" class="font-bold text-base text-green-600 mt-1">0 ฿</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm">
+                    <p class="text-xs text-gray-500">รายจ่ายรวม</p>
+                    <p id="adminTotalExpense" class="font-bold text-base text-red-600 mt-1">0 ฿</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm">
+                    <p class="text-xs text-gray-500">กำไรสุทธิ</p>
+                    <p id="adminNetProfit" class="font-bold text-base text-blue-600 mt-1">0 ฿</p>
+                </div>
+            </div>
+
+            <!-- บันทึกรายรับ-รายจ่ายเพิ่ม -->
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
+                <h3 class="font-bold text-sm">➕ บันทึกรายการบัญชี</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
+                    <input type="text" id="transTitle" placeholder="ชื่อรายการ (เช่น ค่าอะไหล่)" class="p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+                    <select id="transType" class="p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+                        <option value="income">รายรับ (+)</option>
+                        <option value="expense">รายจ่าย (-)</option>
+                    </select>
+                    <input type="number" id="transAmount" placeholder="จำนวนเงิน (บาท)" class="p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <button onclick="addTransaction()" class="w-full bg-purple-600 text-white py-2 rounded-xl text-xs font-medium">บันทึกรายการลงระบบ / Google Sheet</button>
+            </div>
+
+            <!-- ส่งประกาศด่วนถึงช่าง -->
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
+                <h3 class="font-bold text-sm">📢 ส่งประกาศด่วนถึงทีมช่าง</h3>
+                <textarea id="broadcastInput" rows="2" placeholder="พิมพ์ข้อความประกาศส่งถึงทีมช่างภาคสนาม..." class="w-full p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-xs"></textarea>
+                <button onclick="sendBroadcast()" class="w-full bg-amber-600 text-white py-2 rounded-xl text-xs font-medium">ส่งประกาศทันที</button>
+            </div>
+
+            <!-- ประวัติงานทั้งหมด -->
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
+                <h3 class="font-bold text-sm">📋 ประวัติการจองและส่งมอบงาน</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b dark:border-gray-700 text-gray-400">
+                                <th class="p-2">วันที่/เวลา</th>
+                                <th class="p-2">เบอร์ลูกค้า</th>
+                                <th class="p-2">บริการ</th>
+                                <th class="p-2">ที่อยู่</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminJobTableBody">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-400">ยังไม่มีประวัติงานในระบบ</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <div class="card" style="border-left: 6px solid var(--accent);">
-            <h3>👥 ระบบเช็คอินสมาชิกทีมรายวัน</h3>
-            <div class="flex" style="margin-bottom: 12px;">
-                <input type="text" id="new-member-name" placeholder="ชื่อ-นามสกุลช่าง..." style="margin-bottom:0; flex: 2;">
-                <button class="btn-success" onclick="addMemberToCurrentTeam()" style="width: auto; padding: 0 20px;">+ เพิ่มเข้าทีม</button>
-            </div>
-            <table style="margin-top: 0;">
-                <thead><tr><th>สมาชิก</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
-                <tbody id="team-members-table-body">
-                    <tr><td colspan="3" style="text-align: center; color: var(--text-sub);">ยังไม่มีสมาชิกเช็คอินวันนี้</td></tr>
-                </tbody>
-            </table>
-        </div>
+    </main>
 
-        <div class="card" style="border-left: 6px solid var(--secondary);">
-            <h3>⏱️ ระบบจับเวลาปฏิบัติงานหน้างาน</h3>
-            <div style="background: var(--primary-light); padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 12px; border: 1px solid var(--border);">
-                <span id="job-timer-display" style="font-size: 32px; font-weight: 800; color: var(--secondary);">00:00:00</span>
-            </div>
-            <div class="flex">
-                <button class="btn-success" onclick="startJobTimer()" style="flex: 1;">▶️ เริ่มจับเวลา</button>
-                <button class="btn-warning" onclick="pauseJobTimer()" style="flex: 1;">⏸️ พักชั่วคราว</button>
-                <button class="btn-danger" onclick="stopJobTimer()" style="flex: 1;">⏹️ สิ้นสุดเวลา</button>
-            </div>
-        </div>
-
-        <div class="card" style="border-left: 6px solid var(--warning);">
-            <h3>⛽ ระบบคำนวณค่าน้ำมัน</h3>
-            <div class="flex" style="margin-bottom: 12px;">
-                <input type="number" id="fuel-km-per-liter" placeholder="อัตรา กม./ลิตร">
-                <input type="number" id="fuel-price-per-liter" placeholder="ราคาบาท/ลิตร">
-            </div>
-            <button class="btn-success" onclick="calculateDailyFuel()" style="margin-bottom: 12px;">🔄 คำนวณค่าน้ำมัน</button>
-            <div id="fuel-calculation-result-box" style="display: none; background: var(--primary-light); padding: 12px; border-radius: 10px; font-size: 14px;">
-                - ระยะทางรวม: <strong id="res-total-distance">0</strong> กม. | <strong>ค่าน้ำมันรวม: <span id="res-total-cost" style="color: var(--accent);">0</span> บาท</strong>
-            </div>
-        </div>
-
-        <div class="card" style="border-left: 6px solid var(--secondary);">
-            <h3 id="tech-current-job-title">⚡ งานปัจจุบัน: บริการงานช่างทั่วไป</h3>
-            <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 15px;">ตรวจสอบความเรียบร้อยและกดส่งงานเมื่อเสร็จสิ้น</p>
-            <button onclick="finishAndSubmitJobToAdmin()" class="btn-success" style="padding: 14px;">✅ ปิดจ๊อบและส่งมอบงานให้แอดมิน</button>
-        </div>
-    </div>
-
-    <!-- JavaScript ควบคุมระบบทั้งหมด -->
+    <!-- JavaScript ลุยงานจริง -->
     <script>
-        const GOOGLE_SHEET_WEB_APP_URL = ""; 
+        // ตั้งค่าตัวแปรระบบ
+        let currentUser = null;
+        let currentRole = null;
+        let transactions = [];
+        let bookings = [];
+        let timerInterval = null;
+        let seconds = 0;
 
-        function syncDataToGoogleSheets(payload) {
-            if (!GOOGLE_SHEET_WEB_APP_URL) return;
-            fetch(GOOGLE_SHEET_WEB_APP_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).catch(err => console.error("Sheets Sync Error:", err));
+        // URL Google Apps Script (ใส่ลิงก์ของคุณตรงนี้เมื่อใช้งานจริง)
+        const GOOGLE_SHEET_URL = ""; 
+
+        // สลับหน้าจอ
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+            window.scrollTo(0,0);
         }
 
-        function toggleTheme() {
-            const body = document.body;
-            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
         }
 
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<span>${type === 'success' ? '✅' : '⚠️'}</span> ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+        // Login ฝั่งลูกค้า
+        function customerLogin() {
+            const phone = document.getElementById('customerPhoneInput').value.trim();
+            if(phone.length < 10) {
+                alert('กรุณากรอกเบอร์โทรศัพท์มือถือให้ครบ 10 หลัก');
+                return;
+            }
+            currentUser = phone;
+            currentRole = 'customer';
+            document.getElementById('displayCustomerPhone').innerText = 'เบอร์ติดต่อ: ' + phone;
+            showScreen('customerBookingScreen');
         }
 
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Login ฝั่งช่าง / แอดมิน
+        function staffLogin() {
+            const user = document.getElementById('loginUsername').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+
+            if (user === 'adminpao' && pass === 'admin2537') {
+                currentUser = 'adminpao';
+                currentRole = 'admin';
+                setupNav();
+                showScreen('adminScreen');
+                updateFinancialUI();
+            } else if (['teamservice1', 'teamservice2', 'teamservice3'].includes(user) && pass === '08072537') {
+                currentUser = user;
+                currentRole = 'tech';
+                document.getElementById('techWelcomeName').innerText = 'ทีมช่าง: ' + user.toUpperCase();
+                setupNav();
+                showScreen('techScreen');
+            } else {
+                alert('Username หรือ Password ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง');
+            }
         }
 
-        function backToHome() { switchScreen('screen-home'); }
-        function goToCustomerScreen() { switchScreen('screen-customer'); }
-        function goToTechLoginScreen() { switchScreen('screen-login'); }
-
-        function selectService(el, serviceName) {
-            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            document.getElementById('selected-service-type').value = serviceName;
+        function setupNav() {
+            document.getElementById('navUserBadge').innerText = currentUser;
+            document.getElementById('navUserBadge').classList.remove('hidden');
+            document.getElementById('btnLogout').classList.remove('hidden');
         }
 
-        function previewCustImage(event) {
-            const reader = new FileReader();
-            reader.onload = function(){
-                const output = document.getElementById('cust-img-preview');
-                output.src = reader.result;
-                document.getElementById('cust-image-preview-container').style.display = 'block';
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            document.getElementById('navUserBadge').classList.add('hidden');
+            document.getElementById('btnLogout').classList.add('hidden');
+            showScreen('homeScreen');
+        }
+
+        // ส่งจองบริการ
+        function submitBooking() {
+            const service = document.getElementById('serviceType').value;
+            const date = document.getElementById('serviceDate').value;
+            const address = document.getElementById('serviceAddress').value.trim();
+
+            if(!date || !address) {
+                alert('กรุณาเลือกวันที่และระบุที่อยู่หน้างานให้ครบถ้วน');
+                return;
+            }
+
+            const newBooking = {
+                date: new Date().toLocaleString(),
+                phone: currentUser,
+                service: service,
+                address: address
             };
-            if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
-        }
 
-        let currentBookingData = null;
+            bookings.unshift(newBooking);
+            updateAdminJobTable();
+            updateTechJobView(newBooking);
 
-        function submitCustomerBooking() {
-            const service = document.getElementById('selected-service-type').value;
-            const name = document.getElementById('cust-name').value;
-            const address = document.getElementById('cust-address').value;
-            const phone = document.getElementById('cust-phone').value;
-
-            if(!name || !address || !phone) {
-                showToast('กรุณากรอกข้อมูลชื่อ ที่อยู่ และเบอร์โทรให้ครบถ้วน', 'danger');
-                return;
+            // ส่งข้อมูลไป Google Sheet (ถ้าใส่ URL ไว้)
+            if(GOOGLE_SHEET_URL) {
+                fetch(GOOGLE_SHEET_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ type: 'booking', ...newBooking })
+                }).catch(err => console.log('Google Sheet Sync Error:', err));
             }
 
-            currentBookingData = { service, name, address, phone };
-
-            document.getElementById('track-service-name').innerText = service;
-            document.getElementById('customer-tracking-box').style.display = 'block';
-            document.getElementById('tech-current-job-title').innerText = `⚡ งานปัจจุบัน: ${service} (${name})`;
-            
-            syncDataToGoogleSheets({ type: 'booking', service, name, address, phone, time: new Date().toISOString() });
-            showToast('จองบริการสำเร็จ! ช่างได้รับคำขอแล้ว', 'success');
+            alert('จองบริการสำเร็จ! ข้อมูลส่งถึงทีมช่างเรียบร้อยแล้ว');
+            showScreen('homeScreen');
         }
 
-        function sendCustomerChatMessage() {
-            const input = document.getElementById('chat-input-text');
-            if(!input.value.trim()) return;
-            const box = document.getElementById('chat-messages-container');
-            box.innerHTML += `<div class="chat-msg cust">${input.value}</div>`;
-            input.value = '';
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function handleLogin() {
-            const usernameInput = document.getElementById('login-username').value.trim();
-            const passwordInput = document.getElementById('login-password').value.trim();
-
-            if (usernameInput === 'adminpao' && passwordInput === '08072537') {
-                showToast('ยินดีต้อนรับเข้าสู่ระบบหลังบ้าน, คุณเป๋า (Admin) 🚀', 'success');
-                document.getElementById('btn-back-to-admin').style.display = 'inline-block';
-                document.getElementById('display-team-name').innerText = 'ทีมช่าง (มุมมองผู้ดูแลระบบ: adminpao)';
-                switchScreen('screen-admin-panel');
-            } else if (usernameInput.startsWith('teamservice')) {
-                showToast('ยินดีต้อนรับเข้าสู่ระบบทีมช่างภาคสนาม 🎉', 'success');
-                document.getElementById('btn-back-to-admin').style.display = 'none';
-                document.getElementById('display-team-name').innerText = 'ทีมช่างภาคสนาม (' + usernameInput + ')';
-                switchScreen('screen-tech-dashboard');
-            } else {
-                showToast('❌ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง', 'danger');
-            }
-        }
-
-        let dailyIncome = 0, dailyExpense = 0;
-        let monthlyIncome = 0, monthlyExpense = 0;
-
-        function addNewTransaction() {
-            const title = document.getElementById('new-trans-title').value.trim();
-            const type = document.getElementById('new-trans-type').value;
-            const amount = parseFloat(document.getElementById('new-trans-amount').value);
-
-            if(!title || isNaN(amount) || amount <= 0) {
-                showToast('กรุณากรอกข้อมูลรายการและจำนวนเงินให้ถูกต้อง', 'danger');
-                return;
-            }
-
-            if(type === 'income') {
-                dailyIncome += amount;
-                monthlyIncome += amount;
-            } else {
-                dailyExpense += amount;
-                monthlyExpense += amount;
-            }
-
-            document.getElementById('admin-daily-income').innerText = dailyIncome.toLocaleString() + ' ฿';
-            document.getElementById('admin-daily-expense').innerText = dailyExpense.toLocaleString() + ' ฿';
-            document.getElementById('admin-daily-net').innerText = (dailyIncome - dailyExpense).toLocaleString() + ' ฿';
-
-            document.getElementById('admin-monthly-income').innerText = monthlyIncome.toLocaleString() + ' ฿';
-            document.getElementById('admin-monthly-expense').innerText = monthlyExpense.toLocaleString() + ' ฿';
-            document.getElementById('admin-monthly-net').innerText = (monthlyIncome - monthlyExpense).toLocaleString() + ' ฿';
-
-            syncDataToGoogleSheets({ type: 'transaction', title, transType: type, amount, date: new Date().toISOString() });
-
-            document.getElementById('new-trans-title').value = '';
-            document.getElementById('new-trans-amount').value = '';
-            showToast('บันทึกรายการบัญชีสำเร็จ!', 'success');
-        }
-
-        function sendAdminBroadcast() {
-            const msg = document.getElementById('admin-broadcast-msg').value.trim();
-            if(!msg) return;
-            document.getElementById('alert-text-msg').innerText = msg;
-            document.getElementById('tech-alert-banner').style.display = 'flex';
-            document.getElementById('admin-broadcast-msg').value = '';
-            showToast('ส่งประกาศถึงทีมช่างสำเร็จ!', 'success');
-        }
-
-        // Team members check-in logic
-        let teamMembers = [];
-        function addMemberToCurrentTeam() {
-            const nameInput = document.getElementById('new-member-name');
-            const name = nameInput.value.trim();
-            if(!name) return;
-
-            teamMembers.push({ name, status: 'เข้างานแล้ว' });
-            nameInput.value = '';
-            renderTeamMembers();
-            showToast('เช็คอินสมาชิกเข้าทีมสำเร็จ', 'success');
-        }
-
-        function removeTeamMember(index) {
-            teamMembers.splice(index, 1);
-            renderTeamMembers();
-        }
-
-        function renderTeamMembers() {
-            const tbody = document.getElementById('team-members-table-body');
-            if(teamMembers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-sub);">ยังไม่มีสมาชิกเช็คอินวันนี้</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = teamMembers.map((m, idx) => `
-                <tr>
-                    <td>${m.name}</td>
-                    <td><span class="badge badge-success">${m.status}</span></td>
-                    <td><button class="btn-danger" style="padding: 4px 10px; font-size: 12px; width: auto;" onclick="removeTeamMember(${idx})">ลบ</button></td>
+        // อัปเดตตารางประวัติงานแอดมิน
+        function updateAdminJobTable() {
+            const tbody = document.getElementById('adminJobTableBody');
+            if(bookings.length === 0) return;
+            tbody.innerHTML = bookings.map(b => `
+                <tr class="border-b dark:border-gray-700">
+                    <td class="p-2">${b.date}</td>
+                    <td class="p-2 font-medium">${b.phone}</td>
+                    <td class="p-2">${b.service}</td>
+                    <td class="p-2">${b.address}</td>
                 </tr>
             `).join('');
         }
 
-        // Timer logic
-        let timerInterval = null;
-        let secondsElapsed = 0;
+        // อัปเดตงานให้ช่างเห็น
+        function updateTechJobView(job) {
+            document.getElementById('techCurrentJob').innerHTML = `
+                <p><strong>บริการ:</strong> ${job.service}</p>
+                <p><strong>ลูกค้าโทร:</strong> <a href="tel:${job.phone}" class="text-blue-500 underline">${job.phone} (กดโทรด่วน)</a></p>
+                <p><strong>ที่อยู่หน้างาน:</strong> ${job.address}</p>
+            `;
+        }
 
-        function startJobTimer() {
+        // ระบบจับเวลาช่าง
+        function startTimer() {
             if(timerInterval) return;
             timerInterval = setInterval(() => {
-                secondsElapsed++;
-                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-                const secs = String(secondsElapsed % 60).padStart(2, '0');
-                document.getElementById('job-timer-display').innerText = `${hrs}:${mins}:${secs}`;
+                seconds++;
+                let hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                let mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                let secs = (seconds % 60).toString().padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
             }, 1000);
-            showToast('เริ่มจับเวลาการทำงานแล้ว', 'success');
+        }
+        function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
+        function stopTimer() {
+            pauseTimer();
+            alert('บันทึกเวลาปฏิบัติงานเรียบร้อยแล้ว');
+            seconds = 0;
+            document.getElementById('timerDisplay').innerText = "00:00:00";
         }
 
-        function pauseJobTimer() {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            showToast('พักการจับเวลาชั่วคราว', 'warning');
+        // คำนวณค่าน้ำมัน
+        function calcFuel() {
+            const km = parseFloat(document.getElementById('calcKm').value) || 0;
+            const cost = (km / 10) * 35; // สมมติค่าน้ำมันเฉลี่ย 35 บาท/ลิตร
+            document.getElementById('fuelResult').innerText = `ค่าน้ำมันโดยประมาณ: ${cost.toFixed(2)} บาท`;
         }
 
-        function stopJobTimer() {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            showToast('หยุดเวลาปฏิบัติงาน', 'success');
-        }
+        // ระบบบัญชีแอดมิน
+        function addTransaction() {
+            const title = document.getElementById('transTitle').value.trim();
+            const type = document.getElementById('transType').value;
+            const amount = parseFloat(document.getElementById('transAmount').value) || 0;
 
-        // Fuel calculation logic
-        function calculateDailyFuel() {
-            const kmPerLiter = parseFloat(document.getElementById('fuel-km-per-liter').value);
-            const pricePerLiter = parseFloat(document.getElementById('fuel-price-per-liter').value);
-
-            if(isNaN(kmPerLiter) || isNaN(pricePerLiter) || kmPerLiter <= 0 || pricePerLiter <= 0) {
-                showToast('กรุณากรอกอัตราค่าน้ำมันให้ถูกต้อง', 'danger');
+            if(!title || amount <= 0) {
+                alert('กรุณากรอกชื่อรายการและจำนวนเงินให้ถูกต้อง');
                 return;
             }
 
-            const estimatedDistance = 25; // ค่าสมมติระยะทางวิ่งหน้างานเฉลี่ย
-            const totalCost = (estimatedDistance / kmPerLiter) * pricePerLiter;
+            transactions.push({ title, type, amount });
+            updateFinancialUI();
 
-            document.getElementById('res-total-distance').innerText = estimatedDistance;
-            document.getElementById('res-total-cost').innerText = totalCost.toFixed(2);
-            document.getElementById('fuel-calculation-result-box').style.display = 'block';
-            showToast('คำนวณค่าน้ำมันเรียบร้อย', 'success');
+            document.getElementById('transTitle').value = '';
+            document.getElementById('transAmount').value = '';
+            alert('บันทึกรายการบัญชีสำเร็จ!');
         }
 
-        // Job completion handler
-        let jobHistory = [];
-        function finishAndSubmitJobToAdmin() {
-            const serviceName = currentBookingData ? currentBookingData.service : "บริการทั่วไป";
-            const custInfo = currentBookingData ? `${currentBookingData.name} (${currentBookingData.address})` : "ลูกค้านัดหมายทั่วไป";
-            const jobId = "JOB-" + Math.floor(1000 + Math.random() * 9000);
-
-            jobHistory.push({
-                id: jobId,
-                service: serviceName,
-                customer: custInfo,
-                team: document.getElementById('display-team-name').innerText,
-                status: 'ส่งมอบสำเร็จ'
+        function updateFinancialUI() {
+            let totalInc = 0, totalExp = 0;
+            transactions.forEach(t => {
+                if(t.type === 'income') totalInc += t.amount;
+                else totalExp += t.amount;
             });
-
-            renderJobHistory();
-            document.getElementById('track-status-badge').className = 'badge badge-success';
-            document.getElementById('track-status-badge').innerText = 'เสร็จสิ้นสมบูรณ์';
-            showToast('ปิดจ๊อบและส่งมอบงานให้แอดมินเรียบร้อย!', 'success');
+            document.getElementById('adminTotalIncome').innerText = totalInc.toLocaleString() + ' ฿';
+            document.getElementById('adminTotalExpense').innerText = totalExp.toLocaleString() + ' ฿';
+            document.getElementById('adminNetProfit').innerText = (totalInc - totalExp).toLocaleString() + ' ฿';
         }
 
-        function renderJobHistory() {
-            const tbody = document.getElementById('admin-job-history-body');
-            if(jobHistory.length === 0) return;
-            tbody.innerHTML = jobHistory.map(j => `
-                <tr>
-                    <td><strong>${j.id}</strong></td>
-                    <td>${j.service}</td>
-                    <td>${j.customer}</td>
-                    <td>${j.team}</td>
-                    <td><span class="badge badge-success">${j.status}</span></td>
-                </tr>
-            `).join('');
+        // ส่งประกาศด่วน
+        function sendBroadcast() {
+            const msg = document.getElementById('broadcastInput').value.trim();
+            if(!msg) return;
+            localStorage.setItem('broadcastMsg', msg);
+            alert('ส่งประกาศด่วนถึงทีมช่างเรียบร้อยแล้ว');
+            document.getElementById('broadcastInput').value = '';
         }
+
+        // ตรวจสอบประกาศฝั่งช่าง
+        setInterval(() => {
+            if(currentRole === 'tech') {
+                const msg = localStorage.getItem('broadcastMsg');
+                if(msg) {
+                    document.getElementById('techBroadcastBanner').classList.remove('hidden');
+                    document.getElementById('techBroadcastText').innerText = msg;
+                }
+            }
+        }, 2000);
     </script>
 </body>
 </html>
