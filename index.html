@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field & Home Service Platform - Production Ready</title>
+    <title>ServiceHub Pro - Clean Version</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -215,10 +215,10 @@
             
             <div style="text-align: left;">
                 <label>ชื่อผู้ใช้งาน (Username)</label>
-                <input type="text" id="login-username" placeholder="กรอกชื่อผู้ใช้งาน">
+                <input type="text" id="login-username" value="" placeholder="กรอกชื่อผู้ใช้งาน">
                 
                 <label>รหัสผ่าน (Password)</label>
-                <input type="password" id="login-password" placeholder="กรอกรหัสผ่าน">
+                <input type="password" id="login-password" value="" placeholder="กรอกรหัสผ่าน">
 
                 <div class="flex" style="margin-top: 20px;">
                     <button class="btn-secondary" onclick="backToHome()">← หน้าแรก</button>
@@ -380,7 +380,6 @@
 
     <!-- Script ควบคุมระบบทั้งหมด & Google Sheets Sync -->
     <script>
-        // ใส่ URL ของ Google Apps Script Web App ที่นี่
         const GOOGLE_SHEET_WEB_APP_URL = ""; 
 
         function syncDataToGoogleSheets(payload) {
@@ -455,7 +454,6 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ระบบ Login ตรวจสอบ adminpao และรหัส 08072537
         function handleLogin() {
             const usernameInput = document.getElementById('login-username').value.trim();
             const passwordInput = document.getElementById('login-password').value.trim();
@@ -472,7 +470,6 @@
             }
         }
 
-        // ค่าเริ่มต้นการเงินเป็น 0 สำหรับเก็บข้อมูลจริง
         let dailyIncome = 0, dailyExpense = 0;
         let monthlyIncome = 0, monthlyExpense = 0;
 
@@ -551,7 +548,7 @@
         function stopJobTimer() { clearInterval(timerInterval); timerInterval = null; secondsElapsed = 0; document.getElementById('job-timer-display').innerText = "00:00:00"; showToast('สิ้นสุดเวลาทำงาน', 'success'); }
 
         function calculateDailyFuel() {
-            let km = 30; // ตัวอย่างระยะทางจริง
+            let km = 30;
             let kmPerLiter = parseFloat(document.getElementById('fuel-km-per-liter').value) || 12;
             let pricePerLiter = parseFloat(document.getElementById('fuel-price-per-liter').value) || 38.50;
             let totalCost = (km / kmPerLiter) * pricePerLiter;
