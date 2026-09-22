@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field & Home Service Platform - Pro Team Edition</title>
+    <title>Field & Home Service Platform - Pro Team Edition + Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -43,7 +43,7 @@
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { margin: 0; background-color: var(--bg); color: var(--text); padding-bottom: 50px; transition: var(--transition); }
 
-        .screen { display: none; padding: 20px; max-width: 760px; margin: auto; min-height: 100vh; animation: fadeIn 0.4s ease; }
+        .screen { display: none; padding: 20px; max-width: 900px; margin: auto; min-height: 100vh; animation: fadeIn 0.4s ease; }
         .screen.active { display: block; }
 
         @keyframes fadeIn {
@@ -116,14 +116,6 @@
 
     <div id="toast-container"></div>
 
-    <div id="job-detail-modal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeJobModal()">✕</button>
-            <h2>📋 รายละเอียดงานเชิงลึก</h2>
-            <div id="modal-body-content" style="font-size: 15px; line-height: 1.6; color: var(--text);"></div>
-        </div>
-    </div>
-
     <!-- 0. หน้าแรกสุด (Role Selector) -->
     <div id="screen-home" class="screen active">
         <div class="card" style="margin-top: 60px; text-align: center; padding: 40px;">
@@ -140,7 +132,7 @@
                 <div class="card" onclick="goToTechLoginScreen()" style="cursor: pointer; border: 2px solid var(--accent); background: rgba(16, 185, 129, 0.03);">
                     <span style="font-size: 40px;">🛠️</span>
                     <h3 style="margin: 10px 0 5px 0;">ฝั่งช่าง / แอดมิน</h3>
-                    <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">ล็อกอินตัวแทนทีม, จัดการสมาชิก, เช็คอิน, เลื่อนคิว และระบบโปรครบครัน</p>
+                    <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">ล็อกอินตัวแทนทีม, จัดการสมาชิก, เช็คอิน, เลื่อนคิว และระบบหลังบ้าน</p>
                 </div>
             </div>
         </div>
@@ -233,7 +225,7 @@
         </div>
     </div>
 
-    <!-- 2. LOGIN SCREEN (ไม่มีเลือกทีม และช่องกรอกข้อมูลว่างเปล่าต้องพิมพ์เอง) -->
+    <!-- 2. LOGIN SCREEN (เข้าสู่ระบบฝั่งช่าง / แอดมิน) -->
     <div id="screen-login" class="screen">
         <div class="card" style="margin-top: 60px; padding: 40px;">
             <div style="text-align: center; margin-bottom: 25px;">
@@ -257,10 +249,114 @@
         </div>
     </div>
 
-    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนาม + ระบบเช็คอินสมาชิกทีมและย้ายทีม) -->
+    <!-- 3. ADMIN DASHBOARD (ระบบหลังบ้านเฉพาะ adminpao) -->
+    <div id="screen-admin-panel" class="screen" style="max-width: 950px;">
+        <div class="card" style="border-left: 6px solid var(--secondary);">
+            <div class="flex-between">
+                <div>
+                    <h2 style="margin:0; font-size: 22px;">📊 ระบบหลังบ้านผู้ดูแลระบบ (Admin Panel)</h2>
+                    <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px; font-weight: 600;">ผู้ใช้งานปัจจุบัน: <span style="color: var(--secondary);">คุณเป๋า (adminpao - สิทธิ์สูงสุด)</span></p>
+                </div>
+                <button class="btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
+            </div>
+        </div>
+
+        <!-- สถิติภาพรวม -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 22px;">
+            <div class="card" style="margin-bottom: 0; text-align: center; border-left: 5px solid var(--secondary);">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">ยอดจองทั้งหมด</span>
+                <h3 id="admin-stat-total" style="font-size: 28px; margin: 8px 0 0 0; color: var(--secondary);">1 รายการ</h3>
+            </div>
+            <div class="card" style="margin-bottom: 0; text-align: center; border-left: 5px solid var(--accent);">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">รายได้รวม (บาท)</span>
+                <h3 id="admin-stat-revenue" style="font-size: 28px; margin: 8px 0 0 0; color: var(--accent);">1,500 ฿</h3>
+            </div>
+            <div class="card" style="margin-bottom: 0; text-align: center; border-left: 5px solid var(--warning);">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">ทีมช่างในระบบ</span>
+                <h3 style="font-size: 28px; margin: 8px 0 0 0; color: var(--warning);">3 ทีม</h3>
+            </div>
+        </div>
+
+        <!-- จัดการประกาศด่วนถึงทีมช่าง -->
+        <div class="card" style="border-left: 6px solid var(--warning);">
+            <h3>📢 ประกาศด่วนถึงทีมช่างภาคสนาม</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">พิมพ์ข้อความประกาศเพื่อให้แบนเนอร์แจ้งเตือนปรากฏขึ้นบนหน้าจอของช่างทุกคนทันที</p>
+            <div class="flex">
+                <input type="text" id="admin-broadcast-msg" placeholder="ระบุข้อความประกาศ เช่น แจ้งปรับเปลี่ยนค่าน้ำมันรอบเดือนนี้..." style="margin-bottom: 0; flex: 2;">
+                <button class="btn-warning" onclick="sendAdminBroadcast()" style="width: auto; padding: 0 20px;">📢 ส่งประกาศ</button>
+            </div>
+        </div>
+
+        <!-- รายการจองทั้งหมดในระบบ -->
+        <div class="card">
+            <h3>📋 รายการจองบริการจากลูกค้าทั้งหมด</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">ตรวจสอบข้อมูลการจอง สถานะ และรายละเอียดเชิงลึก</p>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>บริการ</th>
+                            <th>วันที่นัดหมาย</th>
+                            <th>ลูกค้า / เบอร์โทร</th>
+                            <th>สถานะ</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-booking-table-body">
+                        <tr>
+                            <td>ล้างแอร์</td>
+                            <td>2026-09-02 (09:00 - 12:00)</td>
+                            <td>ซอย 5, ลาดยาว (089-999-8888)</td>
+                            <td><span class="badge badge-warning">กำลังเดินทาง</span></td>
+                            <td><button class="btn-danger" style="padding: 6px 10px; font-size: 12px; width: auto;" onclick="this.closest('tr').remove(); showToast('ลบรายการจองสำเร็จ', 'success');">ลบ</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- จัดการบัญชีผู้ใช้งานระบบ -->
+        <div class="card">
+            <h3>👤 จัดการบัญชีผู้ใช้งานระบบ (User Management)</h3>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">รายชื่อบัญชีทั้งหมดที่มีสิทธิ์เข้าสู่ระบบฝั่งช่างและหลังบ้าน</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>ชื่อทีม / ตัวแทน</th>
+                        <th>สิทธิ์การใช้งาน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>adminpao</strong></td>
+                        <td>ผู้ดูแลระบบสูงสุด (Admin)</td>
+                        <td><span class="badge badge-success">Admin (เข้าหลังบ้านได้)</span></td>
+                    </tr>
+                    <tr>
+                        <td>teamservice1</td>
+                        <td>ทีมติดตั้งและซ่อมบำรุง A</td>
+                        <td><span class="badge badge-warning">ช่าง / ห้ามเข้าหลังบ้าน</span></td>
+                    </tr>
+                    <tr>
+                        <td>teamservice2</td>
+                        <td>ทีมระบบไฟฟ้าและโซลาเซลล์ B</td>
+                        <td><span class="badge badge-warning">ช่าง / ห้ามเข้าหลังบ้าน</span></td>
+                    </tr>
+                    <tr>
+                        <td>teamservice3</td>
+                        <td>ทีมสมาร์ทโฮมและกล้องวงจรปิด C</td>
+                        <td><span class="badge badge-warning">ช่าง / ห้ามเข้าหลังบ้าน</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนามทั่วไป ห้ามเข้าหลังบ้าน) -->
     <div id="screen-tech-dashboard" class="screen" style="max-width: 760px;">
         <div id="tech-alert-banner" class="alert-banner" style="display: none;">
-            <span>📢 <strong>ประกาศด่วน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
+            <span>📢 <strong>ประกาศจากแอดมิน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
             <button onclick="document.getElementById('tech-alert-banner').style.display='none'" style="width: auto; padding: 6px 12px; font-size: 12px; background: var(--danger);">ปิด</button>
         </div>
 
@@ -270,10 +366,7 @@
                     <h3 id="display-team-name" style="margin:0; font-size: 20px;">ทีมติดตั้งและซ่อมบำรุง A</h3>
                     <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px; font-weight: 600;">ตัวแทนผู้เข้าใช้งาน: <span id="display-rep-name" style="color: var(--secondary);">ช่างสมชาย (หัวหน้าทีม)</span></p>
                 </div>
-                <div class="flex" style="gap: 8px;">
-                    <button class="btn-secondary" style="width: auto; padding: 8px 12px; font-size: 12px;" onclick="backToHome()">หน้าแรก</button>
-                    <button class="btn-secondary" style="width: auto; padding: 8px 12px; font-size: 12px;" onclick="switchToAdmin()">โหมดแอดมิน 📊</button>
-                </div>
+                <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
             </div>
         </div>
 
@@ -299,9 +392,7 @@
                             <th>การจัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="team-members-table-body">
-                        <!-- รายการช่างจะถูกเรนเดอร์ด้วย JavaScript -->
-                    </tbody>
+                    <tbody id="team-members-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -353,11 +444,6 @@
             </div>
             <p id="tech-current-job-desc" style="font-size: 14px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">รายละเอียด: ล้างแอร์ขนาด 18,000 BTU และตรวจสอบน้ำยา</p>
             <p style="font-size: 14px; color: var(--secondary); margin-bottom: 12px; font-weight: 700;">📅 วันเวลานัดหมาย: <span id="tech-current-sched">02/09/2026 (09:00 - 12:00 น.)</span></p>
-            
-            <div id="tech-customer-photo-box" style="margin-bottom: 15px; background: var(--primary-light); padding: 12px; border-radius: 12px; border: 1px solid var(--border);">
-                <span style="font-size: 13px; color: var(--secondary); font-weight: 700;">🖼️ รูปภาพหน้างานที่ลูกค้าแนบมาล่วงหน้า:</span>
-                <img id="tech-preview-img-display" src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80" alt="Customer Job Photo" class="thumbnail-preview" style="margin-top: 8px;">
-            </div>
 
             <!-- ⚠️ ฟังก์ชันเลื่อนคิวฉุกเฉิน (Reschedule) -->
             <div style="background: var(--primary-light); border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 15px;">
@@ -372,21 +458,6 @@
                     <option value="เหตุฉุกเฉินอื่นๆ">เหตุฉุกเฉินอื่นๆ</option>
                 </select>
 
-                <div class="flex" style="margin-bottom: 12px;">
-                    <div style="flex: 1;">
-                        <label>วันที่นัดหมายใหม่</label>
-                        <input type="date" id="delay-new-date" value="2026-09-02">
-                    </div>
-                    <div style="flex: 1;">
-                        <label>ช่วงเวลาใหม่</label>
-                        <select id="delay-new-timeslot">
-                            <option value="13:00 - 16:00 น. (ช่วงบ่าย)">13:00 - 16:00 น. (ช่วงบ่าย)</option>
-                            <option value="17:00 - 19:00 น. (ช่วงเย็น)">17:00 - 19:00 น. (ช่วงเย็น)</option>
-                            <option value="09:00 - 12:00 น. (วันถัดไป)">09:00 - 12:00 น. (วันถัดไป)</option>
-                        </select>
-                    </div>
-                </div>
-
                 <button class="btn-warning" onclick="submitEmergencyReschedule()">🚨 ส่งเรื่องเลื่อนนัดหมาย (แจ้งลูกค้าและแอดมินทันที)</button>
             </div>
 
@@ -399,28 +470,8 @@
                 <button onclick="sendTechChatMessage()" style="width: auto; padding: 0 20px;">ตอบกลับ</button>
             </div>
 
-            <div class="map-box">
-                <span>🛰️ พิกัดบ้านลูกค้า: <span id="tech-current-address">ซอย 5, ลาดยาว, กรุงเทพฯ</span></span>
-                <div class="flex" style="gap: 8px; margin-top: 4px;">
-                    <button class="btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px;" onclick="openGPSNavigation()">🗺️ เปิดนำทาง Google Maps</button>
-                    <button class="btn-success" style="width: auto; padding: 8px 16px; font-size: 13px;" onclick="calculateAndSendETA()">⏱️ คำนวณ ETA แจ้งลูกค้า & แอดมิน</button>
-                </div>
-            </div>
-
-            <div id="eta-display-box" style="display: none; background: var(--accent-bg); color: var(--accent); padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-bottom: 15px;">
-                🚗 คาดว่าจะถึงหน้างานเวลา: <span id="eta-time-val">--:--</span> น. (ใช้เวลาเดินทางประมาณ <span id="eta-mins-val">--</span> นาที) | อัปเดตให้ลูกค้าเรียบร้อย ✅
-            </div>
-
             <div class="flex">
                 <button onclick="updateTaskStatus('งานเสร็จสิ้น', 'success')" style="flex:1; padding:14px;" class="btn-success">✅ ปิดจ๊อบงานนี้</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3>🎙️ บันทึกสรุปงานด้วยเสียง (Voice Report)</h3>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">กดปุ่มแล้วพูดสรุปผลงาน ระบบจะพิมพ์ข้อความอัตโนมัติ</p>
-            <div class="flex" style="margin-bottom: 10px;">
-                <button id="btn-mic" onclick="toggleVoiceRecord()" class="btn-danger" style="flex: 1;">🎙️ เริ่มอัดเสียงสรุปงาน</button>
             </div>
         </div>
     </div>
@@ -429,11 +480,7 @@
     <script>
         function toggleTheme() {
             const body = document.body;
-            if(body.getAttribute('data-theme') === 'light') {
-                body.setAttribute('data-theme', 'dark');
-            } else {
-                body.setAttribute('data-theme', 'light');
-            }
+            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
         }
 
         function showToast(message, type = 'success') {
@@ -461,10 +508,6 @@
 
         function goToTechLoginScreen() {
             switchScreen('screen-login');
-        }
-
-        function switchToAdmin() {
-            showToast('สลับเข้าสู่โหมดผู้ดูแลระบบ (Admin Panel)', 'success');
         }
 
         function selectService(el, serviceName) {
@@ -516,34 +559,42 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ฟังก์ชัน Login ที่ตรวจสอบ User และ Password (ไม่มีช่องเลือกทีม และช่องต้องว่างเปล่า)
+        // ฟังก์ชัน Login ตรวจสอบสิทธิ์ Admin และช่าง
         function handleLogin() {
             const usernameInput = document.getElementById('login-username').value.trim();
             const passwordInput = document.getElementById('login-password').value.trim();
 
             const validUsers = [
+                { username: 'adminpao', password: '2244288216', isAdmin: true },
                 { username: 'teamservice1', password: '123456', team: 'ทีมติดตั้งและซ่อมบำรุง A', repName: 'ช่างสมชาย (หัวหน้าทีม)', isAdmin: false },
                 { username: 'teamservice2', password: '654321', team: 'ทีมระบบไฟฟ้าและโซลาเซลล์ B', repName: 'ช่างวิรัช (หัวหน้าทีม)', isAdmin: false },
-                { username: 'teamservice3', password: '1212121', team: 'ทีมสมาร์ทโฮมและกล้องวงจรปิด C', repName: 'ช่างก้อง (หัวหน้าทีม)', isAdmin: false },
-                { username: 'Adminpao', password: '2244288216', team: 'ผู้ดูแลระบบสูงสุด (Admin)', repName: 'คุณเป๋า (Admin)', isAdmin: true }
+                { username: 'teamservice3', password: '1212121', team: 'ทีมสมาร์ทโฮมและกล้องวงจรปิด C', repName: 'ช่างก้อง (หัวหน้าทีม)', isAdmin: false }
             ];
 
             const matchedUser = validUsers.find(u => u.username === usernameInput && u.password === passwordInput);
 
             if (matchedUser) {
-                showToast(`ยินดีต้อนรับเข้าสู่ระบบ, ${matchedUser.repName} 🎉`, 'success');
-                
-                document.getElementById('display-team-name').innerText = matchedUser.team;
-                document.getElementById('display-rep-name').innerText = matchedUser.repName;
-
                 if (matchedUser.isAdmin) {
-                    switchToAdmin();
+                    showToast('ยินดีต้อนรับเข้าสู่ระบบหลังบ้าน, คุณเป๋า (Admin) 🚀', 'success');
+                    switchScreen('screen-admin-panel');
                 } else {
+                    showToast(`ยินดีต้อนรับเข้าสู่ระบบทีม, ${matchedUser.repName} 🎉`, 'success');
+                    document.getElementById('display-team-name').innerText = matchedUser.team;
+                    document.getElementById('display-rep-name').innerText = matchedUser.repName;
                     switchScreen('screen-tech-dashboard');
                 }
             } else {
                 showToast('❌ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง', 'danger');
             }
+        }
+
+        function sendAdminBroadcast() {
+            const msg = document.getElementById('admin-broadcast-msg').value.trim();
+            if(!msg) return;
+            document.getElementById('alert-text-msg').innerText = msg;
+            document.getElementById('tech-alert-banner').style.display = 'flex';
+            document.getElementById('admin-broadcast-msg').value = '';
+            showToast('ส่งประกาศไปยังหน้าจอช่างทุกคนสำเร็จแล้ว!', 'success');
         }
 
         function addMemberToCurrentTeam() {
@@ -608,29 +659,10 @@
             showToast('ส่งเรื่องเลื่อนนัดหมายไปยังระบบและแจ้งลูกค้าเรียบร้อย', 'warning');
         }
 
-        function openGPSNavigation() {
-            showToast('กำลังเปิดแผนที่นำทาง Google Maps...', 'success');
-        }
-
-        function calculateAndSendETA() {
-            document.getElementById('eta-time-val').innerText = "11:15";
-            document.getElementById('eta-mins-val').innerText = "25";
-            document.getElementById('eta-display-box').style.display = 'block';
-            showToast('ส่งข้อมูล ETA ให้ลูกค้าสำเร็จ', 'success');
-        }
-
         function updateTaskStatus(statusText, type) {
             document.getElementById('task-badge').innerText = statusText;
             document.getElementById('task-badge').className = `badge badge-${type}`;
             showToast(`อัปเดตสถานะงานเป็น: ${statusText}`, 'success');
-        }
-
-        function toggleVoiceRecord() {
-            showToast('🎙️ กำลังบันทึกเสียงสรุปงาน... (จำลองข้อความอัตโนมัติ)', 'success');
-        }
-
-        function closeJobModal() {
-            document.getElementById('job-detail-modal').style.display = 'none';
         }
     </script>
 </body>
