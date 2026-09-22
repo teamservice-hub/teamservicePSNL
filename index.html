@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field & Home Service Platform - Ultimate Pro Edition + Full Admin & Financial Panel</title>
+    <title>Field & Home Service Platform - Ultimate Pro + Google Sheets Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -176,6 +176,9 @@
                 <img id="cust-img-preview" class="thumbnail-preview" alt="Customer Upload Preview">
             </div>
 
+            <label>ชื่อลูกค้า</label>
+            <input type="text" id="cust-name" value="คุณวิชัย ใจดี">
+
             <label>ที่อยู่บ้านลูกค้า (สถานที่หน้างาน)</label>
             <input type="text" id="cust-address" value="ซอย 5, ลาดยาว, กรุงเทพฯ">
 
@@ -207,7 +210,7 @@
             <div style="text-align: center; margin-bottom: 25px;">
                 <div style="font-size: 48px; margin-bottom: 10px;">🛠️</div>
                 <h2 style="margin-bottom: 6px; font-size: 24px;">เข้าสู่ระบบฝั่งช่าง / แอดมิน</h2>
-                <p style="color: var(--text-sub); font-size: 14px; font-weight: 500;">พิมพ์ <strong>adminpao</strong> / รหัสผ่านเพื่อเข้าสู่ระบบหลังบ้าน</p>
+                <p style="color: var(--text-sub); font-size: 14px; font-weight: 500;">พิมพ์ <strong>adminpao</strong> / รหัสผ่าน <strong>08072537</strong> เพื่อเข้าสู่ระบบหลังบ้าน</p>
             </div>
             
             <div style="text-align: left;">
@@ -215,7 +218,7 @@
                 <input type="text" id="login-username" value="adminpao" placeholder="เช่น adminpao หรือ teamservice1">
                 
                 <label>รหัสผ่าน (Password)</label>
-                <input type="password" id="login-password" value="2244288216" placeholder="รหัสผ่านของคุณ">
+                <input type="password" id="login-password" value="08072537" placeholder="รหัสผ่านของคุณ">
 
                 <div class="flex" style="margin-top: 20px;">
                     <button class="btn-secondary" onclick="backToHome()">← หน้าแรก</button>
@@ -246,26 +249,26 @@
                 <div style="background: var(--primary-light); padding: 18px; border-radius: 14px; border: 1px solid var(--border);">
                     <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">📅 รายรับรายจ่ายประจำวัน (วันนี้)</span>
                     <div style="margin-top: 10px; font-size: 15px;">
-                        - รายรับรวม: <strong style="color: var(--accent);" id="admin-daily-income">3,500 ฿</strong><br>
-                        - รายจ่าย (ค่าน้ำมัน/อื่นๆ): <strong style="color: var(--danger);" id="admin-daily-expense">450 ฿</strong><br>
+                        - รายรับรวม: <strong style="color: var(--accent);" id="admin-daily-income">0 ฿</strong><br>
+                        - รายจ่าย (ค่าน้ำมัน/อื่นๆ): <strong style="color: var(--danger);" id="admin-daily-expense">0 ฿</strong><br>
                         <hr style="border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
-                        - กำไรสุทธิวันนี้: <strong style="color: var(--secondary); font-size: 18px;" id="admin-daily-net">3,050 ฿</strong>
+                        - กำไรสุทธิวันนี้: <strong style="color: var(--secondary); font-size: 18px;" id="admin-daily-net">0 ฿</strong>
                     </div>
                 </div>
 
                 <div style="background: var(--primary-light); padding: 18px; border-radius: 14px; border: 1px solid var(--border);">
                     <span style="font-size: 12px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;">🗓️ รายรับรายจ่ายประจำเดือน (เดือนนี้)</span>
                     <div style="margin-top: 10px; font-size: 15px;">
-                        - รายรับรวมทั้งเดือน: <strong style="color: var(--accent);" id="admin-monthly-income">48,500 ฿</strong><br>
-                        - รายจ่ายรวมทั้งเดือน: <strong style="color: var(--danger);" id="admin-monthly-expense">6,200 ฿</strong><br>
+                        - รายรับรวมทั้งเดือน: <strong style="color: var(--accent);" id="admin-monthly-income">0 ฿</strong><br>
+                        - รายจ่ายรวมทั้งเดือน: <strong style="color: var(--danger);" id="admin-monthly-expense">0 ฿</strong><br>
                         <hr style="border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
-                        - กำไรสุทธิเดือนนี้: <strong style="color: var(--secondary); font-size: 18px;" id="admin-monthly-net">42,300 ฿</strong>
+                        - กำไรสุทธิเดือนนี้: <strong style="color: var(--secondary); font-size: 18px;" id="admin-monthly-net">0 ฿</strong>
                     </div>
                 </div>
             </div>
 
             <div class="flex">
-                <input type="text" id="new-trans-title" placeholder="รายการ เช่น รับเงินค่าล้างแอร์บ้านคุณปู / ค่าน้ำมันรถช่าง" style="margin-bottom:0; flex: 2;">
+                <input type="text" id="new-trans-title" placeholder="รายการ เช่น รับเงินค่าบริการ / ค่าน้ำมัน" style="margin-bottom:0; flex: 2;">
                 <select id="new-trans-type" style="margin-bottom:0; width: 140px;">
                     <option value="income">รายรับ (+)</option>
                     <option value="expense">รายจ่าย (-)</option>
@@ -275,10 +278,10 @@
             </div>
         </div>
 
-        <!-- 📂 ประวัติการส่งงานลูกค้า (Job History Logs) -->
+        <!-- 📂 ประวัติการส่งงานลูกค้า (Job History Logs) - อัปเดตเมื่อช่างกดส่งงานเท่านั้น -->
         <div class="card" style="border-left: 6px solid var(--warning);">
             <h3>📂 ประวัติการส่งงานลูกค้าทั้งหมด (Job History Logs)</h3>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">ประวัติงานที่ช่างปฏิบัติการและส่งมอบสำเร็จแล้ว</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">รายการงานที่ถูกส่งมอบสำเร็จจากฝั่งทีมช่างภาคสนาม</p>
             
             <div style="overflow-x: auto;">
                 <table>
@@ -293,18 +296,7 @@
                     </thead>
                     <tbody id="admin-job-history-body">
                         <tr>
-                            <td>#JOB-901</td>
-                            <td>ล้างแอร์ 18,000 BTU</td>
-                            <td>คุณวิชัย (ซอย 5 ลาดยาว)</td>
-                            <td>ทีมติดตั้งและซ่อมบำรุง A</td>
-                            <td><span class="badge badge-success">ส่งมอบงานสำเร็จ ✅</span></td>
-                        </tr>
-                        <tr>
-                            <td>#JOB-902</td>
-                            <td>ติดตั้งกล้องวงจรปิด 4 ตัว</td>
-                            <td>คุณสุชาติ (พหลโยธิน 32)</td>
-                            <td>ทีมสมาร์ทโฮม C</td>
-                            <td><span class="badge badge-success">ส่งมอบงานสำเร็จ ✅</span></td>
+                            <td colspan="5" style="text-align: center; color: var(--text-sub);">ยังไม่มีประวัติการส่งงานจากช่าง (ข้อมูลจะแสดงเมื่อช่างกดปิดจ๊อบ)</td>
                         </tr>
                     </tbody>
                 </table>
@@ -380,14 +372,27 @@
         </div>
 
         <div class="card" style="border-left: 6px solid var(--secondary);">
-            <h3 id="tech-current-job-title">⚡ งานปัจจุบัน: ล้างแอร์ (บ้านคุณวิชัย)</h3>
-            <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 15px;">ล้างแอร์ขนาด 18,000 BTU และตรวจสอบน้ำยา</p>
+            <h3 id="tech-current-job-title">⚡ งานปัจจุบัน: ล้างแอร์</h3>
+            <p style="font-size: 14px; color: var(--text-sub); margin-bottom: 15px;">ตรวจสอบความเรียบร้อยและกดส่งงานเมื่อเสร็จสิ้น</p>
             <button onclick="finishAndSubmitJobToAdmin()" class="btn-success" style="padding: 14px;">✅ ปิดจ๊อบและส่งมอบงานให้แอดมิน</button>
         </div>
     </div>
 
-    <!-- Script ควบคุมระบบทั้งหมด -->
+    <!-- Script ควบคุมระบบทั้งหมด & เชื่อมต่อ Google Sheets -->
     <script>
+        // ใส่ URL ของ Google Apps Script Web App ของคุณที่นี่
+        const GOOGLE_SHEET_WEB_APP_URL = ""; 
+
+        function syncDataToGoogleSheets(payload) {
+            if (!GOOGLE_SHEET_WEB_APP_URL) return;
+            fetch(GOOGLE_SHEET_WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error("Sheets Sync Error:", err));
+        }
+
         function toggleTheme() {
             const body = document.body;
             body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
@@ -429,8 +434,16 @@
         }
 
         function submitCustomerBooking() {
-            document.getElementById('track-service-name').innerText = document.getElementById('selected-service-type').value;
+            const service = document.getElementById('selected-service-type').value;
+            const name = document.getElementById('cust-name').value;
+            const address = document.getElementById('cust-address').value;
+            const phone = document.getElementById('cust-phone').value;
+
+            document.getElementById('track-service-name').innerText = service;
             document.getElementById('customer-tracking-box').style.display = 'block';
+            
+            // ส่งข้อมูลการจองเข้า Google Sheets
+            syncDataToGoogleSheets({ type: 'booking', service, name, address, phone, time: new Date().toISOString() });
             showToast('จองบริการสำเร็จ! ช่างได้รับคำขอแล้ว', 'success');
         }
 
@@ -443,12 +456,12 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ระบบ Login ตัวแยก Admin และทีมช่าง
+        // ระบบ Login ปรับรหัสผ่าน adminpao เป็น 08072537 ตรงตามต้องการ
         function handleLogin() {
             const usernameInput = document.getElementById('login-username').value.trim();
             const passwordInput = document.getElementById('login-password').value.trim();
 
-            if (usernameInput === 'adminpao' && passwordInput === '2244288216') {
+            if (usernameInput === 'adminpao' && passwordInput === '08072537') {
                 showToast('ยินดีต้อนรับเข้าสู่ระบบหลังบ้าน, คุณเป๋า (Admin) 🚀', 'success');
                 switchScreen('screen-admin-panel');
             } else if (usernameInput.startsWith('teamservice')) {
@@ -461,8 +474,8 @@
         }
 
         // ระบบจัดการการเงิน รายรับ-รายจ่าย
-        let dailyIncome = 3500, dailyExpense = 450;
-        let monthlyIncome = 48500, monthlyExpense = 6200;
+        let dailyIncome = 0, dailyExpense = 0;
+        let monthlyIncome = 0, monthlyExpense = 0;
 
         function addNewTransaction() {
             const title = document.getElementById('new-trans-title').value.trim();
@@ -489,6 +502,8 @@
             document.getElementById('admin-monthly-income').innerText = monthlyIncome.toLocaleString() + ' ฿';
             document.getElementById('admin-monthly-expense').innerText = monthlyExpense.toLocaleString() + ' ฿';
             document.getElementById('admin-monthly-net').innerText = (monthlyIncome - monthlyExpense).toLocaleString() + ' ฿';
+
+            syncDataToGoogleSheets({ type: 'transaction', title, transType: type, amount, date: new Date().toISOString() });
 
             document.getElementById('new-trans-title').value = '';
             document.getElementById('new-trans-amount').value = '';
@@ -544,16 +559,31 @@
             showToast('คำนวณค่าน้ำมันเรียบร้อย', 'success');
         }
 
+        let jobCounter = 901;
         function finishAndSubmitJobToAdmin() {
-            document.getElementById('admin-job-history-body').innerHTML += `
+            const tbody = document.getElementById('admin-job-history-body');
+            
+            // ลบข้อความ "ยังไม่มีประวัติ" ออกถ้ามีอยู่
+            if(tbody.querySelector('td[colspan]')) {
+                tbody.innerHTML = '';
+            }
+
+            const jobId = `#JOB-${jobCounter++}`;
+            const serviceName = document.getElementById('tech-current-job-title').innerText.replace('⚡ งานปัจจุบัน: ', '');
+            
+            tbody.innerHTML += `
                 <tr>
-                    <td>#JOB-903</td>
-                    <td>บริการล้างแอร์/ซ่อมบำรุง</td>
+                    <td>${jobId}</td>
+                    <td>${serviceName}</td>
                     <td>คุณวิชัย (ซอย 5 ลาดยาว)</td>
-                    <td>ทีมช่างภาคสนาม</td>
+                    <td>ทีมช่างภาคสนาม A</td>
                     <td><span class="badge badge-success">ส่งมอบงานสำเร็จ ✅</span></td>
                 </tr>
             `;
+
+            // บันทึกส่งข้อมูลลง Google Sheets
+            syncDataToGoogleSheets({ type: 'job_finish', jobId, serviceName, team: 'ทีมช่างภาคสนาม A', time: new Date().toISOString() });
+
             showToast('ปิดจ๊อบและส่งประวัติงานไปหลังบ้านแอดมินเรียบร้อย!', 'success');
             switchScreen('screen-home');
         }
