@@ -45,8 +45,6 @@
 
         .screen { display: none; padding: 20px; max-width: 760px; margin: auto; min-height: 100vh; animation: fadeIn 0.4s ease; }
         .screen.active { display: block; }
-        .admin-layout { display: none; max-width: 1400px; margin: auto; min-height: 100vh; animation: fadeIn 0.4s ease; }
-        .admin-layout.active { display: flex; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -78,23 +76,12 @@
         .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); font-size: 20px; transition: var(--transition); }
         .icon-btn:hover { transform: scale(1.05); }
 
-        .sidebar { width: 280px; background: var(--card); border-right: 1px solid var(--border); padding: 28px; height: 100vh; position: fixed; box-shadow: var(--shadow); }
-        .sidebar h2 { font-size: 20px; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; color: var(--secondary); }
-        .sidebar ul { list-style: none; padding: 0; }
-        .sidebar li { padding: 14px 18px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; font-size: 14px; color: var(--text-sub); transition: var(--transition); display: flex; align-items: center; gap: 14px; font-weight: 600; }
-        .sidebar li:hover, .sidebar li.active { background: rgba(99, 102, 241, 0.1); color: var(--secondary); }
-        .main-content { margin-left: 280px; padding: 40px; width: calc(100% - 280px); }
-
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 16px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; }
         th { background: var(--primary-light); color: var(--text); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
 
         .flex { display: flex; gap: 14px; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 30px; }
-        .stat-card { background: var(--card); padding: 24px; border-radius: var(--radius); border-left: 6px solid var(--secondary); box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .stat-card h3 { font-size: 12px; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
-
         .alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); padding: 16px 20px; border-radius: 14px; margin-bottom: 24px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
         
         .map-box { background: var(--primary-light); border: 2px dashed var(--border); border-radius: 14px; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 14px; margin-bottom: 15px; font-weight: 600; }
@@ -246,7 +233,7 @@
         </div>
     </div>
 
-    <!-- 2. LOGIN SCREEN (ตัวแทนทีมกรอก Username, รหัส และไม่มีค่าเริ่มต้น) -->
+    <!-- 2. LOGIN SCREEN (ไม่มีเลือกทีม และช่องกรอกข้อมูลว่างเปล่าต้องพิมพ์เอง) -->
     <div id="screen-login" class="screen">
         <div class="card" style="margin-top: 60px; padding: 40px;">
             <div style="text-align: center; margin-bottom: 25px;">
@@ -529,7 +516,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ฟังก์ชัน Login ที่ปรับปรุงใหม่ (ไม่มีเลือกทีม และช่องว่างเปล่าต้องกรอกเอง)
+        // ฟังก์ชัน Login ที่ตรวจสอบ User และ Password (ไม่มีช่องเลือกทีม และช่องต้องว่างเปล่า)
         function handleLogin() {
             const usernameInput = document.getElementById('login-username').value.trim();
             const passwordInput = document.getElementById('login-password').value.trim();
