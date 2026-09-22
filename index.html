@@ -204,7 +204,7 @@
         </div>
     </div>
 
-    <!-- 2. LOGIN SCREEN (ค่าว่าง ป้องกันข้อมูลรั่วไหล) -->
+    <!-- 2. LOGIN SCREEN -->
     <div id="screen-login" class="screen">
         <div class="card" style="margin-top: 60px; padding: 40px;">
             <div style="text-align: center; margin-bottom: 25px;">
@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <!-- 3. ADMIN DASHBOARD (ระบบหลังบ้าน adminpao) -->
+    <!-- 3. ADMIN DASHBOARD -->
     <div id="screen-admin-panel" class="screen" style="max-width: 1000px;">
         <div class="card" style="border-left: 6px solid var(--secondary);">
             <div class="flex-between">
@@ -243,7 +243,6 @@
             </div>
         </div>
 
-        <!-- ระบบรายงาน รายรับ-รายจ่าย (เริ่มต้นที่ 0 ทั้งหมด) -->
         <div class="card" style="border-left: 6px solid var(--accent);">
             <h3>💰 ระบบสรุปรายรับ - รายจ่าย (Financial Dashboard)</h3>
             <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px; font-weight: 500;">ข้อมูลตัวเลขสถิติจริงซิงค์ตรงกับ Google Sheets</p>
@@ -281,7 +280,6 @@
             </div>
         </div>
 
-        <!-- 📂 ประวัติการส่งงานลูกค้า (แสดงเฉพาะเมื่อช่างกดส่งงาน) -->
         <div class="card" style="border-left: 6px solid var(--warning);">
             <h3>📂 ประวัติการส่งงานลูกค้าทั้งหมด (Job History Logs)</h3>
             <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: 500;">รายการงานที่ถูกส่งมอบสำเร็จจากฝั่งทีมช่างภาคสนาม</p>
@@ -306,7 +304,6 @@
             </div>
         </div>
 
-        <!-- ประกาศด่วนถึงทีมช่าง -->
         <div class="card" style="border-left: 6px solid var(--warning);">
             <h3>📢 ประกาศด่วนถึงทีมช่างภาคสนาม</h3>
             <div class="flex">
@@ -316,7 +313,7 @@
         </div>
     </div>
 
-    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนาม / แอดมินสามารถสลับมาใช้ได้ทันที) -->
+    <!-- 4. FIELD WORKER DASHBOARD -->
     <div id="screen-tech-dashboard" class="screen" style="max-width: 760px;">
         <div id="tech-alert-banner" class="alert-banner" style="display: none;">
             <span>📢 <strong>ประกาศจากแอดมิน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
@@ -336,7 +333,6 @@
             </div>
         </div>
 
-        <!-- ระบบเช็คอินสมาชิกทีม -->
         <div class="card" style="border-left: 6px solid var(--accent);">
             <h3>👥 ระบบเช็คอินสมาชิกทีมรายวัน</h3>
             <div class="flex" style="margin-bottom: 12px;">
@@ -351,7 +347,6 @@
             </table>
         </div>
 
-        <!-- ระบบจับเวลา -->
         <div class="card" style="border-left: 6px solid var(--secondary);">
             <h3>⏱️ ระบบจับเวลาปฏิบัติงานหน้างาน</h3>
             <div style="background: var(--primary-light); padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 12px; border: 1px solid var(--border);">
@@ -364,7 +359,6 @@
             </div>
         </div>
 
-        <!-- คำนวณค่าน้ำมัน -->
         <div class="card" style="border-left: 6px solid var(--warning);">
             <h3>⛽ ระบบคำนวณค่าน้ำมัน</h3>
             <div class="flex" style="margin-bottom: 12px;">
@@ -384,7 +378,7 @@
         </div>
     </div>
 
-    <!-- Script ควบคุมระบบทั้งหมด -->
+    <!-- JavaScript ควบคุมระบบทั้งหมด -->
     <script>
         const GOOGLE_SHEET_WEB_APP_URL = ""; 
 
@@ -438,14 +432,24 @@
             if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
         }
 
+        let currentBookingData = null;
+
         function submitCustomerBooking() {
             const service = document.getElementById('selected-service-type').value;
             const name = document.getElementById('cust-name').value;
             const address = document.getElementById('cust-address').value;
             const phone = document.getElementById('cust-phone').value;
 
+            if(!name || !address || !phone) {
+                showToast('กรุณากรอกข้อมูลชื่อ ที่อยู่ และเบอร์โทรให้ครบถ้วน', 'danger');
+                return;
+            }
+
+            currentBookingData = { service, name, address, phone };
+
             document.getElementById('track-service-name').innerText = service;
             document.getElementById('customer-tracking-box').style.display = 'block';
+            document.getElementById('tech-current-job-title').innerText = `⚡ งานปัจจุบัน: ${service} (${name})`;
             
             syncDataToGoogleSheets({ type: 'booking', service, name, address, phone, time: new Date().toISOString() });
             showToast('จองบริการสำเร็จ! ช่างได้รับคำขอแล้ว', 'success');
@@ -521,77 +525,122 @@
             document.getElementById('alert-text-msg').innerText = msg;
             document.getElementById('tech-alert-banner').style.display = 'flex';
             document.getElementById('admin-broadcast-msg').value = '';
-            showToast('ส่งประกาศไปยังหน้าจอช่างสำเร็จ!', 'success');
+            showToast('ส่งประกาศถึงทีมช่างสำเร็จ!', 'success');
         }
 
+        // Team members check-in logic
+        let teamMembers = [];
         function addMemberToCurrentTeam() {
             const nameInput = document.getElementById('new-member-name');
-            if(!nameInput.value.trim()) return;
-            const tbody = document.getElementById('team-members-table-body');
-            if(tbody.querySelector('td[colspan]')) tbody.innerHTML = '';
+            const name = nameInput.value.trim();
+            if(!name) return;
 
-            tbody.innerHTML += `
-                <tr>
-                    <td>${nameInput.value}</td>
-                    <td><span class="badge badge-success">เข้างานแล้ว ✅</span></td>
-                    <td><button class="btn-danger" style="padding:4px 8px; font-size:11px; width:auto;" onclick="this.closest('tr').remove()">ลบ</button></td>
-                </tr>
-            `;
+            teamMembers.push({ name, status: 'เข้างานแล้ว' });
             nameInput.value = '';
-            showToast('เพิ่มสมาชิกสำเร็จ', 'success');
+            renderTeamMembers();
+            showToast('เช็คอินสมาชิกเข้าทีมสำเร็จ', 'success');
         }
 
-        let timerInterval = null, secondsElapsed = 0;
+        function removeTeamMember(index) {
+            teamMembers.splice(index, 1);
+            renderTeamMembers();
+        }
+
+        function renderTeamMembers() {
+            const tbody = document.getElementById('team-members-table-body');
+            if(teamMembers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-sub);">ยังไม่มีสมาชิกเช็คอินวันนี้</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = teamMembers.map((m, idx) => `
+                <tr>
+                    <td>${m.name}</td>
+                    <td><span class="badge badge-success">${m.status}</span></td>
+                    <td><button class="btn-danger" style="padding: 4px 10px; font-size: 12px; width: auto;" onclick="removeTeamMember(${idx})">ลบ</button></td>
+                </tr>
+            `).join('');
+        }
+
+        // Timer logic
+        let timerInterval = null;
+        let secondsElapsed = 0;
+
         function startJobTimer() {
             if(timerInterval) return;
             timerInterval = setInterval(() => {
                 secondsElapsed++;
-                let hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-                let mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-                let secs = String(secondsElapsed % 60).padStart(2, '0');
+                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
                 document.getElementById('job-timer-display').innerText = `${hrs}:${mins}:${secs}`;
             }, 1000);
-            showToast('เริ่มจับเวลาทำงานแล้ว', 'success');
+            showToast('เริ่มจับเวลาการทำงานแล้ว', 'success');
         }
-        function pauseJobTimer() { clearInterval(timerInterval); timerInterval = null; showToast('พักจับเวลา', 'warning'); }
-        function stopJobTimer() { clearInterval(timerInterval); timerInterval = null; secondsElapsed = 0; document.getElementById('job-timer-display').innerText = "00:00:00"; showToast('สิ้นสุดเวลาทำงาน', 'success'); }
 
+        function pauseJobTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            showToast('พักการจับเวลาชั่วคราว', 'warning');
+        }
+
+        function stopJobTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            showToast('หยุดเวลาปฏิบัติงาน', 'success');
+        }
+
+        // Fuel calculation logic
         function calculateDailyFuel() {
-            let km = 30;
-            let kmPerLiter = parseFloat(document.getElementById('fuel-km-per-liter').value) || 12;
-            let pricePerLiter = parseFloat(document.getElementById('fuel-price-per-liter').value) || 38.50;
-            let totalCost = (km / kmPerLiter) * pricePerLiter;
-            document.getElementById('res-total-distance').innerText = km;
+            const kmPerLiter = parseFloat(document.getElementById('fuel-km-per-liter').value);
+            const pricePerLiter = parseFloat(document.getElementById('fuel-price-per-liter').value);
+
+            if(isNaN(kmPerLiter) || isNaN(pricePerLiter) || kmPerLiter <= 0 || pricePerLiter <= 0) {
+                showToast('กรุณากรอกอัตราค่าน้ำมันให้ถูกต้อง', 'danger');
+                return;
+            }
+
+            const estimatedDistance = 25; // ค่าสมมติระยะทางวิ่งหน้างานเฉลี่ย
+            const totalCost = (estimatedDistance / kmPerLiter) * pricePerLiter;
+
+            document.getElementById('res-total-distance').innerText = estimatedDistance;
             document.getElementById('res-total-cost').innerText = totalCost.toFixed(2);
             document.getElementById('fuel-calculation-result-box').style.display = 'block';
             showToast('คำนวณค่าน้ำมันเรียบร้อย', 'success');
         }
 
-        let jobCounter = 1;
+        // Job completion handler
+        let jobHistory = [];
         function finishAndSubmitJobToAdmin() {
+            const serviceName = currentBookingData ? currentBookingData.service : "บริการทั่วไป";
+            const custInfo = currentBookingData ? `${currentBookingData.name} (${currentBookingData.address})` : "ลูกค้านัดหมายทั่วไป";
+            const jobId = "JOB-" + Math.floor(1000 + Math.random() * 9000);
+
+            jobHistory.push({
+                id: jobId,
+                service: serviceName,
+                customer: custInfo,
+                team: document.getElementById('display-team-name').innerText,
+                status: 'ส่งมอบสำเร็จ'
+            });
+
+            renderJobHistory();
+            document.getElementById('track-status-badge').className = 'badge badge-success';
+            document.getElementById('track-status-badge').innerText = 'เสร็จสิ้นสมบูรณ์';
+            showToast('ปิดจ๊อบและส่งมอบงานให้แอดมินเรียบร้อย!', 'success');
+        }
+
+        function renderJobHistory() {
             const tbody = document.getElementById('admin-job-history-body');
-            
-            if(tbody.querySelector('td[colspan]')) {
-                tbody.innerHTML = '';
-            }
-
-            const jobId = `#JOB-00${jobCounter++}`;
-            const serviceName = document.getElementById('tech-current-job-title').innerText.replace('⚡ งานปัจจุบัน: ', '');
-            
-            tbody.innerHTML += `
+            if(jobHistory.length === 0) return;
+            tbody.innerHTML = jobHistory.map(j => `
                 <tr>
-                    <td>${jobId}</td>
-                    <td>${serviceName}</td>
-                    <td>คุณลูกค้าหน้างานจริง</td>
-                    <td>ทีมช่าง (Admin)</td>
-                    <td><span class="badge badge-success">ส่งมอบงานสำเร็จ ✅</span></td>
+                    <td><strong>${j.id}</strong></td>
+                    <td>${j.service}</td>
+                    <td>${j.customer}</td>
+                    <td>${j.team}</td>
+                    <td><span class="badge badge-success">${j.status}</span></td>
                 </tr>
-            `;
-
-            syncDataToGoogleSheets({ type: 'job_finish', jobId, serviceName, team: 'ทีมช่าง (Admin)', time: new Date().toISOString() });
-
-            showToast('ปิดจ๊อบและส่งประวัติงานไปหลังบ้านแอดมินเรียบร้อย!', 'success');
-            switchScreen('screen-admin-panel');
+            `).join('');
         }
     </script>
 </body>
