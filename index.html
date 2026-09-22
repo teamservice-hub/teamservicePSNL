@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceHub Pro - Admin & Tech Sync Version</title>
+    <title>ServiceHub Pro - Ultimate Sync Version</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -115,7 +115,7 @@
     <div id="screen-home" class="screen active">
         <div class="card" style="margin-top: 60px; text-align: center; padding: 40px;">
             <div style="font-size: 56px; margin-bottom: 15px;">🏠⚡</div>
-            <h2 style="font-size: 26px; margin-bottom: 8px;">ยินดีต้อนรับสู่ ServiceHub Pro</h2>
+            <h2 style="font-size: 26px; margin-bottom: 8px;">ยินดีต้อนรับสู่ ServiceHub Pro (Ver. 2026)</h2>
             <p style="color: var(--text-sub); margin-bottom: 30px; font-weight: 500;">แพลตฟอร์มกลางเชื่อมต่อช่างมืออาชีพและบริการงานบ้านครบวงจร</p>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
@@ -316,7 +316,7 @@
         </div>
     </div>
 
-    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนามทั่วไป / Admin สามารถเข้าใช้งานได้) -->
+    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนาม / แอดมินสามารถสลับมาใช้ได้ทันที) -->
     <div id="screen-tech-dashboard" class="screen" style="max-width: 760px;">
         <div id="tech-alert-banner" class="alert-banner" style="display: none;">
             <span>📢 <strong>ประกาศจากแอดมิน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
@@ -330,7 +330,7 @@
                     <p style="margin: 6px 0 0 0; color: var(--text-sub); font-size: 13px;">สถานะ: <span style="color: var(--accent);">พร้อมปฏิบัติงาน</span></p>
                 </div>
                 <div style="display: flex; gap: 8px;">
-                    <button id="btn-back-to-admin" class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px; display: none;" onclick="switchScreen('screen-admin-panel')">📊 กลับหน้าแอดมิน</button>
+                    <button id="btn-back-to-admin" class="btn-success" style="width: auto; padding: 8px 14px; font-size: 13px; display: inline-block;" onclick="switchScreen('screen-admin-panel')">📊 กลับหน้าแอดมิน</button>
                     <button class="btn-secondary" style="width: auto; padding: 8px 14px; font-size: 13px;" onclick="backToHome()">ออกจากระบบ</button>
                 </div>
             </div>
@@ -384,7 +384,7 @@
         </div>
     </div>
 
-    <!-- Script ควบคุมระบบทั้งหมด & Google Sheets Sync -->
+    <!-- Script ควบคุมระบบทั้งหมด -->
     <script>
         const GOOGLE_SHEET_WEB_APP_URL = ""; 
 
@@ -466,13 +466,11 @@
 
             if (usernameInput === 'adminpao' && passwordInput === '08072537') {
                 showToast('ยินดีต้อนรับเข้าสู่ระบบหลังบ้าน, คุณเป๋า (Admin) 🚀', 'success');
-                // แสดงปุ่มสลับกลับหน้าแอดมินเมื่อเข้ามาทางฝั่งช่าง
                 document.getElementById('btn-back-to-admin').style.display = 'inline-block';
                 document.getElementById('display-team-name').innerText = 'ทีมช่าง (มุมมองผู้ดูแลระบบ: adminpao)';
                 switchScreen('screen-admin-panel');
             } else if (usernameInput.startsWith('teamservice')) {
                 showToast('ยินดีต้อนรับเข้าสู่ระบบทีมช่างภาคสนาม 🎉', 'success');
-                // ซ่อนปุ่มสลับหน้าแอดมินสำหรับช่างทั่วไป
                 document.getElementById('btn-back-to-admin').style.display = 'none';
                 document.getElementById('display-team-name').innerText = 'ทีมช่างภาคสนาม (' + usernameInput + ')';
                 switchScreen('screen-tech-dashboard');
@@ -593,8 +591,6 @@
             syncDataToGoogleSheets({ type: 'job_finish', jobId, serviceName, team: 'ทีมช่าง (Admin)', time: new Date().toISOString() });
 
             showToast('ปิดจ๊อบและส่งประวัติงานไปหลังบ้านแอดมินเรียบร้อย!', 'success');
-            
-            // ถ้าเป็น Admin กดปิดจ๊อบ สามารถเลือกเด้งกลับหน้าแอดมินหรืออยู่ต่อได้ตามสะดวก
             switchScreen('screen-admin-panel');
         }
     </script>
