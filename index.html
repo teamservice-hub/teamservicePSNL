@@ -98,6 +98,8 @@
         .alert-banner { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); padding: 16px 20px; border-radius: 14px; margin-bottom: 24px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
         
         .map-box { background: var(--primary-light); border: 2px dashed var(--border); border-radius: 14px; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-sub); font-size: 14px; margin-bottom: 15px; font-weight: 600; }
+        .thumbnail-preview { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); margin-top: 10px; background: var(--primary-light); }
+
         .service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
         .service-card { border: 2px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: var(--transition); background: var(--card); }
         .service-card:hover, .service-card.selected { border-color: var(--secondary); background: rgba(99, 102, 241, 0.05); }
@@ -112,7 +114,6 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
         .modal-content { background: var(--card); padding: 30px; border-radius: var(--radius); width: 90%; max-width: 600px; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; max-height: 90vh; overflow-y: auto; }
         .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text); width: auto; padding: 5px 10px; box-shadow: none; }
-        .thumbnail-preview { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); margin-top: 10px; background: var(--primary-light); }
 
         #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
         .toast { background: var(--card); color: var(--text); padding: 16px 22px; border-radius: 14px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid var(--border); display: flex; align-items: center; gap: 14px; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s ease 2.7s forwards; font-size: 15px; font-weight: 600; }
@@ -245,28 +246,21 @@
         </div>
     </div>
 
-    <!-- 2. LOGIN SCREEN -->
+    <!-- 2. LOGIN SCREEN (ตัวแทนทีมกรอก Username, รหัส และไม่มีค่าเริ่มต้น) -->
     <div id="screen-login" class="screen">
         <div class="card" style="margin-top: 60px; padding: 40px;">
             <div style="text-align: center; margin-bottom: 25px;">
                 <div style="font-size: 48px; margin-bottom: 10px;">🛠️</div>
                 <h2 style="margin-bottom: 6px; font-size: 24px;">เข้าสู่ระบบฝั่งช่าง / ตัวแทนทีม</h2>
-                <p style="color: var(--text-sub); font-size: 14px; font-weight: 500;">กรอกข้อมูลบัญชีและเลือกทีมปฏิบัติงานของคุณ</p>
+                <p style="color: var(--text-sub); font-size: 14px; font-weight: 500;">กรอกชื่อผู้ใช้งานและรหัสผ่านเพื่อเข้าสู่ระบบ</p>
             </div>
             
             <div style="text-align: left;">
-                <label>ชื่อผู้ใช้งาน (Username / เบอร์โทร)</label>
-                <input type="text" id="login-username" value="teamservice1" placeholder="กรอกชื่อผู้ใช้งานตัวแทนทีม">
+                <label>ชื่อผู้ใช้งาน (Username)</label>
+                <input type="text" id="login-username" value="" placeholder="กรอกชื่อผู้ใช้งานของคุณ">
                 
                 <label>รหัสผ่าน (Password)</label>
-                <input type="password" id="login-password" value="123456" placeholder="กรอกรหัสผ่าน">
-
-                <label>เลือกทีมปฏิบัติงาน</label>
-                <select id="login-team-select">
-                    <option value="ทีมติดตั้งและซ่อมบำรุง A">ทีมติดตั้งและซ่อมบำรุง A</option>
-                    <option value="ทีมระบบไฟฟ้าและโซลาเซลล์ B">ทีมระบบไฟฟ้าและโซลาเซลล์ B</option>
-                    <option value="ทีมสมาร์ทโฮมและกล้องวงจรปิด C">ทีมสมาร์ทโฮมและกล้องวงจรปิด C</option>
-                </select>
+                <input type="password" id="login-password" value="" placeholder="กรอกรหัสผ่านของคุณ">
 
                 <div class="flex" style="margin-top: 20px;">
                     <button class="btn-secondary" onclick="backToHome()">← หน้าแรก</button>
@@ -276,75 +270,7 @@
         </div>
     </div>
 
-    <!-- 3. ADMIN PANEL SCREEN (สำหรับ Adminpao เท่านั้น) -->
-    <div id="screen-admin-panel" class="admin-layout">
-        <div class="sidebar">
-            <h2>🛡️ AdminHub Pro</h2>
-            <ul>
-                <li class="active">📊 แดชบอร์ดภาพรวม</li>
-                <li>👥 จัดการทีมและช่าง</li>
-                <li>📋 รายการงานทั้งหมด</li>
-                <li onclick="backToHome()" style="color: var(--danger); margin-top: 40px;">🚪 ออกจากระบบ</li>
-            </ul>
-        </div>
-        <div class="main-content">
-            <div class="flex-between" style="margin-bottom: 30px;">
-                <div>
-                    <h2>สวัสดี, คุณเป๋า (Admin สูงสุด) 👋</h2>
-                    <p style="color: var(--text-sub); font-size: 14px; margin: 0;">ระบบควบคุมและบริหารจัดการภาพรวมแพลตฟอร์มทั้งหมด</p>
-                </div>
-                <button class="btn-secondary" style="width: auto; padding: 10px 18px;" onclick="backToHome()">ออกจากระบบหลังบ้าน</button>
-            </div>
-
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <h3>งานทั้งหมดวันนี้</h3>
-                    <p style="font-size: 28px; font-weight: 800; margin: 0; color: var(--secondary);">12 งาน</p>
-                </div>
-                <div class="stat-card" style="border-left-color: var(--accent);">
-                    <h3>งานเสร็จสิ้น</h3>
-                    <p style="font-size: 28px; font-weight: 800; margin: 0; color: var(--accent);">8 งาน</p>
-                </div>
-                <div class="stat-card" style="border-left-color: var(--warning);">
-                    <h3>ทีมช่างปฏิบัติงาน</h3>
-                    <p style="font-size: 28px; font-weight: 800; margin: 0; color: var(--warning);">3 ทีม</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>📋 รายการคำขอและสถานะช่างภาคสนามทั้งหมด</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>รหัสงาน</th>
-                            <th>ประเภทบริการ</th>
-                            <th>ลูกค้า / สถานที่</th>
-                            <th>ทีมรับผิดชอบ</th>
-                            <th>สถานะ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#JOB-9012</td>
-                            <td>ล้างแอร์</td>
-                            <td>คุณวิชัย (ซอย 5, ลาดยาว)</td>
-                            <td>ทีมติดตั้งและซ่อมบำรุง A</td>
-                            <td><span class="badge badge-warning">กำลังเดินทาง</span></td>
-                        </tr>
-                        <tr>
-                            <td>#JOB-9013</td>
-                            <td>ติดตั้งโซลาเซลล์</td>
-                            <td>คุณกนก (ถ.พหลโยธิน)</td>
-                            <td>ทีมระบบไฟฟ้าและโซลาเซลล์ B</td>
-                            <td><span class="badge badge-success">เสร็จสิ้น</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. FIELD WORKER DASHBOARD -->
+    <!-- 4. FIELD WORKER DASHBOARD (ช่างภาคสนาม + ระบบเช็คอินสมาชิกทีมและย้ายทีม) -->
     <div id="screen-tech-dashboard" class="screen" style="max-width: 760px;">
         <div id="tech-alert-banner" class="alert-banner" style="display: none;">
             <span>📢 <strong>ประกาศด่วน:</strong> <span id="alert-text-msg">โปรดตรวจสอบงานด่วน</span></span>
@@ -359,6 +285,7 @@
                 </div>
                 <div class="flex" style="gap: 8px;">
                     <button class="btn-secondary" style="width: auto; padding: 8px 12px; font-size: 12px;" onclick="backToHome()">หน้าแรก</button>
+                    <button class="btn-secondary" style="width: auto; padding: 8px 12px; font-size: 12px;" onclick="switchToAdmin()">โหมดแอดมิน 📊</button>
                 </div>
             </div>
         </div>
@@ -511,7 +438,7 @@
         </div>
     </div>
 
-    <!-- Script ควบคุมการทำงานทั้งหมด -->
+    <!-- Script พื้นฐานระบบ -->
     <script>
         function toggleTheme() {
             const body = document.body;
@@ -532,7 +459,7 @@
         }
 
         function switchScreen(screenId) {
-            document.querySelectorAll('.screen, .admin-layout').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -547,6 +474,10 @@
 
         function goToTechLoginScreen() {
             switchScreen('screen-login');
+        }
+
+        function switchToAdmin() {
+            showToast('สลับเข้าสู่โหมดผู้ดูแลระบบ (Admin Panel)', 'success');
         }
 
         function selectService(el, serviceName) {
@@ -598,13 +529,11 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ฟังก์ชัน Login ที่จำกัดสิทธิ์เฉพาะบัญชีที่กำหนดและแยกสิทธิ์แอดมิน
+        // ฟังก์ชัน Login ที่ปรับปรุงใหม่ (ไม่มีเลือกทีม และช่องว่างเปล่าต้องกรอกเอง)
         function handleLogin() {
             const usernameInput = document.getElementById('login-username').value.trim();
             const passwordInput = document.getElementById('login-password').value.trim();
-            const teamSelect = document.getElementById('login-team-select').value;
 
-            // ฐานข้อมูลบัญชีผู้ใช้ที่ได้รับอนุญาตเท่านั้น
             const validUsers = [
                 { username: 'teamservice1', password: '123456', team: 'ทีมติดตั้งและซ่อมบำรุง A', repName: 'ช่างสมชาย (หัวหน้าทีม)', isAdmin: false },
                 { username: 'teamservice2', password: '654321', team: 'ทีมระบบไฟฟ้าและโซลาเซลล์ B', repName: 'ช่างวิรัช (หัวหน้าทีม)', isAdmin: false },
@@ -614,22 +543,19 @@
 
             const matchedUser = validUsers.find(u => u.username === usernameInput && u.password === passwordInput);
 
-            if (!matchedUser) {
-                showToast('❌ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง หรือไม่มีสิทธิ์เข้าสู่ระบบ', 'danger');
-                return;
-            }
+            if (matchedUser) {
+                showToast(`ยินดีต้อนรับเข้าสู่ระบบ, ${matchedUser.repName} 🎉`, 'success');
+                
+                document.getElementById('display-team-name').innerText = matchedUser.team;
+                document.getElementById('display-rep-name').innerText = matchedUser.repName;
 
-            showToast(`ยินดีต้อนรับเข้าสู่ระบบ, ${matchedUser.repName} 🎉`, 'success');
-            
-            document.getElementById('display-team-name').innerText = matchedUser.team;
-            document.getElementById('display-rep-name').innerText = matchedUser.repName;
-
-            // เฉพาะ Adminpao เท่านั้นที่จะเข้าหน้าจอแอดมินหลังบ้านได้
-            if (matchedUser.username === 'Adminpao' && matchedUser.isAdmin) {
-                switchScreen('screen-admin-panel');
+                if (matchedUser.isAdmin) {
+                    switchToAdmin();
+                } else {
+                    switchScreen('screen-tech-dashboard');
+                }
             } else {
-                // ช่างทั่วไปจะถูกบังคับเข้าสู่แดชบอร์ดช่างภาคสนามเท่านั้น ไม่มีสิทธิ์ดูหลังบ้าน
-                switchScreen('screen-tech-dashboard');
+                showToast('❌ ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง', 'danger');
             }
         }
 
@@ -677,7 +603,7 @@
         }
 
         function calculateDailyFuel() {
-            const km = 45;
+            const km = 45; 
             const kmPerLiter = parseFloat(document.getElementById('fuel-km-per-liter').value) || 12;
             const pricePerLiter = parseFloat(document.getElementById('fuel-price-per-liter').value) || 38.50;
             
@@ -713,7 +639,7 @@
         }
 
         function toggleVoiceRecord() {
-            showToast('🎙️ กำลังบันทึกเสียงสรุปงาน...', 'success');
+            showToast('🎙️ กำลังบันทึกเสียงสรุปงาน... (จำลองข้อความอัตโนมัติ)', 'success');
         }
 
         function closeJobModal() {
