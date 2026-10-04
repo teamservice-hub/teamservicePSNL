@@ -416,6 +416,7 @@ td{
 
 .badge.red{
   background:rgba(255,93,115,.12);
+   
 }
 
 /* JOB */
@@ -1470,33 +1471,81 @@ function saveDB(){
    LOGIN
 ========================================================= */
 
-function login(){
+async function login(){
 
-  const team = document.getElementById("loginTeam").value;
+  const email =
+    document.getElementById("loginEmail").value.trim();
 
-  const name =
-    document.getElementById("loginName").value.trim()
-    || team;
+  const password =
+    document.getElementById("loginPassword").value;
 
-  currentUser = {
-    name,
-    team,
-    admin:team === "Paoadmin"
-  };
+  const errorBox =
+    document.getElementById("loginError");
 
-  localStorage.setItem(
-    "service_current_user",
-    JSON.stringify(currentUser)
-  );
+  errorBox.style.display = "none";
+  errorBox.textContent = "";
 
-  document.getElementById("loginScreen")
-    .classList.add("hidden");
+  if(!email || !password){
+    errorBox.textContent = "กรุณากรอกอีเมลและรหัสผ่าน";
+    errorBox.style.display = "block";
+    return;
+  }
 
-  document.getElementById("app")
-    .classList.remove("hidden");
+  try{
 
-  setupUser();
-  renderAll();
+    const result =
+      await window.firebaseService.signInWithEmailAndPassword(
+        window.firebaseService.auth,
+        email,
+        password
+      );
+
+    const user = result.user;
+
+    const userRef =
+      window.firebaseService.doc(
+        window.firebaseService.firestore,
+        "users",
+        user.uid
+      );
+
+    const userSnap =
+      await window.firebaseService.getDoc(userRef);
+
+    if(!userSnap.exists()){
+      throw new Error("ไม่พบข้อมูลผู้ใช้งานในระบบ");
+    }
+
+    const userData = userSnap.data();
+
+    currentUser = {
+      uid: user.uid,
+      email: user.email,
+      name: userData.name || user.email,
+      team: userData.team || "",
+      admin: userData.role === "admin"
+    };
+
+    document
+      .getElementById("loginScreen")
+      .classList.add("hidden");
+
+    document
+      .getElementById("app")
+      .classList.remove("hidden");
+
+    setupUser();
+    renderAll();
+
+  }catch(error){
+
+    console.error(error);
+
+    errorBox.textContent =
+      "เข้าสู่ระบบไม่สำเร็จ: " + error.message;
+
+    errorBox.style.display = "block";
+  }
 }
 
 
