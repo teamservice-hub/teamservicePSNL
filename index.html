@@ -304,12 +304,12 @@
             showScreen('customerBookingScreen');
         }
 
-        // Login ฝั่งช่าง / แอดมิน
+        // Login ฝั่งช่าง / แอดมิน (แก้ไขรหัสผ่านใหม่)
         function staffLogin() {
             const user = document.getElementById('loginUsername').value.trim();
             const pass = document.getElementById('loginPassword').value.trim();
 
-            if (user === 'adminpao' && pass === 'admin2537') {
+            if (user === 'adminpao' && pass === '08072537') {
                 currentUser = 'adminpao';
                 currentRole = 'admin';
                 setupNav();
