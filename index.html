@@ -1551,23 +1551,93 @@ async function login(){
 
 function checkLogin(){
 
-  const saved =
-    localStorage.getItem("service_current_user");
-
-  if(saved){
-
-    currentUser = JSON.parse(saved);
-
-    document.getElementById("loginScreen")
-      .classList.add("hidden");
-
-    document.getElementById("app")
-      .classList.remove("hidden");
-
-    setupUser();
-
+  if(!window.firebaseService){
+    setTimeout(checkLogin, 100);
+    return;
   }
-}
+
+  window.firebaseService.onAuthStateChanged(
+    window.firebaseService.auth,
+    async (user) => {
+
+      if(!user){
+
+        currentUser = null;
+
+        document
+          .getElementById("loginScreen")
+          .classList.remove("hidden");
+
+        document
+          .getElementById("app")
+          .classList.add("hidden");
+
+        return;
+      }
+
+      try{
+
+        const userRef =
+          window.firebaseService.doc(
+            window.firebaseService.firestore,
+            "users",
+            user.uid
+          );
+
+        const userSnap =
+          await window.firebaseService.getDoc(userRef);
+
+        if(!userSnap.exists()){
+
+          await window.firebaseService.signOut(
+            window.firebaseService.auth
+          );
+
+          return;
+        }
+
+        const userData = userSnap.data();
+
+        currentUser = {
+          uid: user.uid,
+          email: user.email,
+          name: userData.name || user.email,
+          team: userData.team || "",
+          admin: userData.role === "admin"
+        };
+
+        document
+          .getElementById("loginScreen")
+          .classList.add("hidden");
+
+        document
+          .getElementById("app")
+          .classList.remove("hidden");
+
+        setupUser();
+        renderAll();
+
+      }catch(error){
+
+        console.error(
+          "ตรวจสอบผู้ใช้ไม่สำเร็จ:",
+          error
+        );
+
+        currentUser = null;
+
+        document
+          .getElementById("loginScreen")
+          .classList.remove("hidden");
+
+        document
+          .getElementById("app")
+          .classList.add("hidden");
+      }
+
+    }
+  );
+}                                         
 
 
 function setupUser(){
