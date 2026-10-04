@@ -1,3252 +1,2898 @@
 <!DOCTYPE html>
-<html lang="th" class="h-full bg-slate-50">
+<html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAKJAI Homestay - พักกาย พักใจ สัมผัสวิถีชุมชนทั่วไทย</title>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Google Fonts: Prompt -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <script>
-        // Attach pakjaiApp directly to window to guarantee availability
-        window.pakjaiApp = function pakjaiApp() {
-            return {
-                currentView: 'public',
-
-                // Login User State
-                currentUser: {
-                    role: 'public',
-                    name: 'ผู้เยี่ยมชมทั่วไป',
-                    username: ''
-                },
-
-                // Filters State
-                searchQuery: '',
-                searchCheckIn: '',
-                searchCheckOut: '',
-                selectedRegion: 'ทั้งหมด',
-                selectedProvince: 'ทั้งหมด',
-                sortBy: 'recommended',
-                activityViewProvince: 'เชียงใหม่',
-
-                // Modals Controls
-                showLoginModal: false,
-                showDetailModal: false,
-                showBookingConfirmModal: false,
-                showPaymentModal: false,
-                showNotificationsModal: false,
-                showMyBookingsModal: false,
-                loginError: '',
-                activeBooking: null,
-
-                loginForm: {
-                    username: '',
-                    password: '',
-                    homestayId: ''
-                },
-
-                customerInfo: {
-                    name: '',
-                    phone: ''
-                },
-
-                activeHomestay: null,
-
-                bookingForm: {
-                    checkIn: new Date().toISOString().split('T')[0],
-                    checkOut: '',
-                    nights: 1,
-                    guests: 2,
-                    selectedActivities: []
-                },
-
-                paymentForm: {
-                    method: 'โอนผ่านธนาคาร'
-                },
-
-                paymentInfo: {
-                    bankName: 'ธนาคารตัวอย่าง PAKJAI',
-                    accountName: 'PAKJAI HOMESTAY (บัญชีตัวอย่าง)',
-                    accountNumber: '123-4-56789-0',
-                    promptPayNumber: '0812345678',
-                    qrReady: false
-                },
-
-                notifications: [],
-
-                newReview: {
-                    rating: 5,
-                    comment: ''
-                },
-
-                userBookings: [],
-
-                toast: {
-                    show: false,
-                    message: ''
-                },
-
-                // Data Structures
-                regions: [
-                    'ภาคเหนือ',
-                    'ภาคกลาง',
-                    'ภาคตะวันออกเฉียงเหนือ',
-                    'ภาคใต้',
-                    'ภาคตะวันออก',
-                    'ภาคตะวันตก'
-                ],
-
-                popularProvinces: [
-                    { name: 'เชียงใหม่', icon: '🍓' },
-                    { name: 'สมุทรสงคราม', icon: '🛶' },
-                    { name: 'นครศรีธรรมราช', icon: '🎨' },
-                    { name: 'น่าน', icon: '🚴' },
-                    { name: 'ภูเก็ต', icon: '🏖️' },
-                    { name: 'กาญจนบุรี', icon: '🌊' }
-                ],
-
-                // Complete 77 Provinces Array
-                allProvincesList: [
-                    "กรุงเทพมหานคร",
-                    "กระบี่",
-                    "กาญจนบุรี",
-                    "กาฬสินธุ์",
-                    "กำแพงเพชร",
-                    "ขอนแก่น",
-                    "จันทบุรี",
-                    "ฉะเชิงเทรา",
-                    "ชลบุรี",
-                    "ชัยนาท",
-                    "ชัยภูมิ",
-                    "ชุมพร",
-                    "เชียงราย",
-                    "เชียงใหม่",
-                    "ตรัง",
-                    "ตราด",
-                    "ตาก",
-                    "นครนายก",
-                    "นครปฐม",
-                    "นครพนม",
-                    "นครราชสีมา",
-                    "นครศรีธรรมราช",
-                    "นครสวรรค์",
-                    "นนทบุรี",
-                    "นราธิวาส",
-                    "น่าน",
-                    "บึงกาฬ",
-                    "บุรีรัมย์",
-                    "ปทุมธานี",
-                    "ประจวบคีรีขันธ์",
-                    "ปราจีนบุรี",
-                    "ปัตตานี",
-                    "พระนครศรีอยุธยา",
-                    "พะเยา",
-                    "พังงา",
-                    "พัทลุง",
-                    "พิจิตร",
-                    "พิษณุโลก",
-                    "เพชรบุรี",
-                    "เพชรบูรณ์",
-                    "แพร่",
-                    "ภูเก็ต",
-                    "มหาสารคาม",
-                    "มุกดาหาร",
-                    "แม่ฮ่องสอน",
-                    "ยโสธร",
-                    "ยะลา",
-                    "ร้อยเอ็ด",
-                    "ระนอง",
-                    "ระยอง",
-                    "ราชบุรี",
-                    "ลพบุรี",
-                    "ลำปาง",
-                    "ลำพูน",
-                    "เลย",
-                    "ศรีสะเกษ",
-                    "สกลนคร",
-                    "สงขลา",
-                    "สตูล",
-                    "สมุทรปราการ",
-                    "สมุทรสงคราม",
-                    "สมุทรสาคร",
-                    "สระแก้ว",
-                    "สระบุรี",
-                    "สิงห์บุรี",
-                    "สุโขทัย",
-                    "สุพรรณบุรี",
-                    "สุราษฎร์ธานี",
-                    "สุรินทร์",
-                    "หนองคาย",
-                    "หนองบัวลำภู",
-                    "อ่างทอง",
-                    "อำนาจเจริญ",
-                    "อุดรธานี",
-                    "อุตรดิตถ์",
-                    "อุทัยธานี",
-                    "อุบลราชธานี"
-                ],
-
-                homestays: [
-                    {
-                        id: 1,
-                        name: 'บ้านแม่กลางหลวง โฮมสเตย์',
-                        ownerUsername: 'owner_chiangmai',
-                        province: 'เชียงใหม่',
-                        region: 'ภาคเหนือ',
-                        district: 'จอมทอง',
-                        pricePerNight: 1200,
-                        rating: 4.9,
-                        reviewsCount: 38,
-                        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=60',
-                        description: 'สัมผัสไอหมอกและนาขั้นบันไดอันเขียวขจี ชิมกาแฟสดต้มเองกลางสวน และร่วมกิจกรรมวิถีชาวดอย',
-                        activities: [
-                            'เก็บสตรอว์เบอร์รีสดจากไร่',
-                            'ทานหมูกระทะบนดอยชมดาว',
-                            'ดริปกาแฟสดปกาเกอะญอ'
-                        ],
-                        status: 'approved',
-                        reviews: [
-                            {
-                                id: 101,
-                                userName: 'กิตติศักดิ์',
-                                rating: 5,
-                                comment: 'บรรยากาศดีมาก อากาศเย็นสบายตลอดปี หมูกระทะอร่อย!'
-                            }
-                        ]
-                    },
-                    {
-                        id: 2,
-                        name: 'บ้านสวนอัมพวา ริมคลองโฮมสเตย์',
-                        ownerUsername: 'owner_samut',
-                        province: 'สมุทรสงคราม',
-                        region: 'ภาคกลาง',
-                        district: 'อัมพวา',
-                        pricePerNight: 950,
-                        rating: 4.8,
-                        reviewsCount: 24,
-                        image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&auto=format&fit=crop&q=60',
-                        description: 'โฮมสเตย์เรือนไทยริมน้ำ สัมผัสวิถีชีวิตชาวสวนมะพร้าว ล่องเรือชมหิ่งห้อยยามค่ำคืน',
-                        activities: [
-                            'พายเรือชมสวนมะพร้าว',
-                            'ล่องเรือชมหิ่งห้อยยามค่ำ',
-                            'ทำน้ำตาลมะพร้าวแบบดั้งเดิม'
-                        ],
-                        status: 'approved',
-                        reviews: [
-                            {
-                                id: 102,
-                                userName: 'นภาวรรณ',
-                                rating: 5,
-                                comment: 'หิ่งห้อยเยอะมาก บ้านพักสะอาด เจ้าของดูแลเหมือนลูกหลาน'
-                            }
-                        ]
-                    },
-                    {
-                        id: 3,
-                        name: 'คีรีวง บ้านสวนหมอก โฮมสเตย์',
-                        ownerUsername: 'owner_nakhon',
-                        province: 'นครศรีธรรมราช',
-                        region: 'ภาคใต้',
-                        district: 'ลานสกา',
-                        pricePerNight: 850,
-                        rating: 4.9,
-                        reviewsCount: 42,
-                        image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=60',
-                        description: 'พักผ่อนในหมู่บ้านที่อากาศดีที่สุดในประเทศไทย เล่นน้ำตกธรรมชาติ จิบกาแฟชิลๆ',
-                        activities: [
-                            'ทำผ้ามัดย้อมสีธรรมชาติ',
-                            'ปั่นจักรยานชมสวนสมุนไพร',
-                            'เล่นน้ำลำธารคีรีวง'
-                        ],
-                        status: 'approved',
-                        reviews: []
-                    },
-                    {
-                        id: 4,
-                        name: 'ตูบนา โฮมสเตย์ น่าน',
-                        ownerUsername: 'owner_nan',
-                        province: 'น่าน',
-                        region: 'ภาคเหนือ',
-                        district: 'ปัว',
-                        pricePerNight: 1100,
-                        rating: 4.7,
-                        reviewsCount: 19,
-                        image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=60',
-                        description: 'โฮมสเตย์กลางทุ่งนาและภูเขา นั่งมองดอยภูคา เรียนรู้วิถีชีวิตไทลื้อ',
-                        activities: [
-                            'ตักบาตรเช้าวิถีไทลื้อ',
-                            'ขี่จักรยานชมทุ่งนาปัว',
-                            'ทอผ้าพื้นเมืองน่าน'
-                        ],
-                        status: 'approved',
-                        reviews: []
-                    },
-                    {
-                        id: 5,
-                        name: 'บ้านย่านเมืองเก่า ภูเก็ต โฮมสเตย์',
-                        ownerUsername: 'owner_phuket',
-                        province: 'ภูเก็ต',
-                        region: 'ภาคใต้',
-                        district: 'เมืองภูเก็ต',
-                        pricePerNight: 1500,
-                        rating: 4.8,
-                        reviewsCount: 31,
-                        image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&auto=format&fit=crop&q=60',
-                        description: 'สถาปัตยกรรมชิโนโปตุกีส เรียนรู้วิถีบาบ๋า เพลิดเพลินกับอาหารพื้นเมืองและดำน้ำทะเลอันดามัน',
-                        activities: [
-                            'ทำอาหารพื้นเมืองภูเก็ต (หมูฮ้อง/โอต้าว)',
-                            'ดำน้ำชมปะการังเกาะเฮ',
-                            'เดินชมอาคารชิโนโปตุกีส'
-                        ],
-                        status: 'approved',
-                        reviews: []
-                    }
-                ],
-
-                pendingApprovals: [],
-                ownerEditForms: {},
-
-                init() {
-                    const today = new Date();
-                    const tomorrow = new Date(today);
-                    tomorrow.setDate(today.getDate() + 1);
-                    this.bookingForm.checkIn = today.toISOString().split('T')[0];
-                    this.bookingForm.checkOut = tomorrow.toISOString().split('T')[0];
-
-                    this.homestays.forEach(hs => {
-                        hs.includes = hs.includes || [
-                            'อาหารเช้า 2 ท่าน',
-                            'Wi-Fi ฟรี',
-                            'น้ำดื่มในห้องพัก',
-                            'ที่จอดรถ'
-                        ];
-                        hs.activityDetails = hs.activities.map((name, index) => ({
-                            name,
-                            price: index === 0 ? 250 : index === 1 ? 300 : 200,
-                            duration: 'ประมาณ 2 ชั่วโมง'
-                        }));
-
-                        this.ownerEditForms[hs.id] = {
-                            pricePerNight: hs.pricePerNight,
-                            province: hs.province,
-                            description: hs.description,
-                            activities: [...hs.activities],
-                            newActivityInput: ''
-                        };
-                    });
-
-                    // เพิ่มโฮมสเตย์ตัวอย่างให้ครบทั้ง 77 จังหวัด
-                    // ใช้รูปเดิมที่มีอยู่แล้ว ไม่เปลี่ยน/แก้ไข URL รูปภาพเดิม
-                    const existingProvinces = new Set(this.homestays.map(h => h.province));
-                    const templateImages = this.homestays.map(h => h.image).filter(Boolean);
-                    const defaultImage = templateImages[0] || '';
-
-                    this.allProvincesList.forEach((province, index) => {
-                        if (existingProvinces.has(province)) return;
-
-                        const regionMap = {
-                            'ภาคเหนือ': ['กำแพงเพชร','เชียงราย','เชียงใหม่','ตาก','น่าน','พะเยา','พิจิตร','พิษณุโลก','เพชรบูรณ์','แพร่','แม่ฮ่องสอน','ลำปาง','ลำพูน','สุโขทัย','อุตรดิตถ์','อุทัยธานี'],
-                            'ภาคกลาง': ['กรุงเทพมหานคร','ชัยนาท','นครปฐม','นนทบุรี','ปทุมธานี','พระนครศรีอยุธยา','ลพบุรี','สมุทรปราการ','สมุทรสงคราม','สมุทรสาคร','สระบุรี','สิงห์บุรี','สุพรรณบุรี','อ่างทอง'],
-                            'ภาคตะวันออกเฉียงเหนือ': ['กาฬสินธุ์','ขอนแก่น','ชัยภูมิ','นครพนม','นครราชสีมา','บึงกาฬ','บุรีรัมย์','มหาสารคาม','มุกดาหาร','ยโสธร','ร้อยเอ็ด','ศรีสะเกษ','สกลนคร','สุรินทร์','หนองคาย','หนองบัวลำภู','อำนาจเจริญ','อุดรธานี','อุบลราชธานี','เลย'],
-                            'ภาคใต้': ['กระบี่','ชุมพร','ตรัง','นครศรีธรรมราช','นราธิวาส','ปัตตานี','พังงา','พัทลุง','ภูเก็ต','ระนอง','สตูล','สงขลา','สุราษฎร์ธานี','ยะลา'],
-                            'ภาคตะวันออก': ['จันทบุรี','ฉะเชิงเทรา','ชลบุรี','ตราด','นครนายก','ปราจีนบุรี','ระยอง','สระแก้ว'],
-                            'ภาคตะวันตก': ['กาญจนบุรี','ประจวบคีรีขันธ์','เพชรบุรี','ราชบุรี']
-                        };
-                        const region = Object.keys(regionMap).find(r => regionMap[r].includes(province)) || 'ภาคกลาง';
-
-                        const generated = {
-                            id: 100 + index,
-                            name: `บ้านชุมชน ${province} โฮมสเตย์`,
-                            ownerUsername: `owner_${index + 1}`,
-                            province,
-                            region,
-                            district: 'ชุมชนท้องถิ่น',
-                            pricePerNight: 800 + (index % 6) * 100,
-                            rating: 4.5 + ((index % 5) * 0.1),
-                            reviewsCount: 10 + (index % 30),
-                            image: defaultImage,
-                            description: `โฮมสเตย์ตัวอย่างในจังหวัด${province} สัมผัสวิถีชีวิต อาหาร และวัฒนธรรมท้องถิ่น`,
-                            activities: [
-                                `เรียนรู้วิถีชุมชน${province}`,
-                                'ทำอาหารพื้นบ้าน',
-                                'ปั่นจักรยานชมชุมชน'
-                            ],
-                            status: 'approved',
-                            reviews: []
-                        };
-
-                        generated.includes = [
-                            'อาหารเช้า 2 ท่าน',
-                            'Wi-Fi ฟรี',
-                            'น้ำดื่มในห้องพัก',
-                            'ที่จอดรถ'
-                        ];
-                        generated.activityDetails = generated.activities.map((name, i) => ({
-                            name,
-                            price: i === 0 ? 250 : i === 1 ? 300 : 200,
-                            duration: 'ประมาณ 2 ชั่วโมง'
-                        }));
-
-                        this.homestays.push(generated);
-                        this.ownerEditForms[generated.id] = {
-                            pricePerNight: generated.pricePerNight,
-                            province: generated.province,
-                            description: generated.description,
-                            activities: [...generated.activities],
-                            newActivityInput: ''
-                        };
-                    });
-                },
-
-                get filteredProvincesList() {
-                    if (this.selectedRegion === 'ทั้งหมด') {
-                        return this.allProvincesList;
-                    }
-
-                    return this.allProvincesList;
-                },
-
-                get displayedHomestays() {
-                    return this.homestays
-                        .filter(hs => {
-                            if (hs.status !== 'approved') return false;
-
-                            const matchSearch =
-                                this.searchQuery === '' ||
-                                hs.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                                hs.province.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                                hs.activities.some(a =>
-                                    a.toLowerCase().includes(this.searchQuery.toLowerCase())
-                                );
-
-                            const matchRegion =
-                                this.selectedRegion === 'ทั้งหมด' ||
-                                hs.region === this.selectedRegion;
-
-                            const matchProvince =
-                                this.selectedProvince === 'ทั้งหมด' ||
-                                hs.province === this.selectedProvince;
-
-                            return matchSearch && matchRegion && matchProvince;
-                        })
-                        .sort((a, b) => {
-                            if (this.sortBy === 'price_asc') {
-                                return a.pricePerNight - b.pricePerNight;
-                            }
-
-                            if (this.sortBy === 'price_desc') {
-                                return b.pricePerNight - a.pricePerNight;
-                            }
-
-                            if (this.sortBy === 'rating') {
-                                return b.rating - a.rating;
-                            }
-
-                            return b.id - a.id;
-                        });
-                },
-
-                filterByPopularProvince(pName) {
-                    this.selectedProvince = pName;
-                    this.currentView = 'public';
-                },
-
-                resetFilters() {
-                    this.searchQuery = '';
-                    this.searchCheckIn = '';
-                    this.searchCheckOut = '';
-                    this.selectedRegion = 'ทั้งหมด';
-                    this.selectedProvince = 'ทั้งหมด';
-                },
-
-                openLoginModal() {
-                    this.loginError = '';
-                    this.showLoginModal = true;
-                },
-
-                handleLogin() {
-                    const u = this.loginForm.username.trim();
-                    const p = this.loginForm.password.trim();
-
-                    if (u === 'admin' && p === '1234') {
-                        this.currentUser = {
-                            role: 'admin',
-                            name: 'Super Admin',
-                            username: 'admin'
-                        };
-
-                        this.currentView = 'admin_dashboard';
-                        this.showLoginModal = false;
-
-                        this.showToast('เข้าสู่ระบบผู้ดูแลระบบสำเร็จ');
-                        return;
-                    }
-
-                    if (u.startsWith('owner_') && p === '1234') {
-                        const selectedHomestay = this.homestays.find(
-                            h => h.id === Number(this.loginForm.homestayId) &&
-                                h.ownerUsername === u
-                        );
-
-                        if (!selectedHomestay) {
-                            this.loginError = 'กรุณาเลือกโฮมสเตย์ที่เป็นของบัญชีเจ้าของที่กำลังเข้าสู่ระบบ';
-                            return;
-                        }
-
-                        this.currentUser = {
-                            role: 'owner',
-                            name: selectedHomestay.name,
-                            username: u,
-                            homestayId: selectedHomestay.id
-                        };
-
-                        this.currentView = 'owner_dashboard';
-                        this.showLoginModal = false;
-                        this.showToast('เข้าสู่ระบบเจ้าของโฮมสเตย์สำเร็จ');
-                        return;
-                    }
-
-                    this.loginError =
-                        'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง หรือไม่ได้เลือกโฮมสเตย์ของบัญชีนี้';
-                },
-
-                logout() {
-                    this.currentUser = {
-                        role: 'public',
-                        name: 'ผู้เยี่ยมชมทั่วไป',
-                        username: '',
-                        homestayId: ''
-                    };
-
-                    this.currentView = 'public';
-
-                    this.showToast('ออกจากระบบเรียบร้อย');
-                },
-
-                getOwnerHomestays() {
-                    return this.homestays.filter(
-                        h => h.ownerUsername === this.currentUser.username
-                    );
-                },
-
-                getOwnerBookings() {
-                    return (this.userBookings || []).filter(
-                        booking => booking.ownerUsername === this.currentUser.username
-                    );
-                },
-
-                getOwnerPendingCount() {
-                    return this.pendingApprovals.filter(
-                        a => a.submittedBy === this.currentUser.username
-                    ).length;
-                },
-
-                addActivityToOwnerForm(homestayId) {
-                    const form = this.ownerEditForms[homestayId];
-
-                    if (form && form.newActivityInput.trim()) {
-                        form.activities.push(form.newActivityInput.trim());
-                        form.newActivityInput = '';
-                    }
-                },
-
-                removeActivityFromOwnerForm(homestayId, index) {
-                    const form = this.ownerEditForms[homestayId];
-
-                    if (form) {
-                        form.activities.splice(index, 1);
-                    }
-                },
-
-                submitOwnerChanges(homestayId) {
-                    const original = this.homestays.find(
-                        h => h.id === homestayId
-                    );
-
-                    const form = this.ownerEditForms[homestayId];
-
-                    if (!original || !form) return;
-
-                    const newReq = {
-                        id: Date.now(),
-                        homestayId: homestayId,
-                        homestayName: original.name,
-                        submittedBy: this.currentUser.username,
-                        timestamp: new Date().toLocaleString('th-TH'),
-
-                        originalData: {
-                            pricePerNight: original.pricePerNight,
-                            province: original.province,
-                            description: original.description,
-                            activities: [...original.activities]
-                        },
-
-                        newData: {
-                            pricePerNight: form.pricePerNight,
-                            province: form.province,
-                            description: form.description,
-                            activities: [...form.activities]
-                        }
-                    };
-
-                    this.pendingApprovals.push(newReq);
-                    original.status = 'pending';
-
-                    this.showToast(
-                        'ส่งคำขอแก้ไขข้อมูลไปยัง Super Admin เรียบร้อย'
-                    );
-                },
-
-                approveApproval(reqId) {
-                    const reqIdx = this.pendingApprovals.findIndex(
-                        r => r.id === reqId
-                    );
-
-                    if (reqIdx === -1) return;
-
-                    const req = this.pendingApprovals[reqIdx];
-
-                    const targetHomestay = this.homestays.find(
-                        h => h.id === req.homestayId
-                    );
-
-                    if (targetHomestay) {
-                        targetHomestay.pricePerNight =
-                            req.newData.pricePerNight;
-
-                        targetHomestay.province =
-                            req.newData.province;
-
-                        targetHomestay.description =
-                            req.newData.description;
-
-                        targetHomestay.activities =
-                            [...req.newData.activities];
-
-                        targetHomestay.status = 'approved';
-                    }
-
-                    this.pendingApprovals.splice(reqIdx, 1);
-
-                    this.showToast(
-                        'อนุมัติการแก้ไขเรียบร้อยแล้ว ข้อมูลปรับเปลี่ยนบนหน้าเว็บจริงแล้ว'
-                    );
-                },
-
-                rejectApproval(reqId) {
-                    const reqIdx = this.pendingApprovals.findIndex(
-                        r => r.id === reqId
-                    );
-
-                    if (reqIdx === -1) return;
-
-                    const req = this.pendingApprovals[reqIdx];
-
-                    const targetHomestay = this.homestays.find(
-                        h => h.id === req.homestayId
-                    );
-
-                    if (targetHomestay) {
-                        targetHomestay.status = 'approved';
-                    }
-
-                    this.pendingApprovals.splice(reqIdx, 1);
-
-                    this.showToast(
-                        'ปฏิเสธคำขอการแก้ไขเรียบร้อยแล้ว'
-                    );
-                },
-
-                getActivitiesForProvince(pName) {
-                    const hsInProv = this.homestays.filter(
-                        h => h.province === pName
-                    );
-
-                    if (hsInProv.length > 0) {
-                        const acts = [];
-
-                        hsInProv.forEach(h => {
-                            h.activities.forEach(a => {
-                                acts.push({
-                                    name: a,
-                                    desc:
-                                        'สัมผัสบรรยากาศท้องถิ่นที่ ' +
-                                        h.name
-                                });
-                            });
-                        });
-
-                        return acts;
-                    }
-
-                    return [
-                        {
-                            name: 'ตักบาตรเช้าสัมผัสวิถีชุมชน',
-                            desc:
-                                'ร่วมทำบุญตักบาตรยามเช้า ร่วมกับชาวบ้านในท้องถิ่น'
-                        },
-                        {
-                            name: 'ทำอาหารพื้นบ้านสไตล์ท้องถิ่น',
-                            desc:
-                                'เรียนรู้สูตรอาหารดั้งเดิม ใช้วัตถุดิบอินทรีย์จากสวน'
-                        },
-                        {
-                            name: 'ปั่นจักรยานชมธรรมชาติต้นไม้ใหญ่',
-                            desc:
-                                'สัมผัสอากาศบริสุทธิ์และวิถีชีวิตดั้งเดิมรอบหมู่บ้าน'
-                        }
-                    ];
-                },
-
-                getHomestaysInProvince(pName) {
-                    return this.homestays.filter(
-                        h =>
-                            h.province === pName &&
-                            h.status === 'approved'
-                    );
-                },
-
-                syncSearchDates() {
-                    if (this.searchCheckIn && this.searchCheckOut) {
-                        const start = new Date(this.searchCheckIn);
-                        const end = new Date(this.searchCheckOut);
-                        const diff = Math.ceil((end - start) / 86400000);
-                        if (diff > 0) {
-                            this.bookingForm.checkIn = this.searchCheckIn;
-                            this.bookingForm.checkOut = this.searchCheckOut;
-                            this.bookingForm.nights = diff;
-                        }
-                    }
-                },
-
-                updateBookingDates() {
-                    if (!this.bookingForm.checkIn || !this.bookingForm.checkOut) return;
-                    const start = new Date(this.bookingForm.checkIn);
-                    const end = new Date(this.bookingForm.checkOut);
-                    const diff = Math.ceil((end - start) / 86400000);
-                    if (diff > 0) this.bookingForm.nights = diff;
-                },
-
-                getSelectedActivitiesTotal() {
-                    if (!this.activeHomestay) return 0;
-                    return this.activeHomestay.activityDetails
-                        .filter(a => this.bookingForm.selectedActivities.includes(a.name))
-                        .reduce((sum, a) => sum + Number(a.price || 0), 0) * Number(this.bookingForm.guests || 1);
-                },
-
-                getBookingTotal() {
-                    if (!this.activeHomestay) return 0;
-                    return (this.activeHomestay.pricePerNight * Number(this.bookingForm.nights || 1))
-                        + this.getSelectedActivitiesTotal();
-                },
-
-                openHomestayDetail(hs) {
-                    this.activeHomestay = hs;
-                    if (this.searchCheckIn && this.searchCheckOut) {
-                        this.bookingForm.checkIn = this.searchCheckIn;
-                        this.bookingForm.checkOut = this.searchCheckOut;
-                        this.updateBookingDates();
-                    }
-                    this.bookingForm.selectedActivities = [];
-                    this.showDetailModal = true;
-                },
-
-                startBookingConfirmation() {
-                    if (!this.activeHomestay) return;
-                    this.updateBookingDates();
-
-                    if (!this.bookingForm.checkIn || !this.bookingForm.checkOut ||
-                        new Date(this.bookingForm.checkOut) <= new Date(this.bookingForm.checkIn)) {
-                        this.showToast('กรุณาเลือกวันที่ออกให้มากกว่าวันที่เข้าพัก');
-                        return;
-                    }
-
-                    this.activeBooking = {
-                        id: Date.now(),
-                        homestayName: this.activeHomestay.name,
-                        ownerUsername: this.activeHomestay.ownerUsername,
-                        checkIn: this.bookingForm.checkIn,
-                        checkOut: this.bookingForm.checkOut,
-                        nights: this.bookingForm.nights,
-                        guests: this.bookingForm.guests,
-                        activities: [...this.bookingForm.selectedActivities],
-                        roomTotal: this.activeHomestay.pricePerNight * Number(this.bookingForm.nights || 1),
-                        activityTotal: this.getSelectedActivitiesTotal(),
-                        totalPrice: this.getBookingTotal(),
-                        status: 'รอชำระเงิน',
-                        paymentStatus: 'ยังไม่ชำระ'
-                    };
-
-                    this.showDetailModal = false;
-                    this.showBookingConfirmModal = true;
-                },
-
-                confirmBookingAndPay() {
-                    if (!this.activeBooking) return;
-
-                    this.userBookings.push({...this.activeBooking});
-
-                    this.notifications.unshift({
-                        id: Date.now(),
-                        title: 'ยืนยันการจองสำเร็จ',
-                        message: `คุณจอง ${this.activeBooking.homestayName} วันที่ ${this.activeBooking.checkIn} - ${this.activeBooking.checkOut} เรียบร้อยแล้ว กรุณาชำระเงิน`,
-                        time: new Date().toLocaleString('th-TH'),
-                        type: 'booking',
-                        read: false
-                    });
-
-                    this.showBookingConfirmModal = false;
-                    this.paymentForm.method = 'โอนผ่านธนาคาร';
-                    this.showPaymentModal = true;
-                    this.paymentInfo.qrReady = false;
-                    this.showToast('ยืนยันการจองแล้ว กรุณาชำระเงิน');
-                },
-
-                generatePaymentQR() {
-                    this.paymentInfo.qrReady = true;
-
-                    this.$nextTick(() => {
-                        const qr = document.getElementById('pakjai-payment-qr');
-                        if (!qr) return;
-
-                        qr.innerHTML = '';
-                        if (typeof QRCode !== 'undefined') {
-                            new QRCode(qr, {
-                                text: `PAKJAI|PROMPTPAY|${this.paymentInfo.promptPayNumber}|${this.activeBooking ? this.activeBooking.totalPrice : 0}`,
-                                width: 190,
-                                height: 190,
-                                colorDark: '#064e3b',
-                                colorLight: '#ffffff',
-                                correctLevel: QRCode.CorrectLevel.M
-                            });
-                        }
-                    });
-                },
-
-                processPayment() {
-                    if (!this.activeBooking) return;
-
-                    if (!this.customerInfo.name.trim() || !this.customerInfo.phone.trim()) {
-                        this.showToast('กรุณากรอกชื่อผู้จองและเบอร์โทรศัพท์');
-                        return;
-                    }
-
-                    this.activeBooking.customerName = this.customerInfo.name.trim();
-                    this.activeBooking.customerPhone = this.customerInfo.phone.trim();
-
-                    const booking = this.userBookings.find(b => b.id === this.activeBooking.id);
-                    if (booking) {
-                        booking.customerName = this.customerInfo.name.trim();
-                        booking.customerPhone = this.customerInfo.phone.trim();
-                        booking.status = 'ชำระเงินแล้ว';
-                        booking.paymentStatus = 'ชำระเงินสำเร็จ';
-                        booking.paymentMethod = this.paymentForm.method;
-                    }
-
-                    this.notifications.unshift({
-                        id: Date.now(),
-                        title: 'ชำระเงินสำเร็จ',
-                        message: `การชำระเงินสำหรับ ${this.activeBooking.homestayName} จำนวน ฿${this.activeBooking.totalPrice.toLocaleString()} สำเร็จแล้ว`,
-                        time: new Date().toLocaleString('th-TH'),
-                        type: 'payment',
-                        read: false
-                    });
-
-                    this.showPaymentModal = false;
-                    this.activeBooking = null;
-                    this.showToast('ชำระเงินสำเร็จ การจองของคุณได้รับการยืนยันแล้ว');
-                },
-
-                openNotificationsModal() {
-                    this.showNotificationsModal = true;
-                    this.notifications.forEach(n => n.read = true);
-                },
-
-                openMyBookingsModal() {
-                    this.showMyBookingsModal = true;
-                },
-
-                submitReview() {
-                    if (
-                        !this.activeHomestay ||
-                        !this.newReview.comment.trim()
-                    ) {
-                        return;
-                    }
-
-                    this.activeHomestay.reviews.unshift({
-                        id: Date.now(),
-                        userName: 'ผู้เข้าพัก',
-                        rating: this.newReview.rating,
-                        comment: this.newReview.comment
-                    });
-
-                    this.newReview.comment = '';
-
-                    this.showToast(
-                        'ขอบคุณสำหรับรีวิวของคุณ!'
-                    );
-                },
-
-                /*
-                 * ==========================================
-                 * ADMIN STATISTICS
-                 * ==========================================
-                 *
-                 * ส่วนที่เพิ่มใหม่สำหรับ Super Admin
-                 */
-
-                getAdminStats() {
-                    const bookings = this.userBookings || [];
-
-                    // จำนวนลูกค้ารวมจากจำนวนผู้เข้าพักในแต่ละ booking
-                    const totalCustomers = bookings.reduce(
-                        (sum, booking) => {
-                            return sum + Number(booking.guests || 0);
-                        },
-                        0
-                    );
-
-                    // จำนวนรายการจองทั้งหมด
-                    const totalBookings = bookings.length;
-
-                    // รายได้รวมทั้งหมด
-                    const totalRevenue = bookings.reduce(
-                        (sum, booking) => {
-                            return sum + Number(booking.totalPrice || 0);
-                        },
-                        0
-                    );
-
-                    return {
-                        totalCustomers,
-                        totalBookings,
-                        totalRevenue
-                    };
-                },
-
-                showToast(msg) {
-                    this.toast.message = msg;
-                    this.toast.show = true;
-
-                    setTimeout(() => {
-                        this.toast.show = false;
-                    }, 3500);
-                }
-            };
-        };
-
-        // Register with Alpine explicitly
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('pakjaiApp', window.pakjaiApp);
-        });
-    </script>
-
-    <!-- QR Code generator -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-    <!-- Alpine.js -->
-    <script
-        defer
-        src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js">
-    </script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        emerald: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                        },
-                        amber: {
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        }
-                    },
-
-                    fontFamily: {
-                        sans: ['Prompt', 'sans-serif'],
-                    }
-                }
-            }
-        };
-    </script>
-
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Team Management</title>
+
+<style>
+:root{
+  --bg:#07111f;
+  --panel:#0d1b2e;
+  --panel2:#10243c;
+  --line:rgba(255,255,255,.09);
+  --text:#eef6ff;
+  --muted:#8da5bd;
+  --primary:#35d0ff;
+  --primary2:#4f7cff;
+  --green:#30d88b;
+  --yellow:#ffc857;
+  --red:#ff5d73;
+  --shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top right,rgba(53,208,255,.12),transparent 30%),
+    radial-gradient(circle at bottom left,rgba(79,124,255,.1),transparent 30%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* LOGIN */
+
+.login-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.login-card{
+  width:min(440px,100%);
+  background:rgba(13,27,46,.9);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:35px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(20px);
+}
+
+.logo{
+  width:70px;
+  height:70px;
+  border-radius:20px;
+  display:grid;
+  place-items:center;
+  font-size:30px;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:white;
+  margin-bottom:20px;
+}
+
+.login-card h1{
+  font-size:28px;
+  margin-bottom:8px;
+}
+
+.login-card p{
+  color:var(--muted);
+  margin-bottom:25px;
+}
+
+.field{
+  margin-bottom:15px;
+}
+
+.field label{
+
+
+
+  
+  display:block;
+  margin-bottom:7px;
+  color:#b7c8d9;
+  font-size:14px;
+}
+
+input,select,textarea{
+  width:100%;
+  border:1px solid var(--line);
+  background:#081729;
+  color:var(--text);
+  border-radius:12px;
+  padding:12px 14px;
+  outline:none;
+}
+
+input:focus,select:focus,textarea:focus{
+  border-color:var(--primary);
+}
+
+textarea{
+  resize:vertical;
+  min-height:100px;
+}
+
+.btn{
+  border:0;
+  border-radius:12px;
+  padding:12px 18px;
+  color:white;
+  background:linear-gradient(135deg,var(--primary2),var(--primary));
+  font-weight:700;
+  transition:.2s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+}
+
+.btn.secondary{
+  background:#152b44;
+}
+
+.btn.success{
+  background:linear-gradient(135deg,#18a96c,var(--green));
+}
+
+.btn.danger{
+  background:linear-gradient(135deg,#d53b53,var(--red));
+}
+
+.btn.full{
+  width:100%;
+}
+
+/* APP */
+
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:260px 1fr;
+}
+
+.sidebar{
+  border-right:1px solid var(--line);
+  background:rgba(5,15,28,.9);
+  padding:20px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:30px;
+}
+
+.brand-icon{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+}
+
+.brand strong{
+  display:block;
+}
+
+.brand small{
+  color:var(--muted);
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.nav button{
+  border:0;
+  color:#a9bdd1;
+  background:transparent;
+  text-align:left;
+  padding:12px 14px;
+  border-radius:12px;
+}
+
+.nav button:hover,
+.nav button.active{
+  color:white;
+  background:linear-gradient(90deg,rgba(53,208,255,.14),rgba(79,124,255,.08));
+}
+
+.main{
+  min-width:0;
+}
+
+.topbar{
+  height:72px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  background:rgba(7,17,31,.7);
+  backdrop-filter:blur(15px);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.user-info{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--primary2),var(--primary));
+  font-weight:800;
+}
+
+.content{
+  padding:28px;
+  max-width:1500px;
+  margin:auto;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.page-title{
+  margin-bottom:22px;
+}
+
+.page-title h2{
+  font-size:28px;
+  margin-bottom:5px;
+}
+
+.page-title p{
+  color:var(--muted);
+}
+
+/* CARDS */
+
+.grid{
+  display:grid;
+  gap:16px;
+}
+
+.grid-4{
+  grid-template-columns:repeat(4,1fr);
+}
+
+.grid-3{
+  grid-template-columns:repeat(3,1fr);
+}
+
+.grid-2{
+  grid-template-columns:repeat(2,1fr);
+}
+
+.card{
+  background:linear-gradient(145deg,rgba(16,36,60,.9),rgba(10,25,42,.92));
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 10px 40px rgba(0,0,0,.18);
+}
+
+.stat{
+  position:relative;
+  overflow:hidden;
+}
+
+.stat:after{
+  content:"";
+  position:absolute;
+  width:100px;
+  height:100px;
+  right:-40px;
+  top:-40px;
+  border-radius:50%;
+  background:rgba(53,208,255,.08);
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.stat-value{
+  font-size:30px;
+  font-weight:800;
+  margin-top:8px;
+}
+
+.green{
+  color:var(--green);
+}
+
+.yellow{
+  color:var(--yellow);
+}
+
+.red{
+  color:var(--red);
+}
+
+.blue{
+  color:var(--primary);
+}
+
+/* TOOLBAR */
+
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
+.toolbar-left,
+.toolbar-right{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* TABLE */
+
+.table-wrap{
+  overflow:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+th,td{
+  padding:13px 12px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+}
+
+th{
+  color:#9eb3c8;
+  font-size:13px;
+}
+
+td{
+  color:#dce9f5;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.badge.blue{
+  background:rgba(53,208,255,.12);
+}
+
+.badge.green{
+  background:rgba(48,216,139,.12);
+}
+
+.badge.yellow{
+  background:rgba(255,200,87,.12);
+}
+
+.badge.red{
+  background:rgba(255,93,115,.12);
+   
+}
+
+/* JOB */
+
+.job-card{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.job-header{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.job-title{
+  font-weight:800;
+  font-size:18px;
+}
+
+.job-meta{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+
+.job-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+/* MAP */
+
+.map-box{
+  height:420px;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(rgba(10,25,42,.75),rgba(10,25,42,.75)),
+    repeating-linear-gradient(
+      45deg,
+      #10263d 0,
+      #10263d 10px,
+      #0d2135 10px,
+      #0d2135 20px
+    );
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+}
+
+.map-inner h3{
+  margin-bottom:8px;
+}
+
+.map-inner p{
+  color:var(--muted);
+  margin-bottom:18px;
+}
+
+/* CHAT */
+
+.chat{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  height:620px;
+  overflow:hidden;
+  border-radius:18px;
+  border:1px solid var(--line);
+}
+
+.chat-rooms{
+  border-right:1px solid var(--line);
+  background:#081729;
+  padding:12px;
+}
+
+.room{
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+  color:#a9bdd1;
+  margin-bottom:5px;
+}
+
+.room.active,
+.room:hover{
+  background:#102b46;
+  color:white;
+}
+
+.chat-main{
+  display:flex;
+  flex-direction:column;
+}
+
+.messages{
+  flex:1;
+  overflow:auto;
+  padding:20px;
+}
+
+.message{
+  max-width:70%;
+  margin-bottom:12px;
+}
+
+.message.me{
+  margin-left:auto;
+  text-align:right;
+}
+
+.message-bubble{
+  display:inline-block;
+  background:#102b46;
+  padding:10px 13px;
+  border-radius:14px;
+  text-align:left;
+}
+
+.message.me .message-bubble{
+  background:linear-gradient(135deg,var(--primary2),var(--primary));
+}
+
+.message small{
+  color:var(--muted);
+  display:block;
+  margin-top:4px;
+}
+
+.chat-input{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid var(--line);
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:100;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-card{
+  width:min(650px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#0d1b2e;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:24px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.close{
+  border:0;
+  background:#152b44;
+  color:white;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+}
+
+/* RESPONSIVE */
+
+.mobile-menu{
+  display:none;
+}
+
+@media(max-width:1000px){
+  .grid-4{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid-3{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:760px){
+  .app{
+    display:block;
+  }
+
+  .sidebar{
+    position:fixed;
+    left:-280px;
+    z-index:50;
+    width:260px;
+    transition:.25s;
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .mobile-menu{
+    display:block;
+    border:0;
+    background:#152b44;
+    color:white;
+    width:40px;
+    height:40px;
+    border-radius:10px;
+  }
+
+  .topbar{
+    padding:0 15px;
+  }
+
+  .content{
+    padding:18px;
+  }
+
+  .grid-4,
+  .grid-3,
+  .grid-2{
+    grid-template-columns:1fr;
+  }
+
+  .chat{
+    grid-template-columns:1fr;
+  }
+
+  .chat-rooms{
+    display:flex;
+    overflow:auto;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+
+  .room{
+    white-space:nowrap;
+  }
+
+  .map-box{
+    height:320px;
+  }
+}
+</style>
 </head>
 
-<body
-    class="h-full font-sans text-slate-800 flex flex-col antialiased selection:bg-emerald-500 selection:text-white"
-    x-data="pakjaiApp"
->
+<body>
 
-    <!-- ========================================================= -->
-    <!-- TOP NAVIGATION HEADER -->
-    <!-- ========================================================= -->
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="logo">⚙️</div>
 
-    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300">
+    <h1>Service Team</h1>
+    <p>ระบบบริหารทีมช่างและงานบริการ</p>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+     <div class="field">
+  <label>อีเมล</label>
+  <input
+    id="loginEmail"
+    type="email"
+    placeholder="กรอกอีเมล"
+    autocomplete="username"
+  >
+</div>
 
-            <div class="flex justify-between items-center h-20">
+<div class="field">
+  <label>รหัสผ่าน</label>
+  <input
+    id="loginPassword"
+    type="password"
+    placeholder="กรอกรหัสผ่าน"
+    autocomplete="current-password"
+  >
+</div>
 
-                <!-- Brand Logo -->
-                <div
-                    class="flex items-center space-x-3 cursor-pointer"
-                    @click="currentView = 'public'; selectedProvince = 'ทั้งหมด'"
-                >
+    <button class="btn full" onclick="login()">
+      เข้าสู่ระบบ
+    </button>
+  <div
+  id="loginError"
+  style="display:none; margin-top:12px; color:#ff6b6b;"
+></div>
 
-                    <div class="w-12 h-12 bg-gradient-to-tr from-emerald-600 to-teal-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 transform hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-house-chimney-window text-2xl"></i>
-                    </div>
+    <p style="margin-top:15px;margin-bottom:0;font-size:12px">
+      Demo version — ข้อมูลเก็บใน Browser เครื่องนี้
+    </p>
+  </div>
+</div>
 
-                    <div>
-                        <span class="text-2xl font-bold bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-500 bg-clip-text text-transparent">
-                            PAKJAI
-                        </span>
 
-                        <span class="text-xs block font-medium tracking-wider text-emerald-800 -mt-1">
-                            HOMESTAY THAILAND
-                        </span>
-                    </div>
+<!-- APP -->
+<div id="app" class="app hidden">
 
-                </div>
+  <aside id="sidebar" class="sidebar">
 
-                <!-- Desktop Navigation Items -->
-                <nav class="hidden md:flex items-center space-x-6">
+    <div class="brand">
+      <div class="brand-icon">⚙️</div>
+      <div>
+        <strong>Service Team</strong>
+        <small>Management System</small>
+      </div>
+    </div>
 
-                    <button
-                        @click="currentView = 'public'"
-                        :class="currentView === 'public'
-                            ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                            : 'text-slate-600 hover:text-emerald-600'"
-                        class="py-2 transition-all"
-                    >
-                        <i class="fa-solid fa-compass mr-1"></i>
-                        สำรวจโฮมสเตย์
-                    </button>
+    <nav class="nav">
 
-                    <button
-                        @click="currentView = 'activities'"
-                        :class="currentView === 'activities'
-                            ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                            : 'text-slate-600 hover:text-emerald-600'"
-                        class="py-2 transition-all"
-                    >
-                        <i class="fa-solid fa-mountain-sun mr-1"></i>
-                        กิจกรรมเด่น 77 จังหวัด
-                    </button>
+      <button class="active" onclick="showPage('dashboard',this)">
+        📊 Dashboard
+      </button>
 
-                    <button
-                        @click="openNotificationsModal()"
-                        class="text-slate-600 hover:text-emerald-600 py-2 relative transition-all"
-                        title="การแจ้งเตือน"
-                    >
-                        <i class="fa-solid fa-bell mr-1"></i>
-                        การแจ้งเตือน
-                        <span
-                            x-show="notifications.filter(n => !n.read).length > 0"
-                            class="absolute -top-1 -right-2 bg-rose-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold"
-                            x-text="notifications.filter(n => !n.read).length"
-                        ></span>
-                    </button>
+      <button onclick="showPage('jobs',this)">
+        🧰 งานของทีม
+      </button>
 
-                    <button
-                        @click="openMyBookingsModal()"
-                        class="text-slate-600 hover:text-emerald-600 py-2 relative transition-all"
-                    >
-                        <i class="fa-solid fa-calendar-check mr-1"></i>
-                        การจองของฉัน
+      <button onclick="showPage('materials',this)">
+        📍 วัสดุ / ร้านค้า
+      </button>
 
-                        <span
-                            x-show="userBookings.length > 0"
-                            class="absolute -top-1 -right-2 bg-rose-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold"
-                            x-text="userBookings.length"
-                        ></span>
-                    </button>
+      <button onclick="showPage('fuel',this)">
+        ⛽ คำนวณน้ำมัน
+      </button>
 
-                </nav>
+      <button id="financeNav" onclick="showPage('finance',this)">
+        💰 การเงิน
+      </button>
 
-                <!-- User Role / Portal Switcher -->
-                <div class="flex items-center space-x-3">
+      <button onclick="showPage('chat',this)">
+        💬 แชททีม
+      </button>
 
-                    <!-- PUBLIC -->
-                    <template x-if="currentUser.role === 'public'">
+      <button onclick="showPage('warranty',this)">
+        🛡️ Warranty
+      </button>
 
-                        <button
-                            @click="openLoginModal()"
-                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors border border-emerald-200 shadow-sm"
-                        >
-                            <i class="fa-solid fa-right-to-bracket mr-2"></i>
-                            เข้าสู่ระบบ (เจ้าของ/แอดมิน)
-                        </button>
+      <button id="reportsNav" onclick="showPage('reports',this)">
+        📈 รายงาน
+      </button>
 
-                    </template>
+      <button id="adminNav" onclick="showPage('admin',this)">
+        ⚙️ Admin
+      </button>
 
-                    <!-- OWNER -->
-                    <template x-if="currentUser.role === 'owner'">
+      <button onclick="logout()">
+        🚪 ออกจากระบบ
+      </button>
 
-                        <div class="flex items-center space-x-2">
+    </nav>
+  </aside>
 
-                            <div class="hidden sm:flex flex-col text-right">
-                                <span class="text-xs text-slate-500">
-                                    เข้าสู่ระบบในฐานะ
-                                </span>
 
-                                <span
-                                    class="text-sm font-semibold text-emerald-700"
-                                    x-text="currentUser.name"
-                                ></span>
-                            </div>
+  <main class="main">
 
-                            <button
-                                @click="currentView = 'owner_dashboard'"
-                                class="px-3.5 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md transition-all flex items-center"
-                            >
-                                <i class="fa-solid fa-store mr-1.5"></i>
-                                จัดการโฮมสเตย์
-                            </button>
+    <header class="topbar">
 
-                            <button
-                                @click="logout()"
-                                class="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100"
-                                title="ออกจากระบบ"
-                            >
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                            </button>
+      <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
 
-                        </div>
+      <div>
+        <strong id="topTitle">Dashboard</strong>
+      </div>
 
-                    </template>
-
-                    <!-- ADMIN -->
-                    <template x-if="currentUser.role === 'admin'">
-
-                        <div class="flex items-center space-x-2">
-
-                            <div class="hidden sm:flex flex-col text-right">
-
-                                <span class="text-xs text-amber-600 font-bold">
-                                    SUPER ADMIN
-                                </span>
-
-                                <span class="text-sm font-semibold text-slate-700">
-                                    ผู้ดูแลระบบ
-                                </span>
-
-                            </div>
-
-                            <button
-                                @click="currentView = 'admin_dashboard'"
-                                class="px-3.5 py-2 text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-md transition-all flex items-center relative"
-                            >
-                                <i class="fa-solid fa-shield-halved mr-1.5"></i>
-                                ระบบอนุมัติ
-
-                                <span
-                                    x-show="pendingApprovals.length > 0"
-                                    class="ml-1.5 bg-rose-600 text-white rounded-full px-1.5 py-0.2 text-[10px]"
-                                    x-text="pendingApprovals.length"
-                                ></span>
-
-                            </button>
-
-                            <button
-                                @click="logout()"
-                                class="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-slate-100"
-                                title="ออกจากระบบ"
-                            >
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                            </button>
-
-                        </div>
-
-                    </template>
-
-                </div>
-
-            </div>
-
+      <div class="user-info">
+        <div>
+          <strong id="currentName">User</strong><br>
+          <small id="currentTeam">Team</small>
         </div>
+
+        <div class="avatar" id="avatar">
+          U
+        </div>
+      </div>
 
     </header>
 
-    <!-- ========================================================= -->
-    <!-- MAIN CONTENT -->
-    <!-- ========================================================= -->
 
-    <main class="flex-grow">
+    <section class="content">
 
-        <!-- ===================================================== -->
-        <!-- VIEW 1: PUBLIC HOMESTAY EXPLORER -->
-        <!-- ===================================================== -->
 
-        <div
-            x-show="currentView === 'public'"
-            class="space-y-8 pb-16"
-        >
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="page active">
 
-            <!-- Hero Search Banner -->
-            <section class="relative bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-950 text-white py-16 px-4 sm:px-6 lg:px-8 overflow-hidden shadow-xl">
+        <div class="page-title">
+          <h2>Dashboard</h2>
+          <p>ภาพรวมการทำงานของทีม</p>
+        </div>
 
-                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="grid grid-4">
 
-                <div class="relative max-w-5xl mx-auto text-center space-y-6">
+          <div class="card stat">
+            <div class="stat-label">งานทั้งหมด</div>
+            <div id="statJobs" class="stat-value blue">0</div>
+          </div>
 
-                    <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs sm:text-sm font-medium border border-emerald-400/30 backdrop-blur-sm">
-                        🌿 สัมผัสวิถีชีวิต ชิมอาหารท้องถิ่น เที่ยวไทยอย่างมีความหมาย
-                    </span>
+          <div class="card stat">
+            <div class="stat-label">งานกำลังทำ</div>
+            <div id="statWorking" class="stat-value yellow">0</div>
+          </div>
 
-                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                        ค้นหาโฮมสเตย์ชุมชน
-                        <span class="text-amber-400 underline decoration-amber-400/50">
-                            ครบ 77 จังหวัด
-                        </span>
-                    </h1>
+          <div class="card stat">
+            <div class="stat-label">งานเสร็จแล้ว</div>
+            <div id="statComplete" class="stat-value green">0</div>
+          </div>
 
-                    <p class="text-slate-200 text-base sm:text-lg max-w-2xl mx-auto font-light">
-                        พักผ่อนหย่อนใจในบ้านสวน บนดอย ริมทะเล พร้อมร่วมกิจกรรมสัมผัสวัฒนธรรมประจำถิ่นทั่วประเทศไทย
-                    </p>
-
-                    <!-- Search -->
-                    <div class="bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-2xl text-slate-800 max-w-4xl mx-auto border border-white/20">
-
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-
-                            <div class="md:col-span-4 relative">
-                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
-                                <input
-                                    type="text"
-                                    x-model="searchQuery"
-                                    placeholder="ค้นชื่อโฮมสเตย์, กิจกรรม, หรือสถานที่..."
-                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm"
-                                >
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label class="block text-[10px] font-bold text-slate-500 mb-1">วันที่เข้าพัก</label>
-                                <input type="date" x-model="searchCheckIn" @change="syncSearchDates()"
-                                    class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm">
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label class="block text-[10px] font-bold text-slate-500 mb-1">วันที่ออก</label>
-                                <input type="date" x-model="searchCheckOut" @change="syncSearchDates()" :min="searchCheckIn"
-                                    class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm">
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <select x-model="selectedRegion" @change="selectedProvince = 'ทั้งหมด'"
-                                    class="w-full py-2.5 px-3 mt-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-medium text-slate-700">
-                                    <option value="ทั้งหมด">🌐 ทุกภูมิภาค</option>
-                                    <template x-for="region in regions" :key="region">
-                                        <option :value="region" x-text="region"></option>
-                                    </template>
-                                </select>
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <select x-model="selectedProvince"
-                                    class="w-full py-2.5 px-3 mt-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-medium text-slate-700">
-                                    <option value="ทั้งหมด">📍 ทั้งหมด 77 จังหวัด</option>
-                                    <template x-for="prov in filteredProvincesList" :key="prov">
-                                        <option :value="prov" x-text="prov"></option>
-                                    </template>
-                                </select>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- Popular Provinces -->
-            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar">
-
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider shrink-0 mr-2">
-                        <i class="fa-solid fa-fire text-amber-500 mr-1"></i>
-                        ยอดนิยม:
-                    </span>
-
-                    <template
-                        x-for="popProv in popularProvinces"
-                        :key="popProv.name"
-                    >
-
-                        <button
-                            @click="filterByPopularProvince(popProv.name)"
-                            :class="selectedProvince === popProv.name
-                                ? 'bg-emerald-600 text-white shadow-md'
-                                : 'bg-white text-slate-700 hover:bg-emerald-50 border border-slate-200'"
-                            class="px-3.5 py-1.5 rounded-full text-xs font-medium shrink-0 transition-all flex items-center space-x-1.5"
-                        >
-
-                            <span x-text="popProv.icon"></span>
-
-                            <span x-text="popProv.name"></span>
-
-                        </button>
-
-                    </template>
-
-                </div>
-
-            </section>
-
-            <!-- Listing Summary -->
-            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-
-                    <div>
-
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800 flex items-center">
-
-                            <span>
-                                โฮมสเตย์ชุมชนที่พร้อมให้บริการ
-                            </span>
-
-                            <span
-                                class="ml-3 text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-1 rounded-full"
-                                x-text="displayedHomestays.length + ' รายการ'"
-                            ></span>
-
-                        </h2>
-
-                        <p
-                            class="text-xs text-slate-500 mt-1"
-                            x-text="'กำลังแสดงผล: ' + (
-                                selectedProvince !== 'ทั้งหมด'
-                                ? 'จังหวัด ' + selectedProvince
-                                : (
-                                    selectedRegion !== 'ทั้งหมด'
-                                    ? 'ภาค ' + selectedRegion
-                                    : 'ทุกพื้นที่ทั่วประเทศ'
-                                )
-                            )"
-                        ></p>
-
-                    </div>
-
-                    <div class="flex items-center space-x-3">
-
-                        <label class="text-xs text-slate-500 font-medium shrink-0">
-                            เรียงตาม:
-                        </label>
-
-                        <select
-                            x-model="sortBy"
-                            class="text-xs border border-slate-200 rounded-lg p-2 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                        >
-
-                            <option value="recommended">
-                                แนะนำพิเศษ
-                            </option>
-
-                            <option value="price_asc">
-                                ราคา: ต่ำไปสูง
-                            </option>
-
-                            <option value="price_desc">
-                                ราคา: สูงไปต่ำ
-                            </option>
-
-                            <option value="rating">
-                                คะแนนรีวิวสูงสุด
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- Homestays -->
-            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                <template x-if="displayedHomestays.length === 0">
-
-                    <div class="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300">
-
-                        <i class="fa-solid fa-house-circle-xmark text-5xl text-slate-300 mb-3"></i>
-
-                        <h3 class="text-lg font-semibold text-slate-700">
-                            ไม่พบโฮมสเตย์ตามเงื่อนไขที่ค้นหา
-                        </h3>
-
-                        <p class="text-sm text-slate-500 mt-1">
-                            ลองเปลี่ยนคำค้นหา หรือเลือกดูจังหวัดยอดนิยมอื่น ๆ
-                        </p>
-
-                        <button
-                            @click="resetFilters()"
-                            class="mt-4 px-4 py-2 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 shadow-sm transition-all"
-                        >
-                            ล้างตัวกรองทั้งหมด
-                        </button>
-
-                    </div>
-
-                </template>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                    <template
-                        x-for="hs in displayedHomestays"
-                        :key="hs.id"
-                    >
-
-                        <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition-all duration-300 flex flex-col group">
-
-                            <div class="relative h-52 overflow-hidden bg-slate-100">
-
-                                <img
-                                    :src="hs.image"
-                                    :alt="hs.name"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=PAKJAI+Homestay'"
-                                >
-
-                                <div class="absolute top-3 left-3">
-
-                                    <span class="px-2.5 py-1 bg-slate-900/70 backdrop-blur-md text-white text-xs font-medium rounded-lg flex items-center shadow-md">
-
-                                        <i class="fa-solid fa-location-dot text-rose-400 mr-1.5"></i>
-
-                                        <span x-text="hs.province"></span>
-
-                                    </span>
-
-                                </div>
-
-                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-amber-600 flex items-center shadow-md">
-
-                                    <i class="fa-solid fa-star mr-1 text-amber-500"></i>
-
-                                    <span x-text="hs.rating"></span>
-
-                                    <span
-                                        class="text-slate-400 font-normal ml-1"
-                                        x-text="'(' + hs.reviewsCount + ')'"
-                                    ></span>
-
-                                </div>
-
-                            </div>
-
-                            <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
-
-                                <div>
-
-                                    <div
-                                        class="text-xs font-semibold text-emerald-600 tracking-wider uppercase mb-1"
-                                        x-text="hs.region + ' • ' + hs.district"
-                                    ></div>
-
-                                    <h3
-                                        class="text-lg font-bold text-slate-800 line-clamp-1 group-hover:text-emerald-600 transition-colors"
-                                        x-text="hs.name"
-                                    ></h3>
-
-                                    <p
-                                        class="text-xs text-slate-500 mt-1 line-clamp-2"
-                                        x-text="hs.description"
-                                    ></p>
-
-                                </div>
-
-                                <div class="space-y-1.5 pt-2 border-t border-slate-100">
-
-                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                                        กิจกรรมเด่นไฮไลท์:
-                                    </span>
-
-                                    <div class="flex flex-wrap gap-1">
-
-                                        <template
-                                            x-for="act in hs.activities.slice(0, 2)"
-                                            :key="act"
-                                        >
-
-                                            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] font-medium rounded-md border border-emerald-100 flex items-center">
-
-                                                <i class="fa-solid fa-sparkles text-[9px] mr-1 text-emerald-500"></i>
-
-                                                <span x-text="act"></span>
-
-                                            </span>
-
-                                        </template>
-
-                                        <template x-if="hs.activities.length > 2">
-
-                                            <span
-                                                class="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded-md"
-                                                x-text="'+' + (hs.activities.length - 2)"
-                                            ></span>
-
-                                        </template>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-
-                                    <div>
-
-                                        <span class="text-xs text-slate-400 block">
-                                            เริ่มต้น
-                                        </span>
-
-                                        <div class="text-lg font-extrabold text-emerald-700">
-
-                                            ฿<span x-text="hs.pricePerNight.toLocaleString()"></span>
-
-                                            <span class="text-xs font-normal text-slate-500">
-                                                /คืน
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <button
-                                        @click="openHomestayDetail(hs)"
-                                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center"
-                                    >
-                                        ดูรายละเอียด
-                                        <i class="fa-solid fa-arrow-right ml-1.5"></i>
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </template>
-
-                </div>
-
-            </section>
+          <div class="card stat">
+            <div class="stat-label">งานรอรับ</div>
+            <div id="statPending" class="stat-value red">0</div>
+          </div>
 
         </div>
 
-        <!-- ===================================================== -->
-        <!-- VIEW 2: ACTIVITIES -->
-        <!-- ===================================================== -->
+        <br>
 
-        <div
-            x-show="currentView === 'activities'"
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
-        >
+        <div class="grid grid-2">
 
-            <div class="bg-gradient-to-r from-teal-800 to-emerald-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+          <div class="card">
+            <h3>📌 งานล่าสุด</h3>
+            <br>
+            <div id="recentJobs"></div>
+          </div>
 
-                <div class="relative z-10 max-w-2xl">
-
-                    <span class="px-3 py-1 bg-white/20 text-xs font-semibold rounded-full border border-white/30 backdrop-blur-md">
-                        77 PROVINCIAL HIGHLIGHTS
-                    </span>
-
-                    <h2 class="text-3xl font-extrabold mt-3">
-                        กิจกรรมเด่นวิถีไทย 77 จังหวัด
-                    </h2>
-
-                    <p class="text-emerald-100 text-sm mt-2">
-                        สัมผัสภูมิปัญญา อาหารพื้นบ้าน การเกษตร และวิถีชีวิตดั้งเดิมของชาวบ้านในแต่ละจังหวัดทั่วประเทศ
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                    เลือกดูตามจังหวัด:
-                </label>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
-
-                    <template
-                        x-for="pName in allProvincesList"
-                        :key="pName"
-                    >
-
-                        <button
-                            @click="activityViewProvince = pName"
-                            :class="activityViewProvince === pName
-                                ? 'bg-emerald-600 text-white font-bold shadow'
-                                : 'bg-slate-50 text-slate-700 hover:bg-slate-100'"
-                            class="px-2.5 py-1.5 rounded-lg text-xs truncate text-left transition-all"
-                        >
-                            📍
-                            <span x-text="pName"></span>
-                        </button>
-
-                    </template>
-
-                </div>
-
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-
-                    <div>
-
-                        <h3 class="text-xl font-bold text-slate-800 flex items-center">
-
-                            <span class="mr-2">
-                                📍 กิจกรรมเด่นในจังหวัด
-                            </span>
-
-                            <span
-                                class="text-emerald-600 font-extrabold"
-                                x-text="activityViewProvince"
-                            ></span>
-
-                        </h3>
-
-                        <p class="text-xs text-slate-500 mt-0.5">
-                            กิจกรรมสัมผัสวิถีชีวิตที่สามารถร่วมสนุกเมื่อเข้าพักโฮมสเตย์ในพื้นที่นี้
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-                    <template
-                        x-for="(act, idx) in getActivitiesForProvince(activityViewProvince)"
-                        :key="idx"
-                    >
-
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-emerald-300 transition-all flex items-start space-x-3">
-
-                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base shrink-0 shadow-sm">
-                                <i class="fa-solid fa-seedling"></i>
-                            </div>
-
-                            <div class="space-y-1">
-
-                                <h4
-                                    class="font-bold text-slate-800 text-sm"
-                                    x-text="act.name"
-                                ></h4>
-
-                                <p
-                                    class="text-xs text-slate-500 leading-relaxed"
-                                    x-text="act.desc"
-                                ></p>
-
-                                <span class="inline-block text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                                    เหมาะสำหรับ: ทุกวัย
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </template>
-
-                </div>
-
-                <div class="pt-6 border-t border-slate-100">
-
-                    <h4 class="text-sm font-bold text-slate-700 mb-3">
-                        โฮมสเตย์ในจังหวัด
-                        <span x-text="activityViewProvince"></span>
-                        ที่มีกิจกรรมนี้
-                    </h4>
-
-                    <div class="flex flex-wrap gap-3">
-
-                        <template
-                            x-for="hs in getHomestaysInProvince(activityViewProvince)"
-                            :key="hs.id"
-                        >
-
-                            <button
-                                @click="openHomestayDetail(hs)"
-                                class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-md transition-all text-left flex items-center space-x-2"
-                            >
-
-                                <i class="fa-solid fa-house-chimney text-emerald-600 text-xs"></i>
-
-                                <span
-                                    class="text-xs font-semibold text-slate-700"
-                                    x-text="hs.name"
-                                ></span>
-
-                                <span
-                                    class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500"
-                                    x-text="'฿' + hs.pricePerNight"
-                                ></span>
-
-                            </button>
-
-                        </template>
-
-                        <template
-                            x-if="getHomestaysInProvince(activityViewProvince).length === 0"
-                        >
-
-                            <span class="text-xs text-slate-400 italic">
-                                ยังไม่มีข้อมูลโฮมสเตย์ในจังหวัดนี้ (เจ้าของโฮมสเตย์สามารถลงทะเบียนเพิ่มได้)
-                            </span>
-
-                        </template>
-
-                    </div>
-
-                </div>
-
-            </div>
+          <div class="card">
+            <h3>🛡️ Warranty ใกล้หมด</h3>
+            <br>
+            <div id="dashboardWarranty"></div>
+          </div>
 
         </div>
 
-        <!-- ===================================================== -->
-        <!-- VIEW 3: OWNER DASHBOARD -->
-        <!-- ===================================================== -->
+      </div>
 
-        <div
-            x-show="currentView === 'owner_dashboard'"
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
-        >
 
-            <div class="bg-gradient-to-r from-emerald-800 to-teal-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <!-- JOBS -->
+      <div id="jobs" class="page">
 
-                <div>
-
-                    <span class="px-3 py-1 bg-emerald-500/30 text-emerald-200 text-xs font-semibold rounded-full border border-emerald-400/30">
-                        HOMESTAY OWNER MANAGEMENT PORTAL
-                    </span>
-
-                    <h2
-                        class="text-2xl sm:text-3xl font-extrabold mt-2"
-                        x-text="'สวัสดี, คุณ' + currentUser.name"
-                    ></h2>
-
-                    <p class="text-emerald-100 text-xs sm:text-sm mt-1">
-                        จัดการข้อมูลโฮมสเตย์ ราคา และกิจกรรมเด่นประจำจังหวัดของคุณ
-                    </p>
-
-                </div>
-
-                <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 text-xs space-y-1">
-
-                    <div class="flex justify-between items-center space-x-4">
-
-                        <span class="text-slate-200">
-                            สถานะคำขออนุมัติ:
-                        </span>
-
-                        <span
-                            class="font-bold text-amber-300"
-                            x-text="getOwnerPendingCount() + ' รายการรอดำเนินการ'"
-                        ></span>
-
-                    </div>
-
-                    <p class="text-[11px] text-slate-300">
-                        * การแก้ไขข้อมูลจะส่งให้ Super Admin ตรวจสอบก่อนแสดงผลจริง
-                    </p>
-
-                </div>
-
-            </div>
-
-            <!-- CUSTOMER BOOKINGS FOR THIS OWNER -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
-
-                <div class="flex items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800">
-                            <i class="fa-solid fa-users text-emerald-600 mr-2"></i>
-                            ข้อมูลลูกค้าที่จองเข้ามา
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-1">
-                            แสดงเฉพาะการจองของโฮมสเตย์ที่อยู่ภายใต้บัญชีของคุณ
-                        </p>
-                    </div>
-                    <span
-                        class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold"
-                        x-text="getOwnerBookings().length + ' รายการ'"
-                    ></span>
-                </div>
-
-                <template x-if="getOwnerBookings().length === 0">
-                    <div class="text-center py-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                        <i class="fa-solid fa-calendar-xmark text-3xl text-slate-300 mb-2"></i>
-                        <p class="text-sm font-semibold text-slate-500">ยังไม่มีลูกค้าจองเข้ามา</p>
-                        <p class="text-xs text-slate-400 mt-1">เมื่อมีการจอง ข้อมูลลูกค้าจะปรากฏที่นี่</p>
-                    </div>
-                </template>
-
-                <div class="space-y-3">
-                    <template x-for="booking in getOwnerBookings()" :key="booking.id">
-                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-bold text-slate-800" x-text="booking.customerName || 'ไม่ระบุชื่อ'"></span>
-                                        <span
-                                            class="px-2 py-0.5 rounded-full text-[10px] font-bold"
-                                            :class="booking.paymentStatus === 'ชำระเงินสำเร็จ'
-                                                ? 'bg-emerald-100 text-emerald-700'
-                                                : 'bg-amber-100 text-amber-700'"
-                                            x-text="booking.paymentStatus || 'ยังไม่ชำระ'"
-                                        ></span>
-                                    </div>
-                                    <p class="text-xs text-slate-500 mt-1">
-                                        <i class="fa-solid fa-phone mr-1"></i>
-                                        <span x-text="booking.customerPhone || '-'"></span>
-                                    </p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-extrabold text-emerald-700" x-text="'฿' + Number(booking.totalPrice || 0).toLocaleString()"></p>
-                                    <p class="text-[11px] text-slate-500" x-text="booking.nights + ' คืน • ' + booking.guests + ' คน'"></p>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200 text-xs">
-                                <div>
-                                    <span class="text-slate-400">โฮมสเตย์:</span>
-                                    <span class="font-semibold text-slate-700" x-text="booking.homestayName"></span>
-                                </div>
-                                <div>
-                                    <span class="text-slate-400">เข้าพัก:</span>
-                                    <span class="font-semibold text-slate-700" x-text="booking.checkIn + ' - ' + booking.checkOut"></span>
-                                </div>
-                                <div class="sm:col-span-2">
-                                    <span class="text-slate-400">กิจกรรม:</span>
-                                    <span class="font-semibold text-slate-700" x-text="booking.activities && booking.activities.length ? booking.activities.join(', ') : 'ไม่เลือกกิจกรรม'"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
-
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
-
-                    <div>
-
-                        <h3 class="text-xl font-bold text-slate-800">
-                            โฮมสเตย์ในการดูแลของคุณ
-                        </h3>
-
-                        <p class="text-xs text-slate-500">
-                            เลือกโฮมสเตย์เพื่อแก้ไขราคา คำอธิบาย หรือกิจกรรมเด่น
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <template
-                    x-for="hs in getOwnerHomestays()"
-                    :key="hs.id"
-                >
-
-                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-6">
-
-                        <div class="flex justify-between items-start">
-
-                            <div>
-
-                                <span
-                                    class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-md"
-                                    x-text="hs.province"
-                                ></span>
-
-                                <h4
-                                    class="text-xl font-bold text-slate-800 mt-2"
-                                    x-text="hs.name"
-                                ></h4>
-
-                                <p
-                                    class="text-xs text-slate-500"
-                                    x-text="hs.region + ' • ' + hs.district"
-                                ></p>
-
-                            </div>
-
-                            <span
-                                class="px-3 py-1 text-xs font-semibold rounded-full border"
-                                :class="hs.status === 'approved'
-                                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                                    : 'bg-amber-100 text-amber-800 border-amber-200'"
-                            >
-
-                                <i
-                                    class="fa-solid mr-1"
-                                    :class="hs.status === 'approved'
-                                        ? 'fa-circle-check'
-                                        : 'fa-clock'"
-                                ></i>
-
-                                <span
-                                    x-text="hs.status === 'approved'
-                                        ? 'อนุมัติแล้ว (แสดงผลจริง)'
-                                        : 'มีรายการรออนุมัติ'"
-                                ></span>
-
-                            </span>
-
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200">
-
-                            <div>
-
-                                <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    ราคาต่อคืน (บาท):
-                                </label>
-
-                                <input
-                                    type="number"
-                                    x-model.number="ownerEditForms[hs.id].pricePerNight"
-                                    class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
-                                >
-
-                            </div>
-
-                            <div>
-
-                                <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    จังหวัด (77 จังหวัด):
-                                </label>
-
-                                <select
-                                    x-model="ownerEditForms[hs.id].province"
-                                    class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
-                                >
-
-                                    <template
-                                        x-for="p in allProvincesList"
-                                        :key="p"
-                                    >
-
-                                        <option
-                                            :value="p"
-                                            x-text="p"
-                                        ></option>
-
-                                    </template>
-
-                                </select>
-
-                            </div>
-
-                            <div class="md:col-span-2">
-
-                                <label class="block text-xs font-bold text-slate-700 mb-1">
-                                    รายละเอียดแนะนำโฮมสเตย์:
-                                </label>
-
-                                <textarea
-                                    x-model="ownerEditForms[hs.id].description"
-                                    rows="3"
-                                    class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
-                                ></textarea>
-
-                            </div>
-
-                            <div class="md:col-span-2 space-y-2">
-
-                                <label class="block text-xs font-bold text-slate-700">
-                                    กิจกรรมเด่นไฮไลท์ (ประจำจังหวัด/โฮมสเตย์):
-                                </label>
-
-                                <div class="flex flex-wrap gap-2 mb-2">
-
-                                    <template
-                                        x-for="(act, aIdx) in ownerEditForms[hs.id].activities"
-                                        :key="aIdx"
-                                    >
-
-                                        <span class="inline-flex items-center px-3 py-1 bg-white border border-emerald-300 text-emerald-800 text-xs font-medium rounded-xl shadow-sm">
-
-                                            <i class="fa-solid fa-leaf text-emerald-500 mr-1.5"></i>
-
-                                            <span x-text="act"></span>
-
-                                            <button
-                                                @click="removeActivityFromOwnerForm(hs.id, aIdx)"
-                                                class="ml-2 text-rose-500 hover:text-rose-700 font-bold"
-                                            >
-                                                ×
-                                            </button>
-
-                                        </span>
-
-                                    </template>
-
-                                </div>
-
-                                <div class="flex space-x-2">
-
-                                    <input
-                                        type="text"
-                                        x-model="ownerEditForms[hs.id].newActivityInput"
-                                        placeholder="เพิ่มกิจกรรมใหม่ เช่น ทำผ้ามัดย้อม, ล่องเรือชมหิ่งห้อย..."
-                                        class="flex-grow p-2 bg-white border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
-                                    >
-
-                                    <button
-                                        @click="addActivityToOwnerForm(hs.id)"
-                                        class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition-all"
-                                    >
-                                        + เพิ่มกิจกรรม
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="flex justify-end pt-4 border-t border-slate-200">
-
-                            <button
-                                @click="submitOwnerChanges(hs.id)"
-                                class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center"
-                            >
-
-                                <i class="fa-solid fa-paper-plane mr-2"></i>
-
-                                บันทึกและส่งคำขออนุมัติไปยัง Admin
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </template>
-
-            </div>
-
+        <div class="page-title">
+          <h2>🧰 งานของทีม</h2>
+          <p>รับงาน ดำเนินงาน และปิดงาน</p>
         </div>
 
-        <!-- ===================================================== -->
-        <!-- VIEW 4: SUPER ADMIN -->
-        <!-- ===================================================== -->
-
-        <div
-            x-show="currentView === 'admin_dashboard'"
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8"
-        >
-
-            <!-- ADMIN HEADER -->
-            <div class="bg-gradient-to-r from-amber-600 to-orange-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex items-center justify-between">
-
-                <div>
-
-                    <span class="px-3 py-1 bg-white/20 text-xs font-bold rounded-full border border-white/30 backdrop-blur-md">
-                        SUPER ADMIN CONTROL PANEL
-                    </span>
-
-                    <h2 class="text-2xl sm:text-3xl font-extrabold mt-2">
-                        ศูนย์ตรวจสอบคำขออนุมัติ (Pending Request Review)
-                    </h2>
-
-                    <p class="text-amber-100 text-xs sm:text-sm mt-1">
-                        อนุมัติหรือปฏิเสธรายการเพิ่ม/แก้ไขข้อมูลจากเจ้าของโฮมสเตย์ก่อนแสดงผลสาธารณะ
-                    </p>
-
-                </div>
-
-                <div class="text-center bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20">
-
-                    <span
-                        class="text-2xl font-black block"
-                        x-text="pendingApprovals.length"
-                    ></span>
-
-                    <span class="text-[11px] text-amber-100 uppercase tracking-wider">
-                        คำขอที่รออนุมัติ
-                    </span>
-
-                </div>
-
-            </div>
-
-            <!-- ================================================= -->
-            <!-- NEW: ADMIN BUSINESS STATISTICS -->
-            <!-- ================================================= -->
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
-                <!-- TOTAL CUSTOMERS -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-all">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                ลูกค้าที่มาใช้บริการ
-                            </p>
-
-                            <p
-                                class="text-3xl font-extrabold text-emerald-700 mt-2"
-                                x-text="getAdminStats().totalCustomers.toLocaleString()"
-                            ></p>
-
-                            <p class="text-xs text-slate-400 mt-1">
-                                คน
-                            </p>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-
-                            <i class="fa-solid fa-users text-xl"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- TOTAL BOOKINGS -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-all">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                จำนวนการจองทั้งหมด
-                            </p>
-
-                            <p
-                                class="text-3xl font-extrabold text-blue-600 mt-2"
-                                x-text="getAdminStats().totalBookings.toLocaleString()"
-                            ></p>
-
-                            <p class="text-xs text-slate-400 mt-1">
-                                รายการ
-                            </p>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
-
-                            <i class="fa-solid fa-calendar-check text-xl"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- TOTAL REVENUE -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-all">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                รายได้รวม
-                            </p>
-
-                            <p class="text-3xl font-extrabold text-amber-600 mt-2">
-
-                                ฿<span
-                                    x-text="getAdminStats().totalRevenue.toLocaleString()"
-                                ></span>
-
-                            </p>
-
-                            <p class="text-xs text-slate-400 mt-1">
-                                จากการจองทั้งหมด
-                            </p>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center">
-
-                            <i class="fa-solid fa-sack-dollar text-xl"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- END ADMIN BUSINESS STATISTICS -->
-
-            <!-- APPROVAL LIST -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
-
-                <h3 class="text-lg font-bold text-slate-800 flex items-center">
-
-                    <i class="fa-solid fa-clock-rotate-left text-amber-500 mr-2"></i>
-
-                    รายการคำขอแก้ไขข้อมูลรอการตรวจสอบ
-
-                </h3>
-
-                <template x-if="pendingApprovals.length === 0">
-
-                    <div class="text-center py-12 border border-dashed border-slate-200 rounded-2xl">
-
-                        <i class="fa-solid fa-circle-check text-4xl text-emerald-400 mb-2"></i>
-
-                        <h4 class="text-base font-bold text-slate-700">
-                            ไม่มีคำขอที่รอการอนุมัติในขณะนี้
-                        </h4>
-
-                        <p class="text-xs text-slate-500">
-                            ข้อมูลทั้งหมดในระบบได้รับการอนุมัติและแสดงผลเป็นปัจจุบันแล้ว
-                        </p>
-
-                    </div>
-
-                </template>
-
-                <div class="space-y-4">
-
-                    <template
-                        x-for="req in pendingApprovals"
-                        :key="req.id"
-                    >
-
-                        <div class="border border-amber-200 bg-amber-50/30 rounded-2xl p-5 space-y-4">
-
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-amber-200/60">
-
-                                <div>
-
-                                    <span
-                                        class="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded"
-                                        x-text="'คำขอ ID: #' + req.id"
-                                    ></span>
-
-                                    <span
-                                        class="text-xs text-slate-500 ml-2"
-                                        x-text="'ยื่นคำขอเมื่อ: ' + req.timestamp"
-                                    ></span>
-
-                                    <h4
-                                        class="text-base font-bold text-slate-800 mt-1"
-                                        x-text="'โฮมสเตย์: ' + req.homestayName"
-                                    ></h4>
-
-                                </div>
-
-                                <span
-                                    class="text-xs font-semibold text-slate-600 bg-white px-3 py-1 rounded-full border border-slate-200"
-                                    x-text="'โดยเจ้าของ: ' + req.submittedBy"
-                                ></span>
-
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-
-                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2">
-
-                                    <span class="font-bold text-slate-400 uppercase tracking-wider block">
-                                        📌 ข้อมูลเดิม (ปัจจุบัน):
-                                    </span>
-
-                                    <div>
-                                        <span class="font-semibold text-slate-600">
-                                            ราคา:
-                                        </span>
-
-                                        ฿<span x-text="req.originalData.pricePerNight"></span>
-                                        /คืน
-                                    </div>
-
-                                    <div>
-                                        <span class="font-semibold text-slate-600">
-                                            จังหวัด:
-                                        </span>
-
-                                        <span x-text="req.originalData.province"></span>
-                                    </div>
-
-                                    <div>
-                                        <span class="font-semibold text-slate-600">
-                                            รายละเอียด:
-                                        </span>
-
-                                        <span
-                                            class="text-slate-500 line-clamp-2"
-                                            x-text="req.originalData.description"
-                                        ></span>
-                                    </div>
-
-                                    <div>
-
-                                        <span class="font-semibold text-slate-600 block mb-1">
-                                            กิจกรรมเด่น:
-                                        </span>
-
-                                        <div class="flex flex-wrap gap-1">
-
-                                            <template
-                                                x-for="a in req.originalData.activities"
-                                                :key="a"
-                                            >
-
-                                                <span
-                                                    class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px]"
-                                                    x-text="a"
-                                                ></span>
-
-                                            </template>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="bg-emerald-50/50 p-3.5 rounded-xl border border-emerald-200 space-y-2">
-
-                                    <span class="font-bold text-emerald-700 uppercase tracking-wider block">
-                                        ✨ ข้อมูลขอเปลี่ยนแปลงใหม่:
-                                    </span>
-
-                                    <div>
-
-                                        <span class="font-semibold text-slate-600">
-                                            ราคาใหม่:
-                                        </span>
-
-                                        <span class="font-bold text-emerald-700">
-                                            ฿<span x-text="req.newData.pricePerNight"></span>
-                                        </span>
-
-                                        /คืน
-
-                                    </div>
-
-                                    <div>
-
-                                        <span class="font-semibold text-slate-600">
-                                            จังหวัดใหม่:
-                                        </span>
-
-                                        <span
-                                            class="font-bold text-emerald-700"
-                                            x-text="req.newData.province"
-                                        ></span>
-
-                                    </div>
-
-                                    <div>
-
-                                        <span class="font-semibold text-slate-600">
-                                            รายละเอียดใหม่:
-                                        </span>
-
-                                        <span
-                                            class="text-slate-700 font-medium"
-                                            x-text="req.newData.description"
-                                        ></span>
-
-                                    </div>
-
-                                    <div>
-
-                                        <span class="font-semibold text-slate-600 block mb-1">
-                                            กิจกรรมเด่นใหม่:
-                                        </span>
-
-                                        <div class="flex flex-wrap gap-1">
-
-                                            <template
-                                                x-for="a in req.newData.activities"
-                                                :key="a"
-                                            >
-
-                                                <span
-                                                    class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-semibold text-[10px]"
-                                                    x-text="a"
-                                                ></span>
-
-                                            </template>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="flex justify-end space-x-3 pt-2">
-
-                                <button
-                                    @click="rejectApproval(req.id)"
-                                    class="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold rounded-xl transition-all flex items-center"
-                                >
-
-                                    <i class="fa-solid fa-xmark mr-1.5"></i>
-
-                                    ปฏิเสธคำขอ (Reject)
-
-                                </button>
-
-                                <button
-                                    @click="approveApproval(req.id)"
-                                    class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center"
-                                >
-
-                                    <i class="fa-solid fa-check mr-1.5"></i>
-
-                                    อนุมัติ (Approve & Publish)
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </template>
-
-                </div>
-
-            </div>
-
+        <div id="adminJobButton" class="toolbar hidden">
+          <div></div>
+          <button class="btn" onclick="openJobModal()">
+            + สร้างงานใหม่
+          </button>
         </div>
 
-    </main>
+        <div id="jobsList" class="grid grid-2"></div>
 
-    <!-- ========================================================= -->
-    <!-- MODALS -->
-    <!-- ========================================================= -->
+      </div>
 
-    <!-- LOGIN MODAL -->
 
-    <div
-        x-show="showLoginModal"
-        x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
-    >
+      <!-- MATERIALS -->
+      <div id="materials" class="page">
 
-        <div
-            @click.outside="showLoginModal = false"
-            class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative space-y-6"
-        >
+        <div class="page-title">
+          <h2>📍 วัสดุ / ร้านค้า</h2>
+          <p>ค้นหาร้านค้า เปรียบเทียบราคา และนำทาง</p>
+        </div>
 
-            <button
-                @click="showLoginModal = false"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"
-            >
-                <i class="fa-solid fa-xmark"></i>
+        <div class="card">
+
+          <div class="toolbar">
+
+            <div style="flex:1;min-width:220px">
+              <input
+                id="materialSearch"
+                placeholder="ค้นหา เช่น ท่อ PVC, เบรกเกอร์, สายไฟ..."
+                oninput="renderMaterials()"
+              >
+            </div>
+
+            <button class="btn" onclick="useCurrentLocation()">
+              📍 ใช้ตำแหน่งปัจจุบัน
             </button>
 
-            <div class="text-center space-y-2">
+          </div>
 
-                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl">
-                    <i class="fa-solid fa-user-lock"></i>
-                </div>
-
-                <h3 class="text-xl font-bold text-slate-800">
-                    เข้าสู่ระบบ PAKJAI
-                </h3>
-
-                <p class="text-xs text-slate-500">
-                    สำหรับเจ้าของโฮมสเตย์ และผู้ดูแลระบบ (Super Admin)
-                </p>
-
-            </div>
-
-            <form
-                @submit.prevent="handleLogin()"
-                class="space-y-4"
-            >
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                        เลือกโฮมสเตย์สำหรับเจ้าของ:
-                    </label>
-
-                    <select
-                        x-model="loginForm.homestayId"
-                        @change="
-                            const hs = homestays.find(h => h.id === Number(loginForm.homestayId));
-                            if (hs) loginForm.username = hs.ownerUsername;
-                            loginError = '';
-                        "
-                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
-                    >
-                        <option value="">-- เลือกโฮมสเตย์ --</option>
-                        <template x-for="hs in homestays" :key="hs.id">
-                            <option :value="hs.id" x-text="hs.name + ' (' + hs.province + ')'"></option>
-                        </template>
-                    </select>
-                    <p class="text-[10px] text-slate-400 mt-1">
-                        ระบบจะให้เจ้าของเข้าถึงได้เฉพาะโฮมสเตย์ที่ผูกกับบัญชีของตนเอง
-                    </p>
-                </div>
-
-                <div>
-
-                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                        ชื่อผู้ใช้งาน (Username / ID):
-                    </label>
-
-                    <input
-                        type="text"
-                        x-model="loginForm.username"
-                        required
-                        placeholder="เช่น owner_chiangmai หรือ admin"
-                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
-                    >
-
-                </div>
-
-                <div>
-
-                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                        รหัสผ่าน (Password / Pin):
-                    </label>
-
-                    <input
-                        type="password"
-                        x-model="loginForm.password"
-                        required
-                        placeholder="••••••••"
-                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
-                    >
-
-                </div>
-
-                <template x-if="loginError">
-
-                    <p
-                        class="text-xs text-rose-600 font-semibold"
-                        x-text="loginError"
-                    ></p>
-
-                </template>
-
-                <button
-                    type="submit"
-                    class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition-all"
-                >
-                    เข้าสู่ระบบ
-                </button>
-
-            </form>
-
-            <div class="pt-4 border-t border-slate-100 space-y-2 text-[11px] text-slate-500">
-
-                <p class="font-bold text-slate-600">
-                    บัญชีทดสอบสำหรับล็อกอิน:
-                </p>
-
-                <div class="grid grid-cols-2 gap-2">
-
-                    <button
-                        @click="loginForm.homestayId = 1; loginForm.username = 'owner_chiangmai'; loginForm.password = '1234'"
-                        class="p-2 bg-slate-50 hover:bg-emerald-50 rounded-lg border border-slate-200 text-left"
-                    >
-
-                        <span class="font-bold block text-slate-700">
-                            เจ้าของเชียงใหม่
-                        </span>
-
-                        <span class="text-[10px] text-slate-400">
-                            owner_chiangmai / 1234
-                        </span>
-
-                    </button>
-
-                    <button
-                        @click="loginForm.username = 'admin'; loginForm.password = '1234'"
-                        class="p-2 bg-slate-50 hover:bg-amber-50 rounded-lg border border-slate-200 text-left"
-                    >
-
-                        <span class="font-bold block text-amber-700">
-                            Super Admin
-                        </span>
-
-                        <span class="text-[10px] text-slate-400">
-                            admin / 1234
-                        </span>
-
-                    </button>
-
-                </div>
-
-            </div>
+          <div id="materialResults" class="grid grid-2"></div>
 
         </div>
 
+        <br>
+
+        <div class="map-box">
+
+          <div class="map-inner">
+
+            <h3>🗺️ Google Maps</h3>
+
+            <p>
+              ระบบพร้อมเชื่อม Google Maps API<br>
+              สำหรับแผนที่จริงและค้นหาร้านค้าใกล้ตำแหน่งช่าง
+            </p>
+
+            <button class="btn" onclick="openGoogleMaps()">
+              เปิด Google Maps
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FUEL -->
+      <div id="fuel" class="page">
+
+        <div class="page-title">
+          <h2>⛽ คำนวณน้ำมัน</h2>
+          <p>คำนวณน้ำมันที่ต้องใช้และค่าใช้จ่ายโดยประมาณ</p>
+        </div>
+
+        <div class="grid grid-2">
+
+          <div class="card">
+
+            <div class="field">
+              <label>อัตราสิ้นเปลือง (กม./ลิตร)</label>
+              <input id="fuelRate" type="number" value="12">
+            </div>
+
+            <div class="field">
+              <label>ระยะทาง (กม.)</label>
+              <input id="fuelDistance" type="number" value="100">
+            </div>
+
+            <div class="field">
+              <label>ราคาน้ำมัน (บาท/ลิตร)</label>
+              <input id="fuelPrice" type="number" value="32">
+            </div>
+
+            <button class="btn full" onclick="calculateFuel()">
+              คำนวณ
+            </button>
+
+          </div>
+
+          <div class="card">
+
+            <div class="stat-label">
+              ต้องใช้น้ำมันประมาณ
+            </div>
+
+            <div id="fuelLitres" class="stat-value blue">
+              0 ลิตร
+            </div>
+
+            <br>
+
+            <div class="stat-label">
+              ค่าใช้จ่ายประมาณ
+            </div>
+
+            <div id="fuelCost" class="stat-value green">
+              ฿0
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FINANCE -->
+      <div id="finance" class="page">
+
+        <div class="page-title">
+          <h2>💰 การเงิน</h2>
+          <p>รายรับ รายจ่าย และสรุปค่าใช้จ่าย</p>
+        </div>
+
+        <div class="grid grid-3">
+
+          <div class="card stat">
+            <div class="stat-label">รายรับ</div>
+            <div id="incomeTotal" class="stat-value green">
+              ฿0
+            </div>
+          </div>
+
+          <div class="card stat">
+            <div class="stat-label">รายจ่าย</div>
+            <div id="expenseTotal" class="stat-value red">
+              ฿0
+            </div>
+          </div>
+
+          <div class="card stat">
+            <div class="stat-label">คงเหลือ</div>
+            <div id="balanceTotal" class="stat-value blue">
+              ฿0
+            </div>
+          </div>
+
+        </div>
+
+        <br>
+
+        <div class="card">
+
+          <div class="toolbar">
+            <h3>รายการการเงิน</h3>
+
+            <button class="btn" onclick="openFinanceModal()">
+              + เพิ่มรายการ
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>ประเภท</th>
+                  <th>รายละเอียด</th>
+                  <th>จำนวนเงิน</th>
+                </tr>
+              </thead>
+
+              <tbody id="financeTable"></tbody>
+
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CHAT -->
+      <div id="chat" class="page">
+
+        <div class="page-title">
+          <h2>💬 แชททีม</h2>
+          <p>สื่อสารระหว่างทีมและห้องรวม</p>
+        </div>
+
+        <div class="chat">
+
+          <div class="chat-rooms">
+
+            <div class="room active" data-room="all" onclick="selectRoom(this,'all')">
+              🌐 ทุกทีม
+            </div>
+
+            <div class="room" data-room="teamservice1" onclick="selectRoom(this,'teamservice1')">
+              🔵 Team 1
+            </div>
+
+            <div class="room" data-room="teamservice2" onclick="selectRoom(this,'teamservice2')">
+              🟢 Team 2
+            </div>
+
+            <div class="room" data-room="teamservice3" onclick="selectRoom(this,'teamservice3')">
+              🟡 Team 3
+            </div>
+
+            <div class="room" data-room="teamservice4" onclick="selectRoom(this,'teamservice4')">
+              🟠 Team 4
+            </div>
+
+            <div class="room" data-room="teamservice5" onclick="selectRoom(this,'teamservice5')">
+              🔴 Team 5
+            </div>
+
+          </div>
+
+          <div class="chat-main">
+
+            <div id="messages" class="messages"></div>
+
+            <div class="chat-input">
+
+              <input
+                id="messageInput"
+                placeholder="พิมพ์ข้อความ..."
+                onkeydown="if(event.key==='Enter')sendMessage()"
+              >
+
+              <button class="btn" onclick="sendMessage()">
+                ส่ง
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- WARRANTY -->
+      <div id="warranty" class="page">
+
+        <div class="page-title">
+          <h2>🛡️ Warranty</h2>
+          <p>ติดตามประกันงานและวันหมดประกัน</p>
+        </div>
+
+        <div class="card">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>งาน</th>
+                  <th>ทีม</th>
+                  <th>วันที่เสร็จ</th>
+                  <th>รับประกัน</th>
+                  <th>หมดประกัน</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+
+              <tbody id="warrantyTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- REPORTS -->
+      <div id="reports" class="page">
+
+        <div class="page-title">
+          <h2>📈 รายงาน</h2>
+          <p>สรุปผลการทำงาน</p>
+        </div>
+
+        <div class="grid grid-3">
+
+          <div class="card">
+            <div class="stat-label">อัตรางานเสร็จ</div>
+            <div id="completionRate" class="stat-value green">0%</div>
+          </div>
+
+          <div class="card">
+            <div class="stat-label">งานทั้งหมด</div>
+            <div id="reportJobs" class="stat-value blue">0</div>
+          </div>
+
+          <div class="card">
+            <div class="stat-label">Warranty ทั้งหมด</div>
+            <div id="reportWarranty" class="stat-value yellow">0</div>
+          </div>
+
+        </div>
+
+        <br>
+
+        <div class="card">
+
+          <h3>สรุปงานตามทีม</h3>
+
+          <br>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>ทีม</th>
+                  <th>งานทั้งหมด</th>
+                  <th>กำลังทำ</th>
+                  <th>เสร็จแล้ว</th>
+                </tr>
+              </thead>
+
+              <tbody id="teamReport"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ADMIN -->
+      <div id="admin" class="page">
+
+        <div class="page-title">
+          <h2>⚙️ Admin</h2>
+          <p>จัดการงานและข้อมูลระบบ</p>
+        </div>
+
+        <div class="grid grid-3">
+
+          <div class="card">
+            <h3>👥 ทีมทั้งหมด</h3>
+            <br>
+            <div class="stat-value blue">5</div>
+          </div>
+
+          <div class="card">
+            <h3>🧰 งานทั้งหมด</h3>
+            <br>
+            <div id="adminJobs" class="stat-value green">0</div>
+          </div>
+
+          <div class="card">
+            <h3>💰 รายการการเงิน</h3>
+            <br>
+            <div id="adminFinance" class="stat-value yellow">0</div>
+          </div>
+
+        </div>
+
+        <br>
+
+        <div class="card">
+
+          <h3>ข้อมูลระบบ</h3>
+
+          <br>
+
+          <p style="color:var(--muted);line-height:2">
+            ระบบนี้เป็น GitHub-ready frontend<br>
+            ข้อมูล Demo เก็บด้วย LocalStorage<br>
+            สำหรับใช้งานจริงแนะนำเชื่อม Firebase Authentication,
+            Firestore และ Realtime Database
+          </p>
+
+        </div>
+
+      </div>
+
+
+    </section>
+  </main>
+</div>
+
+
+<!-- JOB MODAL -->
+<div id="jobModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <h3>สร้างงานใหม่</h3>
+      <button class="close" onclick="closeModal('jobModal')">×</button>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- HOMESTAY DETAIL MODAL -->
-    <!-- ========================================================= -->
+    <div class="field">
+      <label>ชื่องาน</label>
+      <input id="jobTitle" placeholder="เช่น ติดตั้งระบบไฟ">
+    </div>
 
-    <div
-        x-show="showDetailModal"
-        x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
-    >
+    <div class="field">
+      <label>ลูกค้า / หน่วยงาน</label>
+      <input id="jobCustomer" placeholder="ชื่อลูกค้า">
+    </div>
+
+    <div class="field">
+      <label>สถานที่</label>
+      <input id="jobLocation" placeholder="สถานที่ปฏิบัติงาน">
+    </div>
+
+    <div class="field">
+      <label>วันที่</label>
+      <input id="jobDate" type="date">
+    </div>
+
+    <div class="field">
+      <label>มอบหมายทีม</label>
+
+      <select id="jobTeam">
+        <option value="teamservice1">Team Service 1</option>
+        <option value="teamservice2">Team Service 2</option>
+        <option value="teamservice3">Team Service 3</option>
+        <option value="teamservice4">Team Service 4</option>
+        <option value="teamservice5">Team Service 5</option>
+      </select>
+
+    </div>
+
+    <div class="field">
+      <label>รายละเอียดงาน</label>
+      <textarea id="jobDetails"></textarea>
+    </div>
+
+    <button class="btn full" onclick="createJob()">
+      สร้างงาน
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- FINANCE MODAL -->
+<div id="financeModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <h3>เพิ่มรายการการเงิน</h3>
+      <button class="close" onclick="closeModal('financeModal')">×</button>
+    </div>
+
+    <div class="field">
+      <label>ประเภท</label>
+
+      <select id="financeType">
+        <option value="income">รายรับ</option>
+        <option value="expense">รายจ่าย</option>
+      </select>
+
+    </div>
+
+    <div class="field">
+      <label>รายละเอียด</label>
+      <input id="financeNote" placeholder="เช่น ค่าอะไหล่">
+    </div>
+
+    <div class="field">
+      <label>จำนวนเงิน</label>
+      <input id="financeAmount" type="number">
+    </div>
+
+    <button class="btn full" onclick="addFinance()">
+      บันทึก
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATABASE - DEMO LOCAL STORAGE
+========================================================= */
+
+const DB_KEY = "service_team_database_v1";
+
+let db = {
+  jobs: [],
+  finance: [],
+  messages: [],
+  warranties: []
+};
+
+let currentUser = null;
+let currentRoom = "all";
+
+
+function loadDB(){
+
+  const saved = localStorage.getItem(DB_KEY);
+
+  if(saved){
+    db = JSON.parse(saved);
+  }else{
+
+    db = {
+
+      jobs:[
+        {
+          id:Date.now(),
+          title:"ติดตั้งระบบไฟ",
+          customer:"บริษัท ABC",
+          location:"พิษณุโลก",
+          date:new Date().toISOString().slice(0,10),
+          team:"teamservice1",
+          details:"ตรวจสอบและติดตั้งระบบไฟ",
+          status:"pending",
+          warranty:null
+        },
+        {
+          id:Date.now()+1,
+          title:"ซ่อมปั๊มน้ำ",
+          customer:"ร้าน XYZ",
+          location:"พิษณุโลก",
+          date:new Date().toISOString().slice(0,10),
+          team:"teamservice2",
+          details:"ตรวจเช็คปั๊มน้ำ",
+          status:"working",
+          warranty:null
+        }
+      ],
+
+      finance:[
+        {
+          id:1,
+          date:new Date().toISOString().slice(0,10),
+          type:"income",
+          note:"ค่าบริการ",
+          amount:5000
+        },
+        {
+          id:2,
+          date:new Date().toISOString().slice(0,10),
+          type:"expense",
+          note:"ค่าน้ำมัน",
+          amount:1000
+        }
+      ],
+
+      messages:[
+        {
+          room:"all",
+          user:"ระบบ",
+          text:"ยินดีต้อนรับเข้าสู่ระบบแชท",
+          time:new Date().toLocaleTimeString()
+        }
+      ],
+
+      warranties:[]
+
+    };
+
+    saveDB();
+  }
+}
+
+
+function saveDB(){
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function login(){
+
+  const email =
+    document.getElementById("loginEmail").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  const errorBox =
+    document.getElementById("loginError");
+
+  errorBox.style.display = "none";
+  errorBox.textContent = "";
+
+  if(!email || !password){
+    errorBox.textContent = "กรุณากรอกอีเมลและรหัสผ่าน";
+    errorBox.style.display = "block";
+    return;
+  }
+
+  try{
+
+    const result =
+      await window.firebaseService.signInWithEmailAndPassword(
+        window.firebaseService.auth,
+        email,
+        password
+      );
+
+    const user = result.user;
+
+    const userRef =
+      window.firebaseService.doc(
+        window.firebaseService.firestore,
+        "users",
+        user.uid
+      );
+
+    const userSnap =
+      await window.firebaseService.getDoc(userRef);
+
+    if(!userSnap.exists()){
+      throw new Error("ไม่พบข้อมูลผู้ใช้งานในระบบ");
+    }
+
+    const userData = userSnap.data();
+
+    currentUser = {
+      uid: user.uid,
+      email: user.email,
+      name: userData.name || user.email,
+      team: userData.team || "",
+      admin: userData.role === "admin"
+    };
+
+    document
+      .getElementById("loginScreen")
+      .classList.add("hidden");
+
+    document
+      .getElementById("app")
+      .classList.remove("hidden");
+
+    setupUser();
+    renderAll();
+
+  }catch(error){
+
+    console.error(error);
+
+    errorBox.textContent =
+      "เข้าสู่ระบบไม่สำเร็จ: " + error.message;
+
+    errorBox.style.display = "block";
+  }
+}
+
+
+function checkLogin(){
+
+  if(!window.firebaseService){
+    setTimeout(checkLogin, 100);
+    return;
+  }
+
+  window.firebaseService.onAuthStateChanged(
+    window.firebaseService.auth,
+    async (user) => {
+
+      if(!user){
+
+        currentUser = null;
+
+        document
+          .getElementById("loginScreen")
+          .classList.remove("hidden");
+
+        document
+          .getElementById("app")
+          .classList.add("hidden");
+
+        return;
+      }
+
+      try{
+
+        const userRef =
+          window.firebaseService.doc(
+            window.firebaseService.firestore,
+            "users",
+            user.uid
+          );
+
+        const userSnap =
+          await window.firebaseService.getDoc(userRef);
+
+        if(!userSnap.exists()){
+
+          await window.firebaseService.signOut(
+            window.firebaseService.auth
+          );
+
+          return;
+        }
+
+        const userData = userSnap.data();
+
+        currentUser = {
+          uid: user.uid,
+          email: user.email,
+          name: userData.name || user.email,
+          team: userData.team || "",
+          admin: userData.role === "admin"
+        };
+
+        document
+          .getElementById("loginScreen")
+          .classList.add("hidden");
+
+        document
+          .getElementById("app")
+          .classList.remove("hidden");
+
+        setupUser();
+        renderAll();
+
+      }catch(error){
+
+        console.error(
+          "ตรวจสอบผู้ใช้ไม่สำเร็จ:",
+          error
+        );
+
+        currentUser = null;
+
+        document
+          .getElementById("loginScreen")
+          .classList.remove("hidden");
+
+        document
+          .getElementById("app")
+          .classList.add("hidden");
+      }
+
+    }
+  );
+}                                         
+
+
+function setupUser(){
+
+  document.getElementById("currentName").textContent =
+    currentUser.name;
+
+  document.getElementById("currentTeam").textContent =
+    currentUser.team;
+
+  document.getElementById("avatar").textContent =
+    currentUser.name.charAt(0).toUpperCase();
+
+  const admin =
+    currentUser.admin;
+
+  document
+    .getElementById("financeNav")
+    .classList.toggle("hidden",!admin);
+
+  document
+    .getElementById("reportsNav")
+    .classList.toggle("hidden",!admin);
+
+  document
+    .getElementById("adminNav")
+    .classList.toggle("hidden",!admin);
+
+  document
+    .getElementById("adminJobButton")
+    .classList.toggle("hidden",!admin);
+
+}
+
+
+async function logout(){
+
+  try{
+
+    await window.firebaseService.signOut(
+      window.firebaseService.auth
+    );
+
+    currentUser = null;
+
+    document
+      .getElementById("loginScreen")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("app")
+      .classList.add("hidden");
+
+  }catch(error){
+
+    console.error("Logout error:", error);
+
+    alert("ออกจากระบบไม่สำเร็จ");
+
+  }
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(page,button){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(p=>p.classList.remove("active"));
+
+  document
+    .getElementById(page)
+    .classList.add("active");
+
+  document
+    .querySelectorAll(".nav button")
+    .forEach(b=>b.classList.remove("active"));
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  const titles={
+    dashboard:"Dashboard",
+    jobs:"งานของทีม",
+    materials:"วัสดุ / ร้านค้า",
+    fuel:"คำนวณน้ำมัน",
+    finance:"การเงิน",
+    chat:"แชททีม",
+    warranty:"Warranty",
+    reports:"รายงาน",
+    admin:"Admin"
+  };
+
+  document.getElementById("topTitle").textContent =
+    titles[page] || page;
+
+  document.getElementById("sidebar")
+    .classList.remove("open");
+
+}
+
+
+function toggleSidebar(){
+
+  document
+    .getElementById("sidebar")
+    .classList.toggle("open");
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function getVisibleJobs(){
+
+  if(currentUser.admin){
+    return db.jobs;
+  }
+
+  return db.jobs.filter(
+    j=>j.team===currentUser.team
+  );
+
+}
+
+
+function renderDashboard(){
+
+  const jobs =
+    getVisibleJobs();
+
+  const total =
+    jobs.length;
+
+  const working =
+    jobs.filter(j=>j.status==="working").length;
+
+  const complete =
+    jobs.filter(j=>j.status==="complete").length;
+
+  const pending =
+    jobs.filter(j=>j.status==="pending").length;
+
+  document.getElementById("statJobs").textContent =
+    total;
+
+  document.getElementById("statWorking").textContent =
+    working;
+
+  document.getElementById("statComplete").textContent =
+    complete;
+
+  document.getElementById("statPending").textContent =
+    pending;
+
+
+  const recent =
+    jobs.slice(-5).reverse();
+
+  document.getElementById("recentJobs").innerHTML =
+    recent.length
+    ? recent.map(job=>`
+
+      <div style="padding:12px 0;border-bottom:1px solid var(--line)">
+
+        <strong>${escapeHTML(job.title)}</strong>
+
+        <div style="color:var(--muted);font-size:13px">
+          ${escapeHTML(job.customer)}
+          · ${escapeHTML(job.location)}
+        </div>
+
+        <br>
+
+        ${statusBadge(job.status)}
+
+      </div>
+
+    `).join("")
+    : `<p style="color:var(--muted)">ยังไม่มีงาน</p>`;
+
+
+  const warranties =
+    db.warranties
+      .filter(w=>currentUser.admin || w.team===currentUser.team)
+      .slice(-5)
+      .reverse();
+
+  document.getElementById("dashboardWarranty").innerHTML =
+    warranties.length
+    ? warranties.map(w=>`
+
+      <div style="padding:12px 0;border-bottom:1px solid var(--line)">
+
+        <strong>${escapeHTML(w.jobTitle)}</strong>
+
+        <div style="color:var(--muted)">
+          หมดประกัน ${w.endDate}
+        </div>
+
+      </div>
+
+    `).join("")
+    : `<p style="color:var(--muted)">ยังไม่มีข้อมูล Warranty</p>`;
+
+}
+
+
+/* =========================================================
+   JOBS
+========================================================= */
+
+function renderJobs(){
+
+  const jobs =
+    getVisibleJobs();
+
+  const container =
+    document.getElementById("jobsList");
+
+  if(!jobs.length){
+
+    container.innerHTML =
+      `<div class="card">
+        <p style="color:var(--muted)">ยังไม่มีงาน</p>
+      </div>`;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    jobs.map(job=>`
+
+      <div class="card job-card">
+
+        <div class="job-header">
+
+          <div>
+
+            <div class="job-title">
+              ${escapeHTML(job.title)}
+            </div>
+
+            <div class="job-meta">
+
+              👤 ${escapeHTML(job.customer)}<br>
+
+              📍 ${escapeHTML(job.location)}<br>
+
+              📅 ${job.date}<br>
+
+              👥 ${job.team}
+
+            </div>
+
+          </div>
+
+          ${statusBadge(job.status)}
+
+        </div>
+
+
+        <div style="color:#b9cadb">
+          ${escapeHTML(job.details || "-")}
+        </div>
+
+
+        <div class="job-actions">
+
+          ${job.status==="pending" && !currentUser.admin
+            ? `<button class="btn success"
+                onclick="acceptJob(${job.id})">
+                ✓ รับงาน
+              </button>`
+            : ""
+          }
+
+          ${job.status==="working" && !currentUser.admin
+            ? `<button class="btn"
+                onclick="completeJob(${job.id})">
+                ✓ ปิดงาน
+              </button>`
+            : ""
+          }
+
+          ${currentUser.admin
+            ? `<button class="btn secondary"
+                onclick="deleteJob(${job.id})">
+                ลบงาน
+              </button>`
+            : ""
+          }
+
+          <button
+            class="btn secondary"
+            onclick="navigateTo('${encodeURIComponent(job.location)}')">
+            🗺️ นำทาง
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function openJobModal(){
+
+  document
+    .getElementById("jobModal")
+    .classList.add("show");
+
+}
+
+
+async function createJob(){
+
+  const title =
+    document.getElementById("jobTitle").value.trim();
+
+  const customer =
+    document.getElementById("jobCustomer").value.trim();
+
+  const location =
+    document.getElementById("jobLocation").value.trim();
+
+  const date =
+    document.getElementById("jobDate").value;
+
+  const team =
+    document.getElementById("jobTeam").value;
+
+  const details =
+    document.getElementById("jobDetails").value.trim();
+
+  if(!title || !customer || !location){
+    alert("กรุณากรอกข้อมูลสำคัญให้ครบ");
+    return;
+  }
+
+  try{
+
+    await window.firebaseService.addDoc(
+
+      window.firebaseService.collection(
+        window.firebaseService.firestore,
+        "jobs"
+      ),
+
+      {
+        title: title,
+        customer: customer,
+        location: location,
+
+        date:
+          date ||
+          new Date().toISOString().slice(0,10),
+
+        team: team,
+
+        details: details,
+
+        status: "pending",
+
+        warranty: null,
+
+        createdAt:
+          window.firebaseService.serverTimestamp(),
+
+        createdBy:
+          currentUser.uid
+      }
+
+    );
+
+    closeModal("jobModal");
+
+    clearJobForm();
+
+    alert("สร้างงานเรียบร้อย");
+
+    // ตอนนี้ข้อมูลถูกบันทึกใน Firestore แล้ว
+    // ส่วนการดึงมาแสดงบนหน้าจอ เราจะทำขั้นต่อไป
+
+  }catch(error){
+
+    console.error("Create job error:", error);
+
+    alert(
+      "สร้างงานไม่สำเร็จ\n" +
+      error.message
+    );
+
+  }
+
+}
+
+
+  db.jobs.push({
+
+    id:Date.now(),
+
+    title,
+
+    customer,
+
+    location,
+
+    date:
+      date ||
+      new Date().toISOString().slice(0,10),
+
+    team,
+
+    details,
+
+    status:"pending",
+
+    warranty:null
+
+  });
+
+
+  saveDB();
+
+  closeModal("jobModal");
+
+  clearJobForm();
+
+  renderAll();
+
+  alert("สร้างงานเรียบร้อย");
+
+
+}
+
+
+function acceptJob(id){
+
+  const job =
+    db.jobs.find(j=>j.id===id);
+
+  if(!job) return;
+
+  job.status="working";
+
+  saveDB();
+
+  renderAll();
+
+}
+
+
+function completeJob(id){
+
+  const job =
+    db.jobs.find(j=>j.id===id);
+
+  if(!job) return;
+
+  const doneDate =
+    prompt(
+      "วันที่ทำงานเสร็จ (YYYY-MM-DD)",
+      new Date().toISOString().slice(0,10)
+    );
+
+  if(!doneDate) return;
+
+  const work =
+    prompt(
+      "รายละเอียดสิ่งที่ทำ",
+      job.details || ""
+    );
+
+  const warrantyDays =
+    parseInt(
+      prompt("รับประกันกี่วัน","30"),
+      10
+    ) || 0;
+
+
+  const endDate =
+    new Date(doneDate);
+
+  endDate.setDate(
+    endDate.getDate()+warrantyDays
+  );
+
+
+  job.status="complete";
+
+  job.completedDate=doneDate;
+
+  job.completedWork=work;
+
+  job.warrantyDays=warrantyDays;
+
+  job.warrantyEnd=
+    endDate.toISOString().slice(0,10);
+
+
+  db.warranties.push({
+
+    id:Date.now(),
+
+    jobId:job.id,
+
+    jobTitle:job.title,
+
+    team:job.team,
+
+    completedDate:doneDate,
+
+    days:warrantyDays,
+
+    endDate:job.warrantyEnd
+
+  });
+
+
+  saveDB();
+
+  renderAll();
+
+  alert("ปิดงานและบันทึก Warranty แล้ว");
+
+}
+
+
+function deleteJob(id){
+
+  if(!currentUser.admin) return;
+
+  if(!confirm("ต้องการลบงานนี้หรือไม่?")) return;
+
+  db.jobs =
+    db.jobs.filter(j=>j.id!==id);
+
+  saveDB();
+
+  renderAll();
+
+}
+
+
+function clearJobForm(){
+
+  [
+    "jobTitle",
+    "jobCustomer",
+    "jobLocation",
+    "jobDetails"
+  ].forEach(id=>{
+    document.getElementById(id).value="";
+  });
+
+}
+
+
+/* =========================================================
+   MATERIALS
+========================================================= */
+
+const materials=[
+
+  {
+    name:"ร้านวัสดุก่อสร้าง A",
+    item:"ท่อ PVC 1/2 นิ้ว",
+    price:45,
+    lat:16.82,
+    lng:100.26
+  },
+
+  {
+    name:"ร้านไฟฟ้า B",
+    item:"เบรกเกอร์ 20A",
+    price:180,
+    lat:16.81,
+    lng:100.27
+  },
+
+  {
+    name:"ร้านช่าง C",
+    item:"สายไฟ 2x1.5",
+    price:520,
+    lat:16.83,
+    lng:100.25
+  },
+
+  {
+    name:"ร้านวัสดุ D",
+    item:"ท่อ PVC 1/2 นิ้ว",
+    price:39,
+    lat:16.80,
+    lng:100.28
+  }
+
+];
+
+
+function renderMaterials(){
+
+  const q =
+    document.getElementById("materialSearch")
+      .value
+      .toLowerCase();
+
+  const result =
+    materials.filter(m=>
+      m.name.toLowerCase().includes(q) ||
+      m.item.toLowerCase().includes(q)
+    );
+
+  document.getElementById("materialResults").innerHTML =
+
+    result.map(m=>`
+
+      <div class="card">
+
+        <h3>${escapeHTML(m.name)}</h3>
+
+        <br>
+
+        <p style="color:var(--muted)">
+          ${escapeHTML(m.item)}
+        </p>
 
         <div
-            @click.outside="showDetailModal = false"
-            class="bg-white rounded-3xl max-w-3xl w-full my-8 shadow-2xl border border-slate-100 overflow-hidden relative"
-        >
-
-            <button
-                @click="showDetailModal = false"
-                class="absolute top-4 right-4 z-10 text-slate-600 bg-white/80 hover:bg-white w-9 h-9 rounded-full flex items-center justify-center shadow-md"
-            >
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <template x-if="activeHomestay">
-
-                <div class="space-y-6">
-
-                    <div class="relative h-64 sm:h-80 bg-slate-100">
-
-                        <img
-                            :src="activeHomestay.image"
-                            class="w-full h-full object-cover"
-                        >
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-
-                            <div class="text-white space-y-1">
-
-                                <span
-                                    class="px-2.5 py-1 bg-emerald-500 text-white text-xs font-bold rounded-lg"
-                                    x-text="activeHomestay.province"
-                                ></span>
-
-                                <h2
-                                    class="text-2xl sm:text-3xl font-extrabold"
-                                    x-text="activeHomestay.name"
-                                ></h2>
-
-                                <p
-                                    class="text-xs text-slate-200"
-                                    x-text="activeHomestay.region + ' • ' + activeHomestay.district"
-                                ></p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="p-6 space-y-6">
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                            <div class="md:col-span-2 space-y-4">
-
-                                <h3 class="text-base font-bold text-slate-800">
-                                    เรื่องราวเกี่ยวกับโฮมสเตย์
-                                </h3>
-
-                                <p
-                                    class="text-xs text-slate-600 leading-relaxed"
-                                    x-text="activeHomestay.description"
-                                ></p>
-
-                                <div class="space-y-2 pt-2">
-
-                                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                        🌿 กิจกรรมไฮไลท์ที่คุณจะได้สัมผัส:
-                                    </h4>
-
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-
-                                        <template
-                                            x-for="act in activeHomestay.activities"
-                                            :key="act"
-                                        >
-
-                                            <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-100 text-xs font-semibold text-emerald-800 flex items-center">
-
-                                                <i class="fa-solid fa-star text-amber-500 mr-2"></i>
-
-                                                <span x-text="act"></span>
-
-                                            </div>
-
-                                        </template>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="mt-5 p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                                <h4 class="text-xs font-bold text-slate-700 mb-2">🎁 ราคานี้รวม</h4>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <template x-for="item in activeHomestay.includes" :key="item">
-                                        <div class="text-xs text-slate-600 flex items-center">
-                                            <i class="fa-solid fa-circle-check text-emerald-500 mr-2"></i>
-                                            <span x-text="item"></span>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <!-- BOOKING BOX -->
-
-                            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 h-fit">
-
-                                <div class="text-center pb-3 border-b border-slate-200">
-
-                                    <span class="text-xs text-slate-400">
-                                        ราคาที่พักต่อคืน
-                                    </span>
-
-                                    <div class="text-2xl font-extrabold text-emerald-700">
-
-                                        ฿<span
-                                            x-text="activeHomestay.pricePerNight.toLocaleString()"
-                                        ></span>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="space-y-3">
-
-                                    <div>
-                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">วันที่เข้าพัก:</label>
-                                        <input type="date" x-model="bookingForm.checkIn" @change="updateBookingDates()"
-                                            class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">วันที่ออก:</label>
-                                        <input type="date" x-model="bookingForm.checkOut" @change="updateBookingDates()" :min="bookingForm.checkIn"
-                                            class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-[11px] font-bold text-slate-600 mb-1">จำนวนผู้เข้าพัก:</label>
-                                        <input type="number" min="1" x-model.number="bookingForm.guests"
-                                            class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
-                                    </div>
-
-                                    <div class="pt-2 border-t border-slate-200">
-                                        <label class="block text-[11px] font-bold text-slate-600 mb-2">🌿 เลือกกิจกรรมของที่พัก:</label>
-                                        <div class="space-y-2 max-h-40 overflow-y-auto">
-                                            <template x-for="activity in activeHomestay.activityDetails" :key="activity.name">
-                                                <label class="flex items-start gap-2 p-2 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-emerald-400">
-                                                    <input type="checkbox" :value="activity.name" x-model="bookingForm.selectedActivities"
-                                                        class="mt-1 accent-emerald-600">
-                                                    <span class="text-xs text-slate-700">
-                                                        <span class="font-semibold block" x-text="activity.name"></span>
-                                                        <span class="text-emerald-700 font-bold" x-text="'฿' + activity.price.toLocaleString() + ' / คน'"></span>
-                                                    </span>
-                                                </label>
-                                            </template>
-                                        </div>
-                                    </div>
-
-                                    <div class="pt-2 border-t border-slate-200 space-y-1 text-xs">
-                                        <div class="flex justify-between text-slate-500">
-                                            <span>ค่าที่พัก (<span x-text="bookingForm.nights"></span> คืน)</span>
-                                            <span x-text="'฿' + (activeHomestay.pricePerNight * (bookingForm.nights || 1)).toLocaleString()"></span>
-                                        </div>
-                                        <div class="flex justify-between text-slate-500">
-                                            <span>ค่ากิจกรรม</span>
-                                            <span x-text="'฿' + getSelectedActivitiesTotal().toLocaleString()"></span>
-                                        </div>
-                                        <div class="flex justify-between font-bold text-sm text-slate-800 pt-1">
-                                            <span>ราคารวมทั้งสิ้น</span>
-                                            <span class="text-emerald-700" x-text="'฿' + getBookingTotal().toLocaleString()"></span>
-                                        </div>
-                                    </div>
-
-                                    <button @click="startBookingConfirmation()"
-                                        class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all">
-                                        จองและตรวจสอบรายการ
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- REVIEWS -->
-
-                        <div class="pt-6 border-t border-slate-200 space-y-4">
-
-                            <h3 class="text-base font-bold text-slate-800 flex items-center justify-between">
-
-                                <span>
-                                    รีวิวจากผู้เข้าพัก
-                                    (<span x-text="activeHomestay.reviews.length"></span>)
-                                </span>
-
-                                <span class="text-amber-500 text-sm font-bold">
-
-                                    <i class="fa-solid fa-star"></i>
-
-                                    <span x-text="activeHomestay.rating"></span>
-
-                                </span>
-
-                            </h3>
-
-                            <div class="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
-
-                                <template
-                                    x-for="rev in activeHomestay.reviews"
-                                    :key="rev.id"
-                                >
-
-                                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
-
-                                        <div class="flex justify-between items-center text-xs">
-
-                                            <span
-                                                class="font-bold text-slate-700"
-                                                x-text="rev.userName"
-                                            ></span>
-
-                                            <span class="text-amber-500 font-bold">
-
-                                                <i class="fa-solid fa-star text-[10px]"></i>
-
-                                                <span x-text="rev.rating"></span>
-
-                                            </span>
-
-                                        </div>
-
-                                        <p
-                                            class="text-xs text-slate-600"
-                                            x-text="rev.comment"
-                                        ></p>
-
-                                    </div>
-
-                                </template>
-
-                            </div>
-
-                            <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 space-y-3">
-
-                                <span class="text-xs font-bold text-emerald-800 block">
-                                    เขียนรีวิวความประทับใจ:
-                                </span>
-
-                                <div class="flex items-center space-x-2">
-
-                                    <label class="text-xs text-slate-600">
-                                        ให้คะแนน:
-                                    </label>
-
-                                    <select
-                                        x-model.number="newReview.rating"
-                                        class="p-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-amber-500"
-                                    >
-
-                                        <option value="5">
-                                            ⭐⭐⭐⭐⭐ 5 ดาว
-                                        </option>
-
-                                        <option value="4">
-                                            ⭐⭐⭐⭐ 4 ดาว
-                                        </option>
-
-                                        <option value="3">
-                                            ⭐⭐⭐ 3 ดาว
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-                                <input
-                                    type="text"
-                                    x-model="newReview.comment"
-                                    placeholder="เล่าประสบการณ์ของคุณที่นี่..."
-                                    class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs"
-                                >
-
-                                <button
-                                    @click="submitReview()"
-                                    class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition-all"
-                                >
-                                    ส่งรีวิว
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </template>
-
+          class="stat-value green"
+          style="font-size:24px">
+          ฿${m.price.toLocaleString()}
         </div>
 
-    </div>
+        <br>
 
-    <!-- ========================================================= -->
-    <!-- BOOKING CONFIRMATION MODAL -->
-    <!-- ========================================================= -->
-    <div x-show="showBookingConfirmModal" x-cloak
-        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div @click.outside="showBookingConfirmModal = false"
-            class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 relative">
-            <button @click="showBookingConfirmModal = false"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="text-center mb-5">
-                <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">
-                    <i class="fa-solid fa-clipboard-check"></i>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800 mt-3">ยืนยันการจอง</h3>
-                <p class="text-xs text-slate-500 mt-1">ตรวจสอบรายละเอียดก่อนดำเนินการชำระเงิน</p>
-            </div>
-            <template x-if="activeBooking">
-                <div class="space-y-3 text-sm">
-                    <div class="p-4 bg-slate-50 rounded-2xl space-y-2">
-                        <div class="flex justify-between gap-4"><span class="text-slate-500">โฮมสเตย์</span><span class="font-bold text-right" x-text="activeBooking.homestayName"></span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">เข้าพัก</span><span class="font-semibold" x-text="activeBooking.checkIn"></span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">ออก</span><span class="font-semibold" x-text="activeBooking.checkOut"></span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">จำนวนคืน</span><span x-text="activeBooking.nights + ' คืน'"></span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">ผู้เข้าพัก</span><span x-text="activeBooking.guests + ' คน'"></span></div>
-                        <div class="flex justify-between gap-3"><span class="text-slate-500">กิจกรรม</span><span class="font-semibold text-right" x-text="activeBooking.activities.length ? activeBooking.activities.join(', ') : 'ไม่เลือกกิจกรรม'"></span></div>
-                        <div class="pt-2 border-t border-slate-200 flex justify-between font-bold"><span>ยอดชำระ</span><span class="text-emerald-700" x-text="'฿' + activeBooking.totalPrice.toLocaleString()"></span></div>
-                    </div>
-                    <div class="flex gap-2 pt-2">
-                        <button @click="showBookingConfirmModal = false; showDetailModal = true"
-                            class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">แก้ไขรายการ</button>
-                        <button @click="confirmBookingAndPay()"
-                            class="w-1/2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md">ยืนยันและไปชำระเงิน</button>
-                    </div>
-                </div>
-            </template>
+        <button
+          class="btn"
+          onclick="navigateCoords(${m.lat},${m.lng})">
+          🗺️ นำทาง
+        </button>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function navigateTo(location){
+
+  window.open(
+    "https://www.google.com/maps/search/?api=1&query="
+    + encodeURIComponent(location),
+    "_blank"
+  );
+
+}
+
+
+function navigateCoords(lat,lng){
+
+  window.open(
+    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+    "_blank"
+  );
+
+}
+
+
+function openGoogleMaps(){
+
+  window.open(
+    "https://www.google.com/maps",
+    "_blank"
+  );
+
+}
+
+
+function useCurrentLocation(){
+
+  if(!navigator.geolocation){
+
+    alert("Browser ไม่รองรับ GPS");
+
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    position=>{
+
+      const lat =
+        position.coords.latitude;
+
+      const lng =
+        position.coords.longitude;
+
+      window.open(
+        `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
+        "_blank"
+      );
+
+    },
+
+    ()=>{
+      alert("ไม่สามารถอ่านตำแหน่งปัจจุบันได้");
+    }
+
+  );
+
+}
+
+
+/* =========================================================
+   FUEL
+========================================================= */
+
+function calculateFuel(){
+
+  const rate =
+    parseFloat(
+      document.getElementById("fuelRate").value
+    );
+
+  const distance =
+    parseFloat(
+      document.getElementById("fuelDistance").value
+    );
+
+  const price =
+    parseFloat(
+      document.getElementById("fuelPrice").value
+    );
+
+
+  if(!rate || !distance || !price){
+
+    alert("กรุณากรอกข้อมูลให้ครบ");
+
+    return;
+  }
+
+
+  const litres =
+    distance/rate;
+
+  const cost =
+    litres*price;
+
+
+  document.getElementById("fuelLitres")
+    .textContent =
+      litres.toFixed(2)+" ลิตร";
+
+  document.getElementById("fuelCost")
+    .textContent =
+      "฿"+cost.toLocaleString(
+        undefined,
+        {
+          maximumFractionDigits:2
+        }
+      );
+
+}
+
+
+/* =========================================================
+   FINANCE
+========================================================= */
+
+function openFinanceModal(){
+
+  document
+    .getElementById("financeModal")
+    .classList.add("show");
+
+}
+
+
+function addFinance(){
+
+  const type =
+    document.getElementById("financeType").value;
+
+  const note =
+    document.getElementById("financeNote")
+      .value.trim();
+
+  const amount =
+    parseFloat(
+      document.getElementById("financeAmount").value
+    );
+
+
+  if(!note || !amount){
+
+    alert("กรุณากรอกข้อมูล");
+
+    return;
+  }
+
+
+  db.finance.push({
+
+    id:Date.now(),
+
+    date:
+      new Date().toISOString().slice(0,10),
+
+    type,
+
+    note,
+
+    amount
+
+  });
+
+
+  saveDB();
+
+  closeModal("financeModal");
+
+  document.getElementById("financeNote").value="";
+  document.getElementById("financeAmount").value="";
+
+  renderAll();
+
+}
+
+
+function renderFinance(){
+
+  if(!currentUser.admin) return;
+
+
+  let income=0;
+  let expense=0;
+
+
+  db.finance.forEach(item=>{
+
+    if(item.type==="income")
+      income+=item.amount;
+
+    else
+      expense+=item.amount;
+
+  });
+
+
+  document.getElementById("incomeTotal").textContent =
+    "฿"+income.toLocaleString();
+
+  document.getElementById("expenseTotal").textContent =
+    "฿"+expense.toLocaleString();
+
+  document.getElementById("balanceTotal").textContent =
+    "฿"+(income-expense).toLocaleString();
+
+
+  document.getElementById("financeTable").innerHTML =
+
+    db.finance
+      .slice()
+      .reverse()
+      .map(item=>`
+
+        <tr>
+
+          <td>${item.date}</td>
+
+          <td>
+            ${
+              item.type==="income"
+              ? `<span class="badge green">รายรับ</span>`
+              : `<span class="badge red">รายจ่าย</span>`
+            }
+          </td>
+
+          <td>${escapeHTML(item.note)}</td>
+
+          <td>
+            ฿${item.amount.toLocaleString()}
+          </td>
+
+        </tr>
+
+      `).join("");
+
+}
+
+
+/* =========================================================
+   CHAT
+========================================================= */
+
+function selectRoom(element,room){
+
+  currentRoom=room;
+
+  document
+    .querySelectorAll(".room")
+    .forEach(r=>r.classList.remove("active"));
+
+  element.classList.add("active");
+
+  renderMessages();
+
+}
+
+
+function sendMessage(){
+
+  const input =
+    document.getElementById("messageInput");
+
+  const text =
+    input.value.trim();
+
+  if(!text) return;
+
+
+  db.messages.push({
+
+    room:currentRoom,
+
+    user:currentUser.name,
+
+    team:currentUser.team,
+
+    text,
+
+    time:new Date().toLocaleTimeString()
+
+  });
+
+
+  input.value="";
+
+  saveDB();
+
+  renderMessages();
+
+}
+
+
+function renderMessages(){
+
+  const messages =
+    db.messages.filter(
+      m=>m.room===currentRoom
+    );
+
+
+  document.getElementById("messages").innerHTML =
+
+    messages.map(m=>`
+
+      <div class="message ${
+        m.user===currentUser.name
+        ? "me"
+        : ""
+      }">
+
+        <div style="font-size:12px;color:var(--muted)">
+          ${escapeHTML(m.user)}
         </div>
-    </div>
 
-    <!-- ========================================================= -->
-    <!-- PAYMENT MODAL -->
-    <!-- ========================================================= -->
-    <div x-show="showPaymentModal" x-cloak
-        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div @click.outside="showPaymentModal = false"
-            class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 relative">
-            <button @click="showPaymentModal = false"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="text-center mb-5">
-                <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl">
-                    <i class="fa-solid fa-credit-card"></i>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800 mt-3">ชำระเงิน</h3>
-                <p class="text-xs text-slate-500 mt-1">ชำระเงินเพื่อยืนยันการจองของคุณ</p>
-            </div>
-            <template x-if="activeBooking">
-                <div class="space-y-4">
-                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex justify-between">
-                        <span class="text-xs text-slate-600">ยอดที่ต้องชำระ</span>
-                        <span class="text-xl font-extrabold text-emerald-700" x-text="'฿' + activeBooking.totalPrice.toLocaleString()"></span>
-                    </div>
-                    <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl space-y-3">
-                        <div class="font-bold text-slate-700 text-sm">
-                            <i class="fa-solid fa-user mr-1 text-emerald-600"></i>
-                            ข้อมูลผู้จอง
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">ชื่อผู้จอง</label>
-                                <input
-                                    type="text"
-                                    x-model="customerInfo.name"
-                                    placeholder="กรอกชื่อ-นามสกุล"
-                                    class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">เบอร์โทรศัพท์</label>
-                                <input
-                                    type="tel"
-                                    x-model="customerInfo.phone"
-                                    placeholder="08xxxxxxxx"
-                                    class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs"
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-2">วิธีชำระเงิน</label>
-                        <select x-model="paymentForm.method" @change="paymentInfo.qrReady = false" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm">
-                            <option>โอนผ่านธนาคาร</option>
-                            <option>PromptPay</option>
-                            <option>บัตรเครดิต / เดบิต</option>
-                        </select>
-                    </div>
-
-                    <template x-if="paymentForm.method === 'โอนผ่านธนาคาร'">
-                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                            <div class="text-xs font-bold text-slate-700">ข้อมูลบัญชีตัวอย่าง</div>
-                            <div class="flex justify-between gap-3 text-xs">
-                                <span class="text-slate-500">ธนาคาร</span>
-                                <span class="font-semibold text-right" x-text="paymentInfo.bankName"></span>
-                            </div>
-                            <div class="flex justify-between gap-3 text-xs">
-                                <span class="text-slate-500">ชื่อบัญชี</span>
-                                <span class="font-semibold text-right" x-text="paymentInfo.accountName"></span>
-                            </div>
-                            <div class="flex justify-between gap-3 text-sm">
-                                <span class="text-slate-500">เลขที่บัญชี</span>
-                                <span class="font-extrabold tracking-wider text-emerald-700" x-text="paymentInfo.accountNumber"></span>
-                            </div>
-                        </div>
-                    </template>
-
-                    <template x-if="paymentForm.method === 'PromptPay'">
-                        <div class="p-4 rounded-2xl bg-white border border-emerald-200 text-center space-y-3">
-                            <div class="text-xs font-bold text-slate-700">สแกน QR เพื่อชำระเงิน</div>
-                            <div class="flex justify-center">
-                                <div id="pakjai-payment-qr" class="p-2 bg-white rounded-xl border border-slate-200 min-h-[206px] min-w-[206px] flex items-center justify-center">
-                                    <span x-show="!paymentInfo.qrReady" class="text-xs text-slate-400">กดสร้าง QR ก่อนชำระเงิน</span>
-                                </div>
-                            </div>
-                            <div class="text-xs text-slate-500">
-                                PromptPay ตัวอย่าง:
-                                <span class="font-bold text-slate-700" x-text="paymentInfo.promptPayNumber"></span>
-                            </div>
-                            <button type="button" @click="generatePaymentQR()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">
-                                <i class="fa-solid fa-qrcode mr-1"></i> สร้าง QR สำหรับยอดนี้
-                            </button>
-                        </div>
-                    </template>
-
-                    <div class="p-4 bg-amber-50 rounded-2xl text-xs text-amber-800 border border-amber-100">
-                        <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i>
-                        บัญชีและ QR นี้เป็นข้อมูลตัวอย่างสำหรับระบบสาธิต ไม่ใช่บัญชีรับเงินจริง
-                    </div>
-                    <button @click="processPayment()"
-                        class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md">
-                        ชำระเงิน ฿<span x-text="activeBooking.totalPrice.toLocaleString()"></span>
-                    </button>
-                </div>
-            </template>
-        </div>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- CUSTOMER NOTIFICATIONS MODAL -->
-    <!-- ========================================================= -->
-    <div x-show="showNotificationsModal" x-cloak
-        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div @click.outside="showNotificationsModal = false"
-            class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 relative">
-            <button @click="showNotificationsModal = false"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h3 class="text-xl font-bold text-slate-800 flex items-center mb-4">
-                <i class="fa-solid fa-bell text-amber-500 mr-2"></i>การแจ้งเตือน
-            </h3>
-            <template x-if="notifications.length === 0">
-                <div class="text-center py-10 text-slate-400 text-xs">ยังไม่มีการแจ้งเตือน</div>
-            </template>
-            <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                <template x-for="n in notifications" :key="n.id">
-                    <div class="p-4 rounded-2xl border"
-                        :class="n.type === 'payment' ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100'">
-                        <div class="flex items-start gap-3">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                                :class="n.type === 'payment' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'">
-                                <i :class="n.type === 'payment' ? 'fa-solid fa-circle-check' : 'fa-solid fa-calendar-check'"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-slate-800" x-text="n.title"></h4>
-                                <p class="text-xs text-slate-600 mt-1 leading-relaxed" x-text="n.message"></p>
-                                <p class="text-[10px] text-slate-400 mt-2" x-text="n.time"></p>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- MY BOOKINGS MODAL -->
-    <!-- ========================================================= -->
-
-    <div
-        x-show="showMyBookingsModal"
-        x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
-    >
-
-        <div
-            @click.outside="showMyBookingsModal = false"
-            class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 relative space-y-4"
-        >
-
-            <button
-                @click="showMyBookingsModal = false"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center"
-            >
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <h3 class="text-xl font-bold text-slate-800 flex items-center">
-
-                <i class="fa-solid fa-calendar-check text-emerald-600 mr-2"></i>
-
-                รายการจองของฉัน
-
-            </h3>
-
-            <template x-if="userBookings.length === 0">
-
-                <div class="text-center py-8 text-slate-400 text-xs">
-                    ยังไม่มีรายการจองโฮมสเตย์ในขณะนี้
-                </div>
-
-            </template>
-
-            <div class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
-
-                <template
-                    x-for="b in userBookings"
-                    :key="b.id"
-                >
-
-                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
-
-                        <div class="flex justify-between items-start">
-
-                            <h4
-                                class="font-bold text-slate-800 text-sm"
-                                x-text="b.homestayName"
-                            ></h4>
-
-                            <span
-                                class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded"
-                                x-text="b.status"
-                            ></span>
-
-                        </div>
-
-                        <p
-                            class="text-xs text-slate-500"
-                            x-text="'เข้าพัก: ' + b.checkIn + ' - ' + b.checkOut + ' (' + b.nights + ' คืน)'
-                        ></p>
-
-                        <p
-                            class="text-xs text-slate-500"
-                            x-text="'ผู้เข้าพัก: ' + b.guests + ' คน'"
-                        ></p>
-
-                        <p
-                            class="text-xs font-bold text-emerald-700"
-                            x-text="'ราคารวม: ฿' + b.totalPrice.toLocaleString()"
-                        ></p>
-
-                        <p class="text-[10px] text-slate-400"
-                            x-text="'สถานะการชำระเงิน: ' + (b.paymentStatus || 'ยังไม่ชำระ')"
-                        ></p>
-
-                    </div>
-
-                </template>
-
-            </div>
-
+        <div class="message-bubble">
+          ${escapeHTML(m.text)}
         </div>
 
-    </div>
+        <small>${m.time}</small>
 
-    <!-- ========================================================= -->
-    <!-- TOAST -->
-    <!-- ========================================================= -->
+      </div>
 
-    <div
-        x-show="toast.show"
-        x-cloak
-        class="fixed bottom-6 right-6 z-50 px-5 py-3 bg-slate-900 text-white text-xs font-semibold rounded-2xl shadow-2xl flex items-center space-x-2 transition-all"
-    >
+    `).join("");
 
-        <i class="fa-solid fa-circle-check text-emerald-400"></i>
 
-        <span x-text="toast.message"></span>
+  const box =
+    document.getElementById("messages");
 
-    </div>
+  box.scrollTop=box.scrollHeight;
 
+}
+
+
+/* =========================================================
+   WARRANTY
+========================================================= */
+
+function renderWarranty(){
+
+  const list =
+    db.warranties.filter(
+      w=>currentUser.admin || w.team===currentUser.team
+    );
+
+
+  document.getElementById("warrantyTable").innerHTML =
+
+    list.map(w=>{
+
+      const expired =
+        new Date(w.endDate)<new Date();
+
+      return `
+
+        <tr>
+
+          <td>${escapeHTML(w.jobTitle)}</td>
+
+          <td>${w.team}</td>
+
+          <td>${w.completedDate}</td>
+
+          <td>${w.days} วัน</td>
+
+          <td>${w.endDate}</td>
+
+          <td>
+
+            ${
+              expired
+              ? `<span class="badge red">หมดประกัน</span>`
+              : `<span class="badge green">ยังมีประกัน</span>`
+            }
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================================================
+   REPORT
+========================================================= */
+
+function renderReports(){
+
+  if(!currentUser.admin) return;
+
+  const jobs=db.jobs;
+
+  const complete =
+    jobs.filter(j=>j.status==="complete").length;
+
+  const rate =
+    jobs.length
+    ? Math.round(complete/jobs.length*100)
+    : 0;
+
+  document.getElementById("completionRate")
+    .textContent=rate+"%";
+
+  document.getElementById("reportJobs")
+    .textContent=jobs.length;
+
+  document.getElementById("reportWarranty")
+    .textContent=db.warranties.length;
+
+
+  const teams=[
+    "teamservice1",
+    "teamservice2",
+    "teamservice3",
+    "teamservice4",
+    "teamservice5"
+  ];
+
+
+  document.getElementById("teamReport").innerHTML =
+
+    teams.map(team=>{
+
+      const list =
+        jobs.filter(j=>j.team===team);
+
+      return `
+
+        <tr>
+
+          <td>${team}</td>
+
+          <td>${list.length}</td>
+
+          <td>
+            ${list.filter(j=>j.status==="working").length}
+          </td>
+
+          <td>
+            ${list.filter(j=>j.status==="complete").length}
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
+
+
+  document.getElementById("adminJobs")
+    .textContent=jobs.length;
+
+  document.getElementById("adminFinance")
+    .textContent=db.finance.length;
+
+}
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function statusBadge(status){
+
+  const map={
+
+    pending:
+      `<span class="badge red">รอรับงาน</span>`,
+
+    working:
+      `<span class="badge yellow">กำลังทำ</span>`,
+
+    complete:
+      `<span class="badge green">เสร็จแล้ว</span>`
+
+  };
+
+  return map[status] || "";
+
+}
+
+
+function closeModal(id){
+
+  document
+    .getElementById(id)
+    .classList.remove("show");
+
+}
+
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function renderAll(){
+
+  renderDashboard();
+
+  renderJobs();
+
+  renderMaterials();
+
+  renderFinance();
+
+  renderMessages();
+
+  renderWarranty();
+
+  renderReports();
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadDB();
+
+checkLogin();
+
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAn71nUu09g36yccy-J9Lu_M0-6vVxdiBE",
+    authDomain: "service-team-system.firebaseapp.com",
+    projectId: "service-team-system",
+    storageBucket: "service-team-system.firebasestorage.app",
+    messagingSenderId: "93461588345",
+    appId: "1:93461588345:web:afe33d07ef8b1d5d4927a8",
+    measurementId: "G-QJPZXDSVEL"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
+
+ window.firebaseService = {
+  auth,
+  firestore,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+};
+</script>
 </body>
 </html>
