@@ -96,6 +96,10 @@ button{
 }
 
 .field label{
+
+
+
+  
   display:block;
   margin-bottom:7px;
   color:#b7c8d9;
@@ -686,21 +690,26 @@ td{
     <h1>Service Team</h1>
     <p>ระบบบริหารทีมช่างและงานบริการ</p>
 
-    <div class="field">
-      <label>เลือกทีม</label>
-      <select id="loginTeam">
-        <option value="teamservice1">Team Service 1</option>
-        <option value="teamservice2">Team Service 2</option>
-        <option value="teamservice3">Team Service 3</option>
-        <option value="teamservice4">Team Service 4</option>
-        <option value="teamservice5">Team Service 5</option>
-        <option value="Paoadmin">Paoadmin - Administrator</option>
-      </select>
-    </div>
+    
+     <div class="field">
+  <label>อีเมล</label>
+  <input
+    id="loginEmail"
+    type="email"
+    placeholder="กรอกอีเมล"
+    autocomplete="username"
+  >
+</div>
 
-    <div class="field">
-      <label>ชื่อผู้ใช้งาน</label>
-      <input id="loginName" placeholder="เช่น ช่างเอก">
+<div class="field">
+  <label>รหัสผ่าน</label>
+  <input
+    id="loginPassword"
+    type="password"
+    placeholder="กรอกรหัสผ่าน"
+    autocomplete="current-password"
+  >
+</div>
     </div>
 
     <button class="btn full" onclick="login()">
