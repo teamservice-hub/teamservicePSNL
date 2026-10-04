@@ -416,7 +416,6 @@ td{
 
 .badge.red{
   background:rgba(255,93,115,.12);
-   
 }
 
 /* JOB */
@@ -712,16 +711,14 @@ td{
   >
 </div>
 
+    <div id="loginError" style="display:none;color:#ff7b8d;background:rgba(255,93,115,.1);border:1px solid rgba(255,93,115,.25);padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:13px"></div>
+
     <button class="btn full" onclick="login()">
       เข้าสู่ระบบ
     </button>
-  <div
-  id="loginError"
-  style="display:none; margin-top:12px; color:#ff6b6b;"
-></div>
 
     <p style="margin-top:15px;margin-bottom:0;font-size:12px">
-      Demo version — ข้อมูลเก็บใน Browser เครื่องนี้
+      Firebase Authentication — ระบบจริง · build 2026-10-04-loginfix4
     </p>
   </div>
 </div>
@@ -1376,6 +1373,61 @@ td{
 </div>
 
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    getDocs,
+    query,
+    where,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAn71nUu09g36yccy-J9Lu_M0-6vVxdiBE",
+    authDomain: "service-team-system.firebaseapp.com",
+    projectId: "service-team-system",
+    storageBucket: "service-team-system.firebasestorage.app",
+    messagingSenderId: "93461588345",
+    appId: "1:93461588345:web:afe33d07ef8b1d5d4927a8",
+    measurementId: "G-QJPZXDSVEL"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
+
+  window.firebaseService = {
+    auth,
+    firestore,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    doc,
+    getDoc,
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    getDocs,
+    query,
+    where,
+    serverTimestamp
+  };
+</script>
+
 <script>
 
 /* =========================================================
@@ -1474,7 +1526,7 @@ function saveDB(){
    LOGIN
 ========================================================= */
 
-async function login(){
+function login(){
 
   const email =
     document.getElementById("loginEmail").value.trim();
@@ -1485,162 +1537,157 @@ async function login(){
   const errorBox =
     document.getElementById("loginError");
 
-  errorBox.style.display = "none";
-  errorBox.textContent = "";
+  errorBox.style.display="none";
+  errorBox.textContent="";
 
   if(!email || !password){
-    errorBox.textContent = "กรุณากรอกอีเมลและรหัสผ่าน";
-    errorBox.style.display = "block";
+    errorBox.textContent="กรุณากรอกอีเมลและรหัสผ่าน";
+    errorBox.style.display="block";
     return;
   }
 
-  try{
+  if(!window.firebaseService){
+    errorBox.textContent="ระบบ Firebase ยังโหลดไม่เสร็จ กรุณารีเฟรชหน้าเว็บแล้วลองใหม่";
+    errorBox.style.display="block";
+    return;
+  }
 
-    const result =
-      await window.firebaseService.signInWithEmailAndPassword(
-        window.firebaseService.auth,
-        email,
-        password
-      );
+  window.firebaseService.signInWithEmailAndPassword(
+    window.firebaseService.auth,
+    email,
+    password
+  ).then(async result=>{
 
-    const user = result.user;
+    const user=result.user;
 
-    const userRef =
-      window.firebaseService.doc(
-        window.firebaseService.firestore,
-        "users",
-        user.uid
-      );
+    const userRef=window.firebaseService.doc(
+      window.firebaseService.firestore,
+      "users",
+      user.uid
+    );
 
-    const userSnap =
-      await window.firebaseService.getDoc(userRef);
+    const userSnap=await window.firebaseService.getDoc(userRef);
 
     if(!userSnap.exists()){
-      throw new Error("ไม่พบข้อมูลผู้ใช้งานในระบบ");
+      throw new Error("ไม่พบข้อมูลผู้ใช้งานใน Firestore users/{uid}");
     }
 
-    const userData = userSnap.data();
+    const userData=userSnap.data();
 
-    currentUser = {
-      uid: user.uid,
-      email: user.email,
-      name: userData.name || user.email,
-      team: userData.team || "",
-      admin: userData.role === "admin"
+    currentUser={
+      uid:user.uid,
+      email:user.email,
+      name:userData.name || user.email,
+      team:userData.team || "",
+      admin:userData.role === "admin"
     };
 
-    document
-      .getElementById("loginScreen")
+    localStorage.setItem(
+      "service_current_user",
+      JSON.stringify(currentUser)
+    );
+
+    document.getElementById("loginScreen")
       .classList.add("hidden");
 
-    document
-      .getElementById("app")
+    document.getElementById("app")
       .classList.remove("hidden");
 
     setupUser();
     renderAll();
 
-  }catch(error){
+  }).catch(error=>{
 
-    console.error(error);
+    console.error("Login error:",error);
 
-    errorBox.textContent =
-      "เข้าสู่ระบบไม่สำเร็จ: " + error.message;
+    let message="เข้าสู่ระบบไม่สำเร็จ";
 
-    errorBox.style.display = "block";
-  }
+    if(error.code === "auth/invalid-credential" || error.code === "auth/wrong-password" || error.code === "auth/user-not-found"){
+      message="อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+    }else if(error.code === "auth/too-many-requests"){
+      message="ลองเข้าสู่ระบบหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่";
+    }else if(error.message){
+      message += ": " + error.message;
+    }
+
+    errorBox.textContent=message;
+    errorBox.style.display="block";
+  });
 }
 
+
+// Make the inline Login button reliably accessible from the HTML page.
+window.login = login;
 
 function checkLogin(){
 
   if(!window.firebaseService){
-    setTimeout(checkLogin, 100);
+    setTimeout(checkLogin,100);
     return;
   }
 
   window.firebaseService.onAuthStateChanged(
     window.firebaseService.auth,
-    async (user) => {
+    async user=>{
 
       if(!user){
-
-        currentUser = null;
-
-        document
-          .getElementById("loginScreen")
+        currentUser=null;
+        document.getElementById("loginScreen")
           .classList.remove("hidden");
-
-        document
-          .getElementById("app")
+        document.getElementById("app")
           .classList.add("hidden");
-
         return;
       }
 
       try{
+        const userRef=window.firebaseService.doc(
+          window.firebaseService.firestore,
+          "users",
+          user.uid
+        );
 
-        const userRef =
-          window.firebaseService.doc(
-            window.firebaseService.firestore,
-            "users",
-            user.uid
-          );
-
-        const userSnap =
-          await window.firebaseService.getDoc(userRef);
+        const userSnap=await window.firebaseService.getDoc(userRef);
 
         if(!userSnap.exists()){
-
           await window.firebaseService.signOut(
             window.firebaseService.auth
           );
-
           return;
         }
 
-        const userData = userSnap.data();
+        const userData=userSnap.data();
 
-        currentUser = {
-          uid: user.uid,
-          email: user.email,
-          name: userData.name || user.email,
-          team: userData.team || "",
-          admin: userData.role === "admin"
+        currentUser={
+          uid:user.uid,
+          email:user.email,
+          name:userData.name || user.email,
+          team:userData.team || "",
+          admin:userData.role === "admin"
         };
 
-        document
-          .getElementById("loginScreen")
+        localStorage.setItem(
+          "service_current_user",
+          JSON.stringify(currentUser)
+        );
+
+        document.getElementById("loginScreen")
           .classList.add("hidden");
 
-        document
-          .getElementById("app")
+        document.getElementById("app")
           .classList.remove("hidden");
 
         setupUser();
         renderAll();
 
       }catch(error){
-
-        console.error(
-          "ตรวจสอบผู้ใช้ไม่สำเร็จ:",
-          error
+        console.error("Auth state error:",error);
+        await window.firebaseService.signOut(
+          window.firebaseService.auth
         );
-
-        currentUser = null;
-
-        document
-          .getElementById("loginScreen")
-          .classList.remove("hidden");
-
-        document
-          .getElementById("app")
-          .classList.add("hidden");
       }
-
     }
   );
-}                                         
+}
 
 
 function setupUser(){
@@ -1678,30 +1725,17 @@ function setupUser(){
 
 async function logout(){
 
-  try{
+  if(!window.firebaseService) return;
 
+  try{
     await window.firebaseService.signOut(
       window.firebaseService.auth
     );
-
-    currentUser = null;
-
-    document
-      .getElementById("loginScreen")
-      .classList.remove("hidden");
-
-    document
-      .getElementById("app")
-      .classList.add("hidden");
-
+    localStorage.removeItem("service_current_user");
   }catch(error){
-
-    console.error("Logout error:", error);
-
+    console.error("Logout error:",error);
     alert("ออกจากระบบไม่สำเร็จ");
-
   }
-
 }
 
 
@@ -1966,7 +2000,12 @@ function openJobModal(){
 }
 
 
-async function createJob(){
+function createJob(){
+
+  if(!currentUser || !currentUser.admin){
+    alert("เฉพาะ Admin เท่านั้นที่สร้างงานได้");
+    return;
+  }
 
   const title =
     document.getElementById("jobTitle").value.trim();
@@ -1986,103 +2025,40 @@ async function createJob(){
   const details =
     document.getElementById("jobDetails").value.trim();
 
+
   if(!title || !customer || !location){
+
     alert("กรุณากรอกข้อมูลสำคัญให้ครบ");
+
     return;
   }
 
-  try{
 
-    await window.firebaseService.addDoc(
-
-      window.firebaseService.collection(
-        window.firebaseService.firestore,
-        "jobs"
-      ),
-
-      {
-        title: title,
-        customer: customer,
-        location: location,
-
-        date:
-          date ||
-          new Date().toISOString().slice(0,10),
-
-        team: team,
-
-        details: details,
-
-        status: "pending",
-
-        warranty: null,
-
-        createdAt:
-          window.firebaseService.serverTimestamp(),
-
-        createdBy:
-          currentUser.uid
-      }
-
-    );
-
+  window.firebaseService.addDoc(
+    window.firebaseService.collection(
+      window.firebaseService.firestore,
+      "jobs"
+    ),
+    {
+      title:title,
+      customer:customer,
+      location:location,
+      date:date || new Date().toISOString().slice(0,10),
+      team:team,
+      details:details,
+      status:"pending",
+      warranty:null,
+      createdAt:window.firebaseService.serverTimestamp(),
+      createdBy:currentUser.uid
+    }
+  ).then(()=>{
     closeModal("jobModal");
-
     clearJobForm();
-
     alert("สร้างงานเรียบร้อย");
-
-    // ตอนนี้ข้อมูลถูกบันทึกใน Firestore แล้ว
-    // ส่วนการดึงมาแสดงบนหน้าจอ เราจะทำขั้นต่อไป
-
-  }catch(error){
-
-    console.error("Create job error:", error);
-
-    alert(
-      "สร้างงานไม่สำเร็จ\n" +
-      error.message
-    );
-
-  }
-
-}
-
-
-  db.jobs.push({
-
-    id:Date.now(),
-
-    title,
-
-    customer,
-
-    location,
-
-    date:
-      date ||
-      new Date().toISOString().slice(0,10),
-
-    team,
-
-    details,
-
-    status:"pending",
-
-    warranty:null
-
+  }).catch(error=>{
+    console.error("Create job error:",error);
+    alert("สร้างงานไม่สำเร็จ\n" + error.message);
   });
-
-
-  saveDB();
-
-  closeModal("jobModal");
-
-  clearJobForm();
-
-  renderAll();
-
-  alert("สร้างงานเรียบร้อย");
 
 
 }
@@ -2840,59 +2816,6 @@ loadDB();
 checkLogin();
 
 </script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  getDocs,
-  query,
-  where,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAn71nUu09g36yccy-J9Lu_M0-6vVxdiBE",
-    authDomain: "service-team-system.firebaseapp.com",
-    projectId: "service-team-system",
-    storageBucket: "service-team-system.firebasestorage.app",
-    messagingSenderId: "93461588345",
-    appId: "1:93461588345:web:afe33d07ef8b1d5d4927a8",
-    measurementId: "G-QJPZXDSVEL"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const firestore = getFirestore(app);
-
- window.firebaseService = {
-  auth,
-  firestore,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-  doc,
-  getDoc,
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  getDocs,
-  query,
-  where,
-  serverTimestamp
-};
-</script>
 </body>
 </html>
