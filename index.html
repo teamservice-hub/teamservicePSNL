@@ -1677,11 +1677,31 @@ function setupUser(){
 }
 
 
-function logout(){
+async function logout(){
 
-  localStorage.removeItem("service_current_user");
+  try{
 
-  location.reload();
+    await window.firebaseService.signOut(
+      window.firebaseService.auth
+    );
+
+    currentUser = null;
+
+    document
+      .getElementById("loginScreen")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("app")
+      .classList.add("hidden");
+
+  }catch(error){
+
+    console.error("Logout error:", error);
+
+    alert("ออกจากระบบไม่สำเร็จ");
+
+  }
 
 }
 
