@@ -1967,7 +1967,7 @@ function openJobModal(){
 }
 
 
-function createJob(){
+async function createJob(){
 
   const title =
     document.getElementById("jobTitle").value.trim();
@@ -1987,13 +1987,67 @@ function createJob(){
   const details =
     document.getElementById("jobDetails").value.trim();
 
-
   if(!title || !customer || !location){
-
     alert("กรุณากรอกข้อมูลสำคัญให้ครบ");
-
     return;
   }
+
+  try{
+
+    await window.firebaseService.addDoc(
+
+      window.firebaseService.collection(
+        window.firebaseService.firestore,
+        "jobs"
+      ),
+
+      {
+        title: title,
+        customer: customer,
+        location: location,
+
+        date:
+          date ||
+          new Date().toISOString().slice(0,10),
+
+        team: team,
+
+        details: details,
+
+        status: "pending",
+
+        warranty: null,
+
+        createdAt:
+          window.firebaseService.serverTimestamp(),
+
+        createdBy:
+          currentUser.uid
+      }
+
+    );
+
+    closeModal("jobModal");
+
+    clearJobForm();
+
+    alert("สร้างงานเรียบร้อย");
+
+    // ตอนนี้ข้อมูลถูกบันทึกใน Firestore แล้ว
+    // ส่วนการดึงมาแสดงบนหน้าจอ เราจะทำขั้นต่อไป
+
+  }catch(error){
+
+    console.error("Create job error:", error);
+
+    alert(
+      "สร้างงานไม่สำเร็จ\n" +
+      error.message
+    );
+
+  }
+
+}
 
 
   db.jobs.push({
