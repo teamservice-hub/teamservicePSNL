@@ -2635,6 +2635,43 @@ loadDB();
 checkLogin();
 
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyAn71nUu09g36yccy-J9Lu_M0-6vVxdiBE",
+    authDomain: "service-team-system.firebaseapp.com",
+    projectId: "service-team-system",
+    storageBucket: "service-team-system.firebasestorage.app",
+    messagingSenderId: "93461588345",
+    appId: "1:93461588345:web:afe33d07ef8b1d5d4927a8",
+    measurementId: "G-QJPZXDSVEL"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
+
+  window.firebaseService = {
+    auth,
+    firestore,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    doc,
+    getDoc
+  };
+</script>
 </body>
 </html>
