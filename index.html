@@ -2796,10 +2796,18 @@ checkLogin();
     signOut
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import {
-    getFirestore,
-    doc,
-    getDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAn71nUu09g36yccy-J9Lu_M0-6vVxdiBE",
@@ -2815,15 +2823,23 @@ checkLogin();
   const auth = getAuth(app);
   const firestore = getFirestore(app);
 
-  window.firebaseService = {
-    auth,
-    firestore,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut,
-    doc,
-    getDoc
-  };
+ window.firebaseService = {
+  auth,
+  firestore,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+};
 </script>
 </body>
 </html>
