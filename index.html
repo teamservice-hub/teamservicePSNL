@@ -1,479 +1,2640 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceHub Pro - ระบบจัดการงานบริการและช่างภาคสนาม</title>
-    <!-- Tailwind CSS สำหรับดีไซน์ที่สวยงามและใช้งานบนมือถือได้ดี -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Prompt', sans-serif; }
-    </style>
-</head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-200">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Team Management</title>
 
-    <!-- Navbar -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2 cursor-pointer" onclick="showScreen('homeScreen')">
-                <span class="text-2xl">🛠️</span>
-                <span class="font-bold text-lg text-blue-600 dark:text-blue-400">ServiceHub Pro</span>
-            </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-sm">🌓</button>
-                <div id="navUserBadge" class="hidden text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full font-medium"></div>
-                <button id="btnLogout" onclick="logout()" class="hidden text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 px-3 py-1 rounded-full font-medium">ออกจากระบบ</button>
-            </div>
+<style>
+:root{
+  --bg:#07111f;
+  --panel:#0d1b2e;
+  --panel2:#10243c;
+  --line:rgba(255,255,255,.09);
+  --text:#eef6ff;
+  --muted:#8da5bd;
+  --primary:#35d0ff;
+  --primary2:#4f7cff;
+  --green:#30d88b;
+  --yellow:#ffc857;
+  --red:#ff5d73;
+  --shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top right,rgba(53,208,255,.12),transparent 30%),
+    radial-gradient(circle at bottom left,rgba(79,124,255,.1),transparent 30%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* LOGIN */
+
+.login-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.login-card{
+  width:min(440px,100%);
+  background:rgba(13,27,46,.9);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:35px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(20px);
+}
+
+.logo{
+  width:70px;
+  height:70px;
+  border-radius:20px;
+  display:grid;
+  place-items:center;
+  font-size:30px;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:white;
+  margin-bottom:20px;
+}
+
+.login-card h1{
+  font-size:28px;
+  margin-bottom:8px;
+}
+
+.login-card p{
+  color:var(--muted);
+  margin-bottom:25px;
+}
+
+.field{
+  margin-bottom:15px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:7px;
+  color:#b7c8d9;
+  font-size:14px;
+}
+
+input,select,textarea{
+  width:100%;
+  border:1px solid var(--line);
+  background:#081729;
+  color:var(--text);
+  border-radius:12px;
+  padding:12px 14px;
+  outline:none;
+}
+
+input:focus,select:focus,textarea:focus{
+  border-color:var(--primary);
+}
+
+textarea{
+  resize:vertical;
+  min-height:100px;
+}
+
+.btn{
+  border:0;
+  border-radius:12px;
+  padding:12px 18px;
+  color:white;
+  background:linear-gradient(135deg,var(--primary2),var(--primary));
+  font-weight:700;
+  transition:.2s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+}
+
+.btn.secondary{
+  background:#152b44;
+}
+
+.btn.success{
+  background:linear-gradient(135deg,#18a96c,var(--green));
+}
+
+.btn.danger{
+  background:linear-gradient(135deg,#d53b53,var(--red));
+}
+
+.btn.full{
+  width:100%;
+}
+
+/* APP */
+
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:260px 1fr;
+}
+
+.sidebar{
+  border-right:1px solid var(--line);
+  background:rgba(5,15,28,.9);
+  padding:20px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:30px;
+}
+
+.brand-icon{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+}
+
+.brand strong{
+  display:block;
+}
+
+.brand small{
+  color:var(--muted);
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.nav button{
+  border:0;
+  color:#a9bdd1;
+  background:transparent;
+  text-align:left;
+  padding:12px 14px;
+  border-radius:12px;
+}
+
+.nav button:hover,
+.nav button.active{
+  color:white;
+  background:linear-gradient(90deg,rgba(53,208,255,.14),rgba(79,124,255,.08));
+}
+
+.main{
+  min-width:0;
+}
+
+.topbar{
+  height:72px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  background:rgba(7,17,31,.7);
+  backdrop-filter:blur(15px);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.user-info{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--primary2),var(--primary));
+  font-weight:800;
+}
+
+.content{
+  padding:28px;
+  max-width:1500px;
+  margin:auto;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.page-title{
+  margin-bottom:22px;
+}
+
+.page-title h2{
+  font-size:28px;
+  margin-bottom:5px;
+}
+
+.page-title p{
+  color:var(--muted);
+}
+
+/* CARDS */
+
+.grid{
+  display:grid;
+  gap:16px;
+}
+
+.grid-4{
+  grid-template-columns:repeat(4,1fr);
+}
+
+.grid-3{
+  grid-template-columns:repeat(3,1fr);
+}
+
+.grid-2{
+  grid-template-columns:repeat(2,1fr);
+}
+
+.card{
+  background:linear-gradient(145deg,rgba(16,36,60,.9),rgba(10,25,42,.92));
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 10px 40px rgba(0,0,0,.18);
+}
+
+.stat{
+  position:relative;
+  overflow:hidden;
+}
+
+.stat:after{
+  content:"";
+  position:absolute;
+  width:100px;
+  height:100px;
+  right:-40px;
+  top:-40px;
+  border-radius:50%;
+  background:rgba(53,208,255,.08);
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.stat-value{
+  font-size:30px;
+  font-weight:800;
+  margin-top:8px;
+}
+
+.green{
+  color:var(--green);
+}
+
+.yellow{
+  color:var(--yellow);
+}
+
+.red{
+  color:var(--red);
+}
+
+.blue{
+  color:var(--primary);
+}
+
+/* TOOLBAR */
+
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
+.toolbar-left,
+.toolbar-right{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* TABLE */
+
+.table-wrap{
+  overflow:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+th,td{
+  padding:13px 12px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+}
+
+th{
+  color:#9eb3c8;
+  font-size:13px;
+}
+
+td{
+  color:#dce9f5;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.badge.blue{
+  background:rgba(53,208,255,.12);
+}
+
+.badge.green{
+  background:rgba(48,216,139,.12);
+}
+
+.badge.yellow{
+  background:rgba(255,200,87,.12);
+}
+
+.badge.red{
+  background:rgba(255,93,115,.12);
+}
+
+/* JOB */
+
+.job-card{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.job-header{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.job-title{
+  font-weight:800;
+  font-size:18px;
+}
+
+.job-meta{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+
+.job-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+/* MAP */
+
+.map-box{
+  height:420px;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(rgba(10,25,42,.75),rgba(10,25,42,.75)),
+    repeating-linear-gradient(
+      45deg,
+      #10263d 0,
+      #10263d 10px,
+      #0d2135 10px,
+      #0d2135 20px
+    );
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+}
+
+.map-inner h3{
+  margin-bottom:8px;
+}
+
+.map-inner p{
+  color:var(--muted);
+  margin-bottom:18px;
+}
+
+/* CHAT */
+
+.chat{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  height:620px;
+  overflow:hidden;
+  border-radius:18px;
+  border:1px solid var(--line);
+}
+
+.chat-rooms{
+  border-right:1px solid var(--line);
+  background:#081729;
+  padding:12px;
+}
+
+.room{
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+  color:#a9bdd1;
+  margin-bottom:5px;
+}
+
+.room.active,
+.room:hover{
+  background:#102b46;
+  color:white;
+}
+
+.chat-main{
+  display:flex;
+  flex-direction:column;
+}
+
+.messages{
+  flex:1;
+  overflow:auto;
+  padding:20px;
+}
+
+.message{
+  max-width:70%;
+  margin-bottom:12px;
+}
+
+.message.me{
+  margin-left:auto;
+  text-align:right;
+}
+
+.message-bubble{
+  display:inline-block;
+  background:#102b46;
+  padding:10px 13px;
+  border-radius:14px;
+  text-align:left;
+}
+
+.message.me .message-bubble{
+  background:linear-gradient(135deg,var(--primary2),var(--primary));
+}
+
+.message small{
+  color:var(--muted);
+  display:block;
+  margin-top:4px;
+}
+
+.chat-input{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid var(--line);
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:100;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-card{
+  width:min(650px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#0d1b2e;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:24px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.close{
+  border:0;
+  background:#152b44;
+  color:white;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+}
+
+/* RESPONSIVE */
+
+.mobile-menu{
+  display:none;
+}
+
+@media(max-width:1000px){
+  .grid-4{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid-3{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:760px){
+  .app{
+    display:block;
+  }
+
+  .sidebar{
+    position:fixed;
+    left:-280px;
+    z-index:50;
+    width:260px;
+    transition:.25s;
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .mobile-menu{
+    display:block;
+    border:0;
+    background:#152b44;
+    color:white;
+    width:40px;
+    height:40px;
+    border-radius:10px;
+  }
+
+  .topbar{
+    padding:0 15px;
+  }
+
+  .content{
+    padding:18px;
+  }
+
+  .grid-4,
+  .grid-3,
+  .grid-2{
+    grid-template-columns:1fr;
+  }
+
+  .chat{
+    grid-template-columns:1fr;
+  }
+
+  .chat-rooms{
+    display:flex;
+    overflow:auto;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+
+  .room{
+    white-space:nowrap;
+  }
+
+  .map-box{
+    height:320px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="logo">⚙️</div>
+
+    <h1>Service Team</h1>
+    <p>ระบบบริหารทีมช่างและงานบริการ</p>
+
+    <div class="field">
+      <label>เลือกทีม</label>
+      <select id="loginTeam">
+        <option value="teamservice1">Team Service 1</option>
+        <option value="teamservice2">Team Service 2</option>
+        <option value="teamservice3">Team Service 3</option>
+        <option value="teamservice4">Team Service 4</option>
+        <option value="teamservice5">Team Service 5</option>
+        <option value="Paoadmin">Paoadmin - Administrator</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>ชื่อผู้ใช้งาน</label>
+      <input id="loginName" placeholder="เช่น ช่างเอก">
+    </div>
+
+    <button class="btn full" onclick="login()">
+      เข้าสู่ระบบ
+    </button>
+
+    <p style="margin-top:15px;margin-bottom:0;font-size:12px">
+      Demo version — ข้อมูลเก็บใน Browser เครื่องนี้
+    </p>
+  </div>
+</div>
+
+
+<!-- APP -->
+<div id="app" class="app hidden">
+
+  <aside id="sidebar" class="sidebar">
+
+    <div class="brand">
+      <div class="brand-icon">⚙️</div>
+      <div>
+        <strong>Service Team</strong>
+        <small>Management System</small>
+      </div>
+    </div>
+
+    <nav class="nav">
+
+      <button class="active" onclick="showPage('dashboard',this)">
+        📊 Dashboard
+      </button>
+
+      <button onclick="showPage('jobs',this)">
+        🧰 งานของทีม
+      </button>
+
+      <button onclick="showPage('materials',this)">
+        📍 วัสดุ / ร้านค้า
+      </button>
+
+      <button onclick="showPage('fuel',this)">
+        ⛽ คำนวณน้ำมัน
+      </button>
+
+      <button id="financeNav" onclick="showPage('finance',this)">
+        💰 การเงิน
+      </button>
+
+      <button onclick="showPage('chat',this)">
+        💬 แชททีม
+      </button>
+
+      <button onclick="showPage('warranty',this)">
+        🛡️ Warranty
+      </button>
+
+      <button id="reportsNav" onclick="showPage('reports',this)">
+        📈 รายงาน
+      </button>
+
+      <button id="adminNav" onclick="showPage('admin',this)">
+        ⚙️ Admin
+      </button>
+
+      <button onclick="logout()">
+        🚪 ออกจากระบบ
+      </button>
+
+    </nav>
+  </aside>
+
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
+
+      <div>
+        <strong id="topTitle">Dashboard</strong>
+      </div>
+
+      <div class="user-info">
+        <div>
+          <strong id="currentName">User</strong><br>
+          <small id="currentTeam">Team</small>
         </div>
+
+        <div class="avatar" id="avatar">
+          U
+        </div>
+      </div>
+
     </header>
 
-    <main class="max-w-4xl mx-auto p-4 pb-20">
 
-        <!-- 1. หน้าแรก (Home Screen: เลือกลงชื่อเข้าใช้) -->
-        <div id="homeScreen" class="screen space-y-6 py-6">
-            <div class="text-center space-y-2">
-                <h1 class="text-2xl font-bold">ยินดีต้อนรับสู่ ServiceHub Pro</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">ระบบจัดการงานบริการลูกค้าและทีมช่างภาคสนาม</p>
-            </div>
+    <section class="content">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <!-- ปุ่มเข้าฝั่งลูกค้า -->
-                <div onclick="showScreen('customerLoginScreen')" class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 cursor-pointer transition text-center space-y-3">
-                    <div class="text-4xl">🧑‍💻</div>
-                    <h2 class="font-bold text-lg">เข้าสู่ระบบ / จองบริการ</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">สำหรับลูกค้าใช้จองคิวบริการและติดตามสถานะงาน</p>
-                </div>
 
-                <!-- ปุ่มเข้าฝั่งช่าง / แอดมิน -->
-                <div onclick="showScreen('staffLoginScreen')" class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 cursor-pointer transition text-center space-y-3">
-                    <div class="text-4xl">👨‍🔧</div>
-                    <h2 class="font-bold text-lg">ทีมช่าง / แอดมิน</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">สำหรับทีมช่างภาคสนามและผู้ดูแลระบบจัดการบัญชี</p>
-                </div>
-            </div>
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="page active">
+
+        <div class="page-title">
+          <h2>Dashboard</h2>
+          <p>ภาพรวมการทำงานของทีม</p>
         </div>
 
-        <!-- 2. หน้า Login ฝั่งลูกค้า (ด้วยเบอร์โทร) -->
-        <div id="customerLoginScreen" class="screen hidden space-y-6 max-w-md mx-auto py-8">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm space-y-4">
-                <h2 class="text-xl font-bold text-center">เข้าสู่ระบบ (ฝั่งลูกค้า)</h2>
-                
-                <!-- กล่องข้อความชี้แจงโปร่งใส -->
-                <div class="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 p-3 rounded-xl text-xs text-blue-800 dark:text-blue-300 space-y-1">
-                    <p class="font-semibold">ℹ️ นโยบายการใช้เบอร์โทรศัพท์:</p>
-                    <p>ระบบขอเบอร์โทรศัพท์มือถือของคุณ เพื่อใช้ในการติดต่อประสานงาน แจ้งสถานะ และให้ช่างโทรหาเมื่อถึงหน้างานเท่านั้น</p>
-                </div>
+        <div class="grid grid-4">
 
-                <div class="space-y-2">
-                    <label class="text-xs font-medium">เบอร์โทรศัพท์มือถือของคุณ</label>
-                    <input type="tel" id="customerPhoneInput" placeholder="0812345678" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm" maxlength="10">
-                </div>
+          <div class="card stat">
+            <div class="stat-label">งานทั้งหมด</div>
+            <div id="statJobs" class="stat-value blue">0</div>
+          </div>
 
-                <button onclick="customerLogin()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-medium hover:bg-blue-700 transition">ถัดไป (จองบริการ)</button>
-                <button onclick="showScreen('homeScreen')" class="w-full text-gray-500 text-xs py-2">ย้อนกลับหน้าหลัก</button>
-            </div>
+          <div class="card stat">
+            <div class="stat-label">งานกำลังทำ</div>
+            <div id="statWorking" class="stat-value yellow">0</div>
+          </div>
+
+          <div class="card stat">
+            <div class="stat-label">งานเสร็จแล้ว</div>
+            <div id="statComplete" class="stat-value green">0</div>
+          </div>
+
+          <div class="card stat">
+            <div class="stat-label">งานรอรับ</div>
+            <div id="statPending" class="stat-value red">0</div>
+          </div>
+
         </div>
 
-        <!-- 3. หน้าจองบริการ (Customer Booking Screen) -->
-        <div id="customerBookingScreen" class="screen hidden space-y-6 max-w-md mx-auto py-4">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-bold">1-Click Booking (จองบริการ)</h2>
-                    <span id="displayCustomerPhone" class="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-md"></span>
-                </div>
+        <br>
 
-                <div class="space-y-3">
-                    <div>
-                        <label class="text-xs font-medium">ประเภทบริการ</label>
-                        <select id="serviceType" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
-                            <option value="ล้างแอร์">ล้างแอร์</option>
-                            <option value="ซ่อมแอร์ / ตรวจเช็ก">ซ่อมแอร์ / ตรวจเช็ก</option>
-                            <option value="งานระบบไฟฟ้า">งานระบบไฟฟ้า</option>
-                            <option value="ติดตั้งกล้องวงจรปิด">ติดตั้งกล้องวงจรปิด</option>
-                            <option value="งานบริการอื่นๆ">งานบริการอื่นๆ</option>
-                        </select>
-                    </div>
+        <div class="grid grid-2">
 
-                    <div>
-                        <label class="text-xs font-medium">วันที่สะดวก</label>
-                        <input type="date" id="serviceDate" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
-                    </div>
+          <div class="card">
+            <h3>📌 งานล่าสุด</h3>
+            <br>
+            <div id="recentJobs"></div>
+          </div>
 
-                    <div>
-                        <label class="text-xs font-medium">ที่อยู่หน้างาน / รายละเอียดอาการ</label>
-                        <textarea id="serviceAddress" rows="3" placeholder="ระบุบ้านเลขที่ ซอย ถนน แขวง/ตำบล และอาการเสียเบื้องต้น" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1"></textarea>
-                    </div>
+          <div class="card">
+            <h3>🛡️ Warranty ใกล้หมด</h3>
+            <br>
+            <div id="dashboardWarranty"></div>
+          </div>
 
-                    <div>
-                        <label class="text-xs font-medium">แนบรูปถ่ายหน้างานหลายรูป (สำหรับให้ช่างดูประเมิน - ไม่เก็บบันทึกถาวร)</label>
-                        <input type="file" id="servicePhotos" multiple accept="image/*" class="w-full p-2 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-xs mt-1">
-                        <div id="photoPreviewContainer" class="flex flex-wrap gap-2 mt-2"></div>
-                    </div>
-                </div>
-
-                <button onclick="submitBooking()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-medium hover:bg-blue-700 transition">ยืนยันการจองบริการ</button>
-            </div>
         </div>
 
-        <!-- 4. หน้า Login ช่าง / แอดมิน (Username & Password) -->
-        <div id="staffLoginScreen" class="screen hidden space-y-6 max-w-md mx-auto py-8">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm space-y-4">
-                <h2 class="text-xl font-bold text-center">เข้าสู่ระบบ (ทีมช่าง / แอดมิน)</h2>
+      </div>
 
-                <div class="space-y-3">
-                    <div>
-                        <label class="text-xs font-medium">Username</label>
-                        <input type="text" id="loginUsername" placeholder="เช่น adminpao หรือ teamservice1" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium">Password</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" class="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-sm mt-1">
-                    </div>
-                </div>
 
-                <button onclick="staffLogin()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-medium hover:bg-blue-700 transition">เข้าสู่ระบบ</button>
-                <button onclick="showScreen('homeScreen')" class="w-full text-gray-500 text-xs py-2">ย้อนกลับหน้าหลัก</button>
-            </div>
+      <!-- JOBS -->
+      <div id="jobs" class="page">
+
+        <div class="page-title">
+          <h2>🧰 งานของทีม</h2>
+          <p>รับงาน ดำเนินงาน และปิดงาน</p>
         </div>
 
-        <!-- 5. หน้าจอฝั่งช่าง (Field Tech Dashboard) -->
-        <div id="techScreen" class="screen hidden space-y-6">
-            <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-sm flex justify-between items-center">
-                <div>
-                    <h2 class="font-bold text-lg" id="techWelcomeName">ทีมช่างภาคสนาม</h2>
-                    <p class="text-xs opacity-80">พร้อมปฏิบัติงานหน้างาน</p>
-                </div>
-                <div class="text-2xl">👷‍♂️</div>
-            </div>
-
-            <!-- แบนเนอร์ประกาศด่วนจากแอดมิน -->
-            <div id="techBroadcastBanner" class="hidden bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 p-4 rounded-2xl text-amber-800 dark:text-amber-200 text-xs space-y-1">
-                <p class="font-bold flex items-center gap-1">📢 ประกาศด่วนจากแอดมิน:</p>
-                <p id="techBroadcastText"></p>
-            </div>
-
-            <!-- รายการงานที่ต้องไปทำ -->
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-4">
-                <h3 class="font-bold text-sm border-b pb-2 dark:border-gray-700">📋 รายการงานปัจจุบัน</h3>
-                <div id="techCurrentJob" class="text-xs space-y-2 text-gray-600 dark:text-gray-300">
-                    <p>ยังไม่มีคิวงานใหม่ในขณะนี้ (ระบบพร้อมรับงานอัปเดต)</p>
-                </div>
-            </div>
-
-            <!-- ระบบเช็คอินรายวัน & เครื่องมือช่าง -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
-                    <h3 class="font-bold text-sm">⏱️ ระบบจับเวลาทำงาน</h3>
-                    <div class="text-center py-2 bg-gray-50 dark:bg-gray-700 rounded-xl font-mono text-xl" id="timerDisplay">00:00:00</div>
-                    <div class="flex gap-2">
-                        <button onclick="startTimer()" class="flex-1 bg-green-600 text-white py-2 rounded-xl text-xs font-medium">เริ่ม</button>
-                        <button onclick="pauseTimer()" class="flex-1 bg-amber-500 text-white py-2 rounded-xl text-xs font-medium">พัก</button>
-                        <button onclick="stopTimer()" class="flex-1 bg-red-600 text-white py-2 rounded-xl text-xs font-medium">เสร็จสิ้น</button>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
-                    <h3 class="font-bold text-sm">🚗 คำนวณค่าน้ำมัน</h3>
-                    <div class="space-y-2 text-xs">
-                        <input type="number" id="calcKm" placeholder="ระยะทาง (กิโลเมตร)" class="w-full p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-                        <button onclick="calcFuel()" class="w-full bg-blue-600 text-white py-2 rounded-xl font-medium">คำนวณค่าน้ำมัน (อัตรา 10 กม./ลิตร)</button>
-                        <p id="fuelResult" class="font-bold text-center text-blue-600 dark:text-blue-400"></p>
-                    </div>
-                </div>
-            </div>
+        <div id="adminJobButton" class="toolbar hidden">
+          <div></div>
+          <button class="btn" onclick="openJobModal()">
+            + สร้างงานใหม่
+          </button>
         </div>
 
-        <!-- 6. หน้าจอฝั่งแอดมิน (Admin Panel) -->
-        <div id="adminScreen" class="screen hidden space-y-6">
-            <div class="bg-purple-600 text-white p-4 rounded-2xl shadow-sm flex justify-between items-center">
-                <div>
-                    <h2 class="font-bold text-lg">แผงควบคุมแอดมิน (adminpao)</h2>
-                    <p class="text-xs opacity-80">จัดการบัญชีรายรับ-รายจ่าย และประวัติงาน</p>
-                </div>
-                <div class="text-2xl">⚙️</div>
-            </div>
+        <div id="jobsList" class="grid grid-2"></div>
 
-            <!-- สรุปการเงิน -->
-            <div class="grid grid-cols-3 gap-3 text-center">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm">
-                    <p class="text-xs text-gray-500">รายรับรวม</p>
-                    <p id="adminTotalIncome" class="font-bold text-base text-green-600 mt-1">0 ฿</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm">
-                    <p class="text-xs text-gray-500">รายจ่ายรวม</p>
-                    <p id="adminTotalExpense" class="font-bold text-base text-red-600 mt-1">0 ฿</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm">
-                    <p class="text-xs text-gray-500">กำไรสุทธิ</p>
-                    <p id="adminNetProfit" class="font-bold text-base text-blue-600 mt-1">0 ฿</p>
-                </div>
-            </div>
+      </div>
 
-            <!-- บันทึกรายรับ-รายจ่ายเพิ่ม -->
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
-                <h3 class="font-bold text-sm">➕ บันทึกรายการบัญชี</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
-                    <input type="text" id="transTitle" placeholder="ชื่อรายการ (เช่น ค่าอะไหล่)" class="p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-                    <select id="transType" class="p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-                        <option value="income">รายรับ (+)</option>
-                        <option value="expense">รายจ่าย (-)</option>
-                    </select>
-                    <input type="number" id="transAmount" placeholder="จำนวนเงิน (บาท)" class="p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600">
-                </div>
-                <button onclick="addTransaction()" class="w-full bg-purple-600 text-white py-2 rounded-xl text-xs font-medium">บันทึกรายการลงระบบ / Google Sheet</button>
-            </div>
 
-            <!-- ส่งประกาศด่วนถึงช่าง -->
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
-                <h3 class="font-bold text-sm">📢 ส่งประกาศด่วนถึงทีมช่าง</h3>
-                <textarea id="broadcastInput" rows="2" placeholder="พิมพ์ข้อความประกาศส่งถึงทีมช่างภาคสนาม..." class="w-full p-2.5 rounded-xl border dark:bg-gray-700 dark:border-gray-600 text-xs"></textarea>
-                <button onclick="sendBroadcast()" class="w-full bg-amber-600 text-white py-2 rounded-xl text-xs font-medium">ส่งประกาศทันที</button>
-            </div>
+      <!-- MATERIALS -->
+      <div id="materials" class="page">
 
-            <!-- ประวัติงานทั้งหมด -->
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm space-y-3">
-                <h3 class="font-bold text-sm">📋 ประวัติการจองและส่งมอบงาน</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="border-b dark:border-gray-700 text-gray-400">
-                                <th class="p-2">วันที่/เวลา</th>
-                                <th class="p-2">เบอร์ลูกค้า</th>
-                                <th class="p-2">บริการ</th>
-                                <th class="p-2">ที่อยู่</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminJobTableBody">
-                            <tr><td colspan="4" class="p-4 text-center text-gray-400">ยังไม่มีประวัติงานในระบบ</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="page-title">
+          <h2>📍 วัสดุ / ร้านค้า</h2>
+          <p>ค้นหาร้านค้า เปรียบเทียบราคา และนำทาง</p>
         </div>
 
-    </main>
+        <div class="card">
 
-    <!-- JavaScript ลุยงานจริง -->
-    <script>
-        // ตั้งค่าตัวแปรระบบ
-        let currentUser = null;
-        let currentRole = null;
-        let transactions = [];
-        let bookings = [];
-        let timerInterval = null;
-        let seconds = 0;
+          <div class="toolbar">
 
-        // URL Google Apps Script (ใส่ลิงก์ของคุณตรงนี้เมื่อใช้งานจริง)
-        const GOOGLE_SHEET_URL = ""; 
+            <div style="flex:1;min-width:220px">
+              <input
+                id="materialSearch"
+                placeholder="ค้นหา เช่น ท่อ PVC, เบรกเกอร์, สายไฟ..."
+                oninput="renderMaterials()"
+              >
+            </div>
 
-        // สลับหน้าจอ
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
-            window.scrollTo(0,0);
-        }
+            <button class="btn" onclick="useCurrentLocation()">
+              📍 ใช้ตำแหน่งปัจจุบัน
+            </button>
 
-        // Dark Mode Toggle
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-        }
+          </div>
 
-        // Login ฝั่งลูกค้า
-        function customerLogin() {
-            const phone = document.getElementById('customerPhoneInput').value.trim();
-            if(phone.length < 10) {
-                alert('กรุณากรอกเบอร์โทรศัพท์มือถือให้ครบ 10 หลัก');
-                return;
-            }
-            currentUser = phone;
-            currentRole = 'customer';
-            document.getElementById('displayCustomerPhone').innerText = 'เบอร์ติดต่อ: ' + phone;
-            showScreen('customerBookingScreen');
-        }
+          <div id="materialResults" class="grid grid-2"></div>
 
-        // Login ฝั่งช่าง / แอดมิน (แก้ไขรหัสผ่านใหม่)
-        function staffLogin() {
-            const user = document.getElementById('loginUsername').value.trim();
-            const pass = document.getElementById('loginPassword').value.trim();
+        </div>
 
-            if (user === 'adminpao' && pass === '08072537') {
-                currentUser = 'adminpao';
-                currentRole = 'admin';
-                setupNav();
-                showScreen('adminScreen');
-                updateFinancialUI();
-            } else if (['teamservice1', 'teamservice2', 'teamservice3'].includes(user) && pass === '08072537') {
-                currentUser = user;
-                currentRole = 'tech';
-                document.getElementById('techWelcomeName').innerText = 'ทีมช่าง: ' + user.toUpperCase();
-                setupNav();
-                showScreen('techScreen');
-            } else {
-                alert('Username หรือ Password ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง');
-            }
-        }
+        <br>
 
-        function setupNav() {
-            document.getElementById('navUserBadge').innerText = currentUser;
-            document.getElementById('navUserBadge').classList.remove('hidden');
-            document.getElementById('btnLogout').classList.remove('hidden');
-        }
+        <div class="map-box">
 
-        function logout() {
-            currentUser = null;
-            currentRole = null;
-            document.getElementById('navUserBadge').classList.add('hidden');
-            document.getElementById('btnLogout').classList.add('hidden');
-            showScreen('homeScreen');
-        }
+          <div class="map-inner">
 
-        // ส่งจองบริการ
-        function submitBooking() {
-            const service = document.getElementById('serviceType').value;
-            const date = document.getElementById('serviceDate').value;
-            const address = document.getElementById('serviceAddress').value.trim();
+            <h3>🗺️ Google Maps</h3>
 
-            if(!date || !address) {
-                alert('กรุณาเลือกวันที่และระบุที่อยู่หน้างานให้ครบถ้วน');
-                return;
-            }
+            <p>
+              ระบบพร้อมเชื่อม Google Maps API<br>
+              สำหรับแผนที่จริงและค้นหาร้านค้าใกล้ตำแหน่งช่าง
+            </p>
 
-            const newBooking = {
-                date: new Date().toLocaleString(),
-                phone: currentUser,
-                service: service,
-                address: address
-            };
+            <button class="btn" onclick="openGoogleMaps()">
+              เปิด Google Maps
+            </button>
 
-            bookings.unshift(newBooking);
-            updateAdminJobTable();
-            updateTechJobView(newBooking);
+          </div>
 
-            // ส่งข้อมูลไป Google Sheet (ถ้าใส่ URL ไว้)
-            if(GOOGLE_SHEET_URL) {
-                fetch(GOOGLE_SHEET_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ type: 'booking', ...newBooking })
-                }).catch(err => console.log('Google Sheet Sync Error:', err));
-            }
+        </div>
 
-            alert('จองบริการสำเร็จ! ข้อมูลส่งถึงทีมช่างเรียบร้อยแล้ว');
-            showScreen('homeScreen');
-        }
+      </div>
 
-        // อัปเดตตารางประวัติงานแอดมิน
-        function updateAdminJobTable() {
-            const tbody = document.getElementById('adminJobTableBody');
-            if(bookings.length === 0) return;
-            tbody.innerHTML = bookings.map(b => `
-                <tr class="border-b dark:border-gray-700">
-                    <td class="p-2">${b.date}</td>
-                    <td class="p-2 font-medium">${b.phone}</td>
-                    <td class="p-2">${b.service}</td>
-                    <td class="p-2">${b.address}</td>
+
+      <!-- FUEL -->
+      <div id="fuel" class="page">
+
+        <div class="page-title">
+          <h2>⛽ คำนวณน้ำมัน</h2>
+          <p>คำนวณน้ำมันที่ต้องใช้และค่าใช้จ่ายโดยประมาณ</p>
+        </div>
+
+        <div class="grid grid-2">
+
+          <div class="card">
+
+            <div class="field">
+              <label>อัตราสิ้นเปลือง (กม./ลิตร)</label>
+              <input id="fuelRate" type="number" value="12">
+            </div>
+
+            <div class="field">
+              <label>ระยะทาง (กม.)</label>
+              <input id="fuelDistance" type="number" value="100">
+            </div>
+
+            <div class="field">
+              <label>ราคาน้ำมัน (บาท/ลิตร)</label>
+              <input id="fuelPrice" type="number" value="32">
+            </div>
+
+            <button class="btn full" onclick="calculateFuel()">
+              คำนวณ
+            </button>
+
+          </div>
+
+          <div class="card">
+
+            <div class="stat-label">
+              ต้องใช้น้ำมันประมาณ
+            </div>
+
+            <div id="fuelLitres" class="stat-value blue">
+              0 ลิตร
+            </div>
+
+            <br>
+
+            <div class="stat-label">
+              ค่าใช้จ่ายประมาณ
+            </div>
+
+            <div id="fuelCost" class="stat-value green">
+              ฿0
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FINANCE -->
+      <div id="finance" class="page">
+
+        <div class="page-title">
+          <h2>💰 การเงิน</h2>
+          <p>รายรับ รายจ่าย และสรุปค่าใช้จ่าย</p>
+        </div>
+
+        <div class="grid grid-3">
+
+          <div class="card stat">
+            <div class="stat-label">รายรับ</div>
+            <div id="incomeTotal" class="stat-value green">
+              ฿0
+            </div>
+          </div>
+
+          <div class="card stat">
+            <div class="stat-label">รายจ่าย</div>
+            <div id="expenseTotal" class="stat-value red">
+              ฿0
+            </div>
+          </div>
+
+          <div class="card stat">
+            <div class="stat-label">คงเหลือ</div>
+            <div id="balanceTotal" class="stat-value blue">
+              ฿0
+            </div>
+          </div>
+
+        </div>
+
+        <br>
+
+        <div class="card">
+
+          <div class="toolbar">
+            <h3>รายการการเงิน</h3>
+
+            <button class="btn" onclick="openFinanceModal()">
+              + เพิ่มรายการ
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>ประเภท</th>
+                  <th>รายละเอียด</th>
+                  <th>จำนวนเงิน</th>
                 </tr>
-            `).join('');
-        }
+              </thead>
 
-        // อัปเดตงานให้ช่างเห็น
-        function updateTechJobView(job) {
-            document.getElementById('techCurrentJob').innerHTML = `
-                <p><strong>บริการ:</strong> ${job.service}</p>
-                <p><strong>ลูกค้าโทร:</strong> <a href="tel:${job.phone}" class="text-blue-500 underline">${job.phone} (กดโทรด่วน)</a></p>
-                <p><strong>ที่อยู่หน้างาน:</strong> ${job.address}</p>
-            `;
-        }
+              <tbody id="financeTable"></tbody>
 
-        // ระบบจับเวลาช่าง
-        function startTimer() {
-            if(timerInterval) return;
-            timerInterval = setInterval(() => {
-                seconds++;
-                let hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
-                let mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-                let secs = (seconds % 60).toString().padStart(2, '0');
-                document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
-            }, 1000);
-        }
-        function pauseTimer() { clearInterval(timerInterval); timerInterval = null; }
-        function stopTimer() {
-            pauseTimer();
-            alert('บันทึกเวลาปฏิบัติงานเรียบร้อยแล้ว');
-            seconds = 0;
-            document.getElementById('timerDisplay').innerText = "00:00:00";
-        }
+            </table>
+          </div>
 
-        // คำนวณค่าน้ำมัน
-        function calcFuel() {
-            const km = parseFloat(document.getElementById('calcKm').value) || 0;
-            const cost = (km / 10) * 35; // สมมติค่าน้ำมันเฉลี่ย 35 บาท/ลิตร
-            document.getElementById('fuelResult').innerText = `ค่าน้ำมันโดยประมาณ: ${cost.toFixed(2)} บาท`;
+        </div>
+
+      </div>
+
+
+      <!-- CHAT -->
+      <div id="chat" class="page">
+
+        <div class="page-title">
+          <h2>💬 แชททีม</h2>
+          <p>สื่อสารระหว่างทีมและห้องรวม</p>
+        </div>
+
+        <div class="chat">
+
+          <div class="chat-rooms">
+
+            <div class="room active" data-room="all" onclick="selectRoom(this,'all')">
+              🌐 ทุกทีม
+            </div>
+
+            <div class="room" data-room="teamservice1" onclick="selectRoom(this,'teamservice1')">
+              🔵 Team 1
+            </div>
+
+            <div class="room" data-room="teamservice2" onclick="selectRoom(this,'teamservice2')">
+              🟢 Team 2
+            </div>
+
+            <div class="room" data-room="teamservice3" onclick="selectRoom(this,'teamservice3')">
+              🟡 Team 3
+            </div>
+
+            <div class="room" data-room="teamservice4" onclick="selectRoom(this,'teamservice4')">
+              🟠 Team 4
+            </div>
+
+            <div class="room" data-room="teamservice5" onclick="selectRoom(this,'teamservice5')">
+              🔴 Team 5
+            </div>
+
+          </div>
+
+          <div class="chat-main">
+
+            <div id="messages" class="messages"></div>
+
+            <div class="chat-input">
+
+              <input
+                id="messageInput"
+                placeholder="พิมพ์ข้อความ..."
+                onkeydown="if(event.key==='Enter')sendMessage()"
+              >
+
+              <button class="btn" onclick="sendMessage()">
+                ส่ง
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- WARRANTY -->
+      <div id="warranty" class="page">
+
+        <div class="page-title">
+          <h2>🛡️ Warranty</h2>
+          <p>ติดตามประกันงานและวันหมดประกัน</p>
+        </div>
+
+        <div class="card">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>งาน</th>
+                  <th>ทีม</th>
+                  <th>วันที่เสร็จ</th>
+                  <th>รับประกัน</th>
+                  <th>หมดประกัน</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+
+              <tbody id="warrantyTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- REPORTS -->
+      <div id="reports" class="page">
+
+        <div class="page-title">
+          <h2>📈 รายงาน</h2>
+          <p>สรุปผลการทำงาน</p>
+        </div>
+
+        <div class="grid grid-3">
+
+          <div class="card">
+            <div class="stat-label">อัตรางานเสร็จ</div>
+            <div id="completionRate" class="stat-value green">0%</div>
+          </div>
+
+          <div class="card">
+            <div class="stat-label">งานทั้งหมด</div>
+            <div id="reportJobs" class="stat-value blue">0</div>
+          </div>
+
+          <div class="card">
+            <div class="stat-label">Warranty ทั้งหมด</div>
+            <div id="reportWarranty" class="stat-value yellow">0</div>
+          </div>
+
+        </div>
+
+        <br>
+
+        <div class="card">
+
+          <h3>สรุปงานตามทีม</h3>
+
+          <br>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>ทีม</th>
+                  <th>งานทั้งหมด</th>
+                  <th>กำลังทำ</th>
+                  <th>เสร็จแล้ว</th>
+                </tr>
+              </thead>
+
+              <tbody id="teamReport"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ADMIN -->
+      <div id="admin" class="page">
+
+        <div class="page-title">
+          <h2>⚙️ Admin</h2>
+          <p>จัดการงานและข้อมูลระบบ</p>
+        </div>
+
+        <div class="grid grid-3">
+
+          <div class="card">
+            <h3>👥 ทีมทั้งหมด</h3>
+            <br>
+            <div class="stat-value blue">5</div>
+          </div>
+
+          <div class="card">
+            <h3>🧰 งานทั้งหมด</h3>
+            <br>
+            <div id="adminJobs" class="stat-value green">0</div>
+          </div>
+
+          <div class="card">
+            <h3>💰 รายการการเงิน</h3>
+            <br>
+            <div id="adminFinance" class="stat-value yellow">0</div>
+          </div>
+
+        </div>
+
+        <br>
+
+        <div class="card">
+
+          <h3>ข้อมูลระบบ</h3>
+
+          <br>
+
+          <p style="color:var(--muted);line-height:2">
+            ระบบนี้เป็น GitHub-ready frontend<br>
+            ข้อมูล Demo เก็บด้วย LocalStorage<br>
+            สำหรับใช้งานจริงแนะนำเชื่อม Firebase Authentication,
+            Firestore และ Realtime Database
+          </p>
+
+        </div>
+
+      </div>
+
+
+    </section>
+  </main>
+</div>
+
+
+<!-- JOB MODAL -->
+<div id="jobModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <h3>สร้างงานใหม่</h3>
+      <button class="close" onclick="closeModal('jobModal')">×</button>
+    </div>
+
+    <div class="field">
+      <label>ชื่องาน</label>
+      <input id="jobTitle" placeholder="เช่น ติดตั้งระบบไฟ">
+    </div>
+
+    <div class="field">
+      <label>ลูกค้า / หน่วยงาน</label>
+      <input id="jobCustomer" placeholder="ชื่อลูกค้า">
+    </div>
+
+    <div class="field">
+      <label>สถานที่</label>
+      <input id="jobLocation" placeholder="สถานที่ปฏิบัติงาน">
+    </div>
+
+    <div class="field">
+      <label>วันที่</label>
+      <input id="jobDate" type="date">
+    </div>
+
+    <div class="field">
+      <label>มอบหมายทีม</label>
+
+      <select id="jobTeam">
+        <option value="teamservice1">Team Service 1</option>
+        <option value="teamservice2">Team Service 2</option>
+        <option value="teamservice3">Team Service 3</option>
+        <option value="teamservice4">Team Service 4</option>
+        <option value="teamservice5">Team Service 5</option>
+      </select>
+
+    </div>
+
+    <div class="field">
+      <label>รายละเอียดงาน</label>
+      <textarea id="jobDetails"></textarea>
+    </div>
+
+    <button class="btn full" onclick="createJob()">
+      สร้างงาน
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- FINANCE MODAL -->
+<div id="financeModal" class="modal">
+
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <h3>เพิ่มรายการการเงิน</h3>
+      <button class="close" onclick="closeModal('financeModal')">×</button>
+    </div>
+
+    <div class="field">
+      <label>ประเภท</label>
+
+      <select id="financeType">
+        <option value="income">รายรับ</option>
+        <option value="expense">รายจ่าย</option>
+      </select>
+
+    </div>
+
+    <div class="field">
+      <label>รายละเอียด</label>
+      <input id="financeNote" placeholder="เช่น ค่าอะไหล่">
+    </div>
+
+    <div class="field">
+      <label>จำนวนเงิน</label>
+      <input id="financeAmount" type="number">
+    </div>
+
+    <button class="btn full" onclick="addFinance()">
+      บันทึก
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATABASE - DEMO LOCAL STORAGE
+========================================================= */
+
+const DB_KEY = "service_team_database_v1";
+
+let db = {
+  jobs: [],
+  finance: [],
+  messages: [],
+  warranties: []
+};
+
+let currentUser = null;
+let currentRoom = "all";
+
+
+function loadDB(){
+
+  const saved = localStorage.getItem(DB_KEY);
+
+  if(saved){
+    db = JSON.parse(saved);
+  }else{
+
+    db = {
+
+      jobs:[
+        {
+          id:Date.now(),
+          title:"ติดตั้งระบบไฟ",
+          customer:"บริษัท ABC",
+          location:"พิษณุโลก",
+          date:new Date().toISOString().slice(0,10),
+          team:"teamservice1",
+          details:"ตรวจสอบและติดตั้งระบบไฟ",
+          status:"pending",
+          warranty:null
+        },
+        {
+          id:Date.now()+1,
+          title:"ซ่อมปั๊มน้ำ",
+          customer:"ร้าน XYZ",
+          location:"พิษณุโลก",
+          date:new Date().toISOString().slice(0,10),
+          team:"teamservice2",
+          details:"ตรวจเช็คปั๊มน้ำ",
+          status:"working",
+          warranty:null
         }
+      ],
 
-        // ระบบบัญชีแอดมิน
-        function addTransaction() {
-            const title = document.getElementById('transTitle').value.trim();
-            const type = document.getElementById('transType').value;
-            const amount = parseFloat(document.getElementById('transAmount').value) || 0;
+      finance:[
+        {
+          id:1,
+          date:new Date().toISOString().slice(0,10),
+          type:"income",
+          note:"ค่าบริการ",
+          amount:5000
+        },
+        {
+          id:2,
+          date:new Date().toISOString().slice(0,10),
+          type:"expense",
+          note:"ค่าน้ำมัน",
+          amount:1000
+        }
+      ],
 
-            if(!title || amount <= 0) {
-                alert('กรุณากรอกชื่อรายการและจำนวนเงินให้ถูกต้อง');
-                return;
+      messages:[
+        {
+          room:"all",
+          user:"ระบบ",
+          text:"ยินดีต้อนรับเข้าสู่ระบบแชท",
+          time:new Date().toLocaleTimeString()
+        }
+      ],
+
+      warranties:[]
+
+    };
+
+    saveDB();
+  }
+}
+
+
+function saveDB(){
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+function login(){
+
+  const team = document.getElementById("loginTeam").value;
+
+  const name =
+    document.getElementById("loginName").value.trim()
+    || team;
+
+  currentUser = {
+    name,
+    team,
+    admin:team === "Paoadmin"
+  };
+
+  localStorage.setItem(
+    "service_current_user",
+    JSON.stringify(currentUser)
+  );
+
+  document.getElementById("loginScreen")
+    .classList.add("hidden");
+
+  document.getElementById("app")
+    .classList.remove("hidden");
+
+  setupUser();
+  renderAll();
+}
+
+
+function checkLogin(){
+
+  const saved =
+    localStorage.getItem("service_current_user");
+
+  if(saved){
+
+    currentUser = JSON.parse(saved);
+
+    document.getElementById("loginScreen")
+      .classList.add("hidden");
+
+    document.getElementById("app")
+      .classList.remove("hidden");
+
+    setupUser();
+
+  }
+}
+
+
+function setupUser(){
+
+  document.getElementById("currentName").textContent =
+    currentUser.name;
+
+  document.getElementById("currentTeam").textContent =
+    currentUser.team;
+
+  document.getElementById("avatar").textContent =
+    currentUser.name.charAt(0).toUpperCase();
+
+  const admin =
+    currentUser.admin;
+
+  document
+    .getElementById("financeNav")
+    .classList.toggle("hidden",!admin);
+
+  document
+    .getElementById("reportsNav")
+    .classList.toggle("hidden",!admin);
+
+  document
+    .getElementById("adminNav")
+    .classList.toggle("hidden",!admin);
+
+  document
+    .getElementById("adminJobButton")
+    .classList.toggle("hidden",!admin);
+
+}
+
+
+function logout(){
+
+  localStorage.removeItem("service_current_user");
+
+  location.reload();
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(page,button){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(p=>p.classList.remove("active"));
+
+  document
+    .getElementById(page)
+    .classList.add("active");
+
+  document
+    .querySelectorAll(".nav button")
+    .forEach(b=>b.classList.remove("active"));
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  const titles={
+    dashboard:"Dashboard",
+    jobs:"งานของทีม",
+    materials:"วัสดุ / ร้านค้า",
+    fuel:"คำนวณน้ำมัน",
+    finance:"การเงิน",
+    chat:"แชททีม",
+    warranty:"Warranty",
+    reports:"รายงาน",
+    admin:"Admin"
+  };
+
+  document.getElementById("topTitle").textContent =
+    titles[page] || page;
+
+  document.getElementById("sidebar")
+    .classList.remove("open");
+
+}
+
+
+function toggleSidebar(){
+
+  document
+    .getElementById("sidebar")
+    .classList.toggle("open");
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+function getVisibleJobs(){
+
+  if(currentUser.admin){
+    return db.jobs;
+  }
+
+  return db.jobs.filter(
+    j=>j.team===currentUser.team
+  );
+
+}
+
+
+function renderDashboard(){
+
+  const jobs =
+    getVisibleJobs();
+
+  const total =
+    jobs.length;
+
+  const working =
+    jobs.filter(j=>j.status==="working").length;
+
+  const complete =
+    jobs.filter(j=>j.status==="complete").length;
+
+  const pending =
+    jobs.filter(j=>j.status==="pending").length;
+
+  document.getElementById("statJobs").textContent =
+    total;
+
+  document.getElementById("statWorking").textContent =
+    working;
+
+  document.getElementById("statComplete").textContent =
+    complete;
+
+  document.getElementById("statPending").textContent =
+    pending;
+
+
+  const recent =
+    jobs.slice(-5).reverse();
+
+  document.getElementById("recentJobs").innerHTML =
+    recent.length
+    ? recent.map(job=>`
+
+      <div style="padding:12px 0;border-bottom:1px solid var(--line)">
+
+        <strong>${escapeHTML(job.title)}</strong>
+
+        <div style="color:var(--muted);font-size:13px">
+          ${escapeHTML(job.customer)}
+          · ${escapeHTML(job.location)}
+        </div>
+
+        <br>
+
+        ${statusBadge(job.status)}
+
+      </div>
+
+    `).join("")
+    : `<p style="color:var(--muted)">ยังไม่มีงาน</p>`;
+
+
+  const warranties =
+    db.warranties
+      .filter(w=>currentUser.admin || w.team===currentUser.team)
+      .slice(-5)
+      .reverse();
+
+  document.getElementById("dashboardWarranty").innerHTML =
+    warranties.length
+    ? warranties.map(w=>`
+
+      <div style="padding:12px 0;border-bottom:1px solid var(--line)">
+
+        <strong>${escapeHTML(w.jobTitle)}</strong>
+
+        <div style="color:var(--muted)">
+          หมดประกัน ${w.endDate}
+        </div>
+
+      </div>
+
+    `).join("")
+    : `<p style="color:var(--muted)">ยังไม่มีข้อมูล Warranty</p>`;
+
+}
+
+
+/* =========================================================
+   JOBS
+========================================================= */
+
+function renderJobs(){
+
+  const jobs =
+    getVisibleJobs();
+
+  const container =
+    document.getElementById("jobsList");
+
+  if(!jobs.length){
+
+    container.innerHTML =
+      `<div class="card">
+        <p style="color:var(--muted)">ยังไม่มีงาน</p>
+      </div>`;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    jobs.map(job=>`
+
+      <div class="card job-card">
+
+        <div class="job-header">
+
+          <div>
+
+            <div class="job-title">
+              ${escapeHTML(job.title)}
+            </div>
+
+            <div class="job-meta">
+
+              👤 ${escapeHTML(job.customer)}<br>
+
+              📍 ${escapeHTML(job.location)}<br>
+
+              📅 ${job.date}<br>
+
+              👥 ${job.team}
+
+            </div>
+
+          </div>
+
+          ${statusBadge(job.status)}
+
+        </div>
+
+
+        <div style="color:#b9cadb">
+          ${escapeHTML(job.details || "-")}
+        </div>
+
+
+        <div class="job-actions">
+
+          ${job.status==="pending" && !currentUser.admin
+            ? `<button class="btn success"
+                onclick="acceptJob(${job.id})">
+                ✓ รับงาน
+              </button>`
+            : ""
+          }
+
+          ${job.status==="working" && !currentUser.admin
+            ? `<button class="btn"
+                onclick="completeJob(${job.id})">
+                ✓ ปิดงาน
+              </button>`
+            : ""
+          }
+
+          ${currentUser.admin
+            ? `<button class="btn secondary"
+                onclick="deleteJob(${job.id})">
+                ลบงาน
+              </button>`
+            : ""
+          }
+
+          <button
+            class="btn secondary"
+            onclick="navigateTo('${encodeURIComponent(job.location)}')">
+            🗺️ นำทาง
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function openJobModal(){
+
+  document
+    .getElementById("jobModal")
+    .classList.add("show");
+
+}
+
+
+function createJob(){
+
+  const title =
+    document.getElementById("jobTitle").value.trim();
+
+  const customer =
+    document.getElementById("jobCustomer").value.trim();
+
+  const location =
+    document.getElementById("jobLocation").value.trim();
+
+  const date =
+    document.getElementById("jobDate").value;
+
+  const team =
+    document.getElementById("jobTeam").value;
+
+  const details =
+    document.getElementById("jobDetails").value.trim();
+
+
+  if(!title || !customer || !location){
+
+    alert("กรุณากรอกข้อมูลสำคัญให้ครบ");
+
+    return;
+  }
+
+
+  db.jobs.push({
+
+    id:Date.now(),
+
+    title,
+
+    customer,
+
+    location,
+
+    date:
+      date ||
+      new Date().toISOString().slice(0,10),
+
+    team,
+
+    details,
+
+    status:"pending",
+
+    warranty:null
+
+  });
+
+
+  saveDB();
+
+  closeModal("jobModal");
+
+  clearJobForm();
+
+  renderAll();
+
+  alert("สร้างงานเรียบร้อย");
+
+
+}
+
+
+function acceptJob(id){
+
+  const job =
+    db.jobs.find(j=>j.id===id);
+
+  if(!job) return;
+
+  job.status="working";
+
+  saveDB();
+
+  renderAll();
+
+}
+
+
+function completeJob(id){
+
+  const job =
+    db.jobs.find(j=>j.id===id);
+
+  if(!job) return;
+
+  const doneDate =
+    prompt(
+      "วันที่ทำงานเสร็จ (YYYY-MM-DD)",
+      new Date().toISOString().slice(0,10)
+    );
+
+  if(!doneDate) return;
+
+  const work =
+    prompt(
+      "รายละเอียดสิ่งที่ทำ",
+      job.details || ""
+    );
+
+  const warrantyDays =
+    parseInt(
+      prompt("รับประกันกี่วัน","30"),
+      10
+    ) || 0;
+
+
+  const endDate =
+    new Date(doneDate);
+
+  endDate.setDate(
+    endDate.getDate()+warrantyDays
+  );
+
+
+  job.status="complete";
+
+  job.completedDate=doneDate;
+
+  job.completedWork=work;
+
+  job.warrantyDays=warrantyDays;
+
+  job.warrantyEnd=
+    endDate.toISOString().slice(0,10);
+
+
+  db.warranties.push({
+
+    id:Date.now(),
+
+    jobId:job.id,
+
+    jobTitle:job.title,
+
+    team:job.team,
+
+    completedDate:doneDate,
+
+    days:warrantyDays,
+
+    endDate:job.warrantyEnd
+
+  });
+
+
+  saveDB();
+
+  renderAll();
+
+  alert("ปิดงานและบันทึก Warranty แล้ว");
+
+}
+
+
+function deleteJob(id){
+
+  if(!currentUser.admin) return;
+
+  if(!confirm("ต้องการลบงานนี้หรือไม่?")) return;
+
+  db.jobs =
+    db.jobs.filter(j=>j.id!==id);
+
+  saveDB();
+
+  renderAll();
+
+}
+
+
+function clearJobForm(){
+
+  [
+    "jobTitle",
+    "jobCustomer",
+    "jobLocation",
+    "jobDetails"
+  ].forEach(id=>{
+    document.getElementById(id).value="";
+  });
+
+}
+
+
+/* =========================================================
+   MATERIALS
+========================================================= */
+
+const materials=[
+
+  {
+    name:"ร้านวัสดุก่อสร้าง A",
+    item:"ท่อ PVC 1/2 นิ้ว",
+    price:45,
+    lat:16.82,
+    lng:100.26
+  },
+
+  {
+    name:"ร้านไฟฟ้า B",
+    item:"เบรกเกอร์ 20A",
+    price:180,
+    lat:16.81,
+    lng:100.27
+  },
+
+  {
+    name:"ร้านช่าง C",
+    item:"สายไฟ 2x1.5",
+    price:520,
+    lat:16.83,
+    lng:100.25
+  },
+
+  {
+    name:"ร้านวัสดุ D",
+    item:"ท่อ PVC 1/2 นิ้ว",
+    price:39,
+    lat:16.80,
+    lng:100.28
+  }
+
+];
+
+
+function renderMaterials(){
+
+  const q =
+    document.getElementById("materialSearch")
+      .value
+      .toLowerCase();
+
+  const result =
+    materials.filter(m=>
+      m.name.toLowerCase().includes(q) ||
+      m.item.toLowerCase().includes(q)
+    );
+
+  document.getElementById("materialResults").innerHTML =
+
+    result.map(m=>`
+
+      <div class="card">
+
+        <h3>${escapeHTML(m.name)}</h3>
+
+        <br>
+
+        <p style="color:var(--muted)">
+          ${escapeHTML(m.item)}
+        </p>
+
+        <div
+          class="stat-value green"
+          style="font-size:24px">
+          ฿${m.price.toLocaleString()}
+        </div>
+
+        <br>
+
+        <button
+          class="btn"
+          onclick="navigateCoords(${m.lat},${m.lng})">
+          🗺️ นำทาง
+        </button>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function navigateTo(location){
+
+  window.open(
+    "https://www.google.com/maps/search/?api=1&query="
+    + encodeURIComponent(location),
+    "_blank"
+  );
+
+}
+
+
+function navigateCoords(lat,lng){
+
+  window.open(
+    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+    "_blank"
+  );
+
+}
+
+
+function openGoogleMaps(){
+
+  window.open(
+    "https://www.google.com/maps",
+    "_blank"
+  );
+
+}
+
+
+function useCurrentLocation(){
+
+  if(!navigator.geolocation){
+
+    alert("Browser ไม่รองรับ GPS");
+
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    position=>{
+
+      const lat =
+        position.coords.latitude;
+
+      const lng =
+        position.coords.longitude;
+
+      window.open(
+        `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
+        "_blank"
+      );
+
+    },
+
+    ()=>{
+      alert("ไม่สามารถอ่านตำแหน่งปัจจุบันได้");
+    }
+
+  );
+
+}
+
+
+/* =========================================================
+   FUEL
+========================================================= */
+
+function calculateFuel(){
+
+  const rate =
+    parseFloat(
+      document.getElementById("fuelRate").value
+    );
+
+  const distance =
+    parseFloat(
+      document.getElementById("fuelDistance").value
+    );
+
+  const price =
+    parseFloat(
+      document.getElementById("fuelPrice").value
+    );
+
+
+  if(!rate || !distance || !price){
+
+    alert("กรุณากรอกข้อมูลให้ครบ");
+
+    return;
+  }
+
+
+  const litres =
+    distance/rate;
+
+  const cost =
+    litres*price;
+
+
+  document.getElementById("fuelLitres")
+    .textContent =
+      litres.toFixed(2)+" ลิตร";
+
+  document.getElementById("fuelCost")
+    .textContent =
+      "฿"+cost.toLocaleString(
+        undefined,
+        {
+          maximumFractionDigits:2
+        }
+      );
+
+}
+
+
+/* =========================================================
+   FINANCE
+========================================================= */
+
+function openFinanceModal(){
+
+  document
+    .getElementById("financeModal")
+    .classList.add("show");
+
+}
+
+
+function addFinance(){
+
+  const type =
+    document.getElementById("financeType").value;
+
+  const note =
+    document.getElementById("financeNote")
+      .value.trim();
+
+  const amount =
+    parseFloat(
+      document.getElementById("financeAmount").value
+    );
+
+
+  if(!note || !amount){
+
+    alert("กรุณากรอกข้อมูล");
+
+    return;
+  }
+
+
+  db.finance.push({
+
+    id:Date.now(),
+
+    date:
+      new Date().toISOString().slice(0,10),
+
+    type,
+
+    note,
+
+    amount
+
+  });
+
+
+  saveDB();
+
+  closeModal("financeModal");
+
+  document.getElementById("financeNote").value="";
+  document.getElementById("financeAmount").value="";
+
+  renderAll();
+
+}
+
+
+function renderFinance(){
+
+  if(!currentUser.admin) return;
+
+
+  let income=0;
+  let expense=0;
+
+
+  db.finance.forEach(item=>{
+
+    if(item.type==="income")
+      income+=item.amount;
+
+    else
+      expense+=item.amount;
+
+  });
+
+
+  document.getElementById("incomeTotal").textContent =
+    "฿"+income.toLocaleString();
+
+  document.getElementById("expenseTotal").textContent =
+    "฿"+expense.toLocaleString();
+
+  document.getElementById("balanceTotal").textContent =
+    "฿"+(income-expense).toLocaleString();
+
+
+  document.getElementById("financeTable").innerHTML =
+
+    db.finance
+      .slice()
+      .reverse()
+      .map(item=>`
+
+        <tr>
+
+          <td>${item.date}</td>
+
+          <td>
+            ${
+              item.type==="income"
+              ? `<span class="badge green">รายรับ</span>`
+              : `<span class="badge red">รายจ่าย</span>`
+            }
+          </td>
+
+          <td>${escapeHTML(item.note)}</td>
+
+          <td>
+            ฿${item.amount.toLocaleString()}
+          </td>
+
+        </tr>
+
+      `).join("");
+
+}
+
+
+/* =========================================================
+   CHAT
+========================================================= */
+
+function selectRoom(element,room){
+
+  currentRoom=room;
+
+  document
+    .querySelectorAll(".room")
+    .forEach(r=>r.classList.remove("active"));
+
+  element.classList.add("active");
+
+  renderMessages();
+
+}
+
+
+function sendMessage(){
+
+  const input =
+    document.getElementById("messageInput");
+
+  const text =
+    input.value.trim();
+
+  if(!text) return;
+
+
+  db.messages.push({
+
+    room:currentRoom,
+
+    user:currentUser.name,
+
+    team:currentUser.team,
+
+    text,
+
+    time:new Date().toLocaleTimeString()
+
+  });
+
+
+  input.value="";
+
+  saveDB();
+
+  renderMessages();
+
+}
+
+
+function renderMessages(){
+
+  const messages =
+    db.messages.filter(
+      m=>m.room===currentRoom
+    );
+
+
+  document.getElementById("messages").innerHTML =
+
+    messages.map(m=>`
+
+      <div class="message ${
+        m.user===currentUser.name
+        ? "me"
+        : ""
+      }">
+
+        <div style="font-size:12px;color:var(--muted)">
+          ${escapeHTML(m.user)}
+        </div>
+
+        <div class="message-bubble">
+          ${escapeHTML(m.text)}
+        </div>
+
+        <small>${m.time}</small>
+
+      </div>
+
+    `).join("");
+
+
+  const box =
+    document.getElementById("messages");
+
+  box.scrollTop=box.scrollHeight;
+
+}
+
+
+/* =========================================================
+   WARRANTY
+========================================================= */
+
+function renderWarranty(){
+
+  const list =
+    db.warranties.filter(
+      w=>currentUser.admin || w.team===currentUser.team
+    );
+
+
+  document.getElementById("warrantyTable").innerHTML =
+
+    list.map(w=>{
+
+      const expired =
+        new Date(w.endDate)<new Date();
+
+      return `
+
+        <tr>
+
+          <td>${escapeHTML(w.jobTitle)}</td>
+
+          <td>${w.team}</td>
+
+          <td>${w.completedDate}</td>
+
+          <td>${w.days} วัน</td>
+
+          <td>${w.endDate}</td>
+
+          <td>
+
+            ${
+              expired
+              ? `<span class="badge red">หมดประกัน</span>`
+              : `<span class="badge green">ยังมีประกัน</span>`
             }
 
-            transactions.push({ title, type, amount });
-            updateFinancialUI();
+          </td>
 
-            document.getElementById('transTitle').value = '';
-            document.getElementById('transAmount').value = '';
-            alert('บันทึกรายการบัญชีสำเร็จ!');
-        }
+        </tr>
 
-        function updateFinancialUI() {
-            let totalInc = 0, totalExp = 0;
-            transactions.forEach(t => {
-                if(t.type === 'income') totalInc += t.amount;
-                else totalExp += t.amount;
-            });
-            document.getElementById('adminTotalIncome').innerText = totalInc.toLocaleString() + ' ฿';
-            document.getElementById('adminTotalExpense').innerText = totalExp.toLocaleString() + ' ฿';
-            document.getElementById('adminNetProfit').innerText = (totalInc - totalExp).toLocaleString() + ' ฿';
-        }
+      `;
 
-        // ส่งประกาศด่วน
-        function sendBroadcast() {
-            const msg = document.getElementById('broadcastInput').value.trim();
-            if(!msg) return;
-            localStorage.setItem('broadcastMsg', msg);
-            alert('ส่งประกาศด่วนถึงทีมช่างเรียบร้อยแล้ว');
-            document.getElementById('broadcastInput').value = '';
-        }
+    }).join("");
 
-        // ตรวจสอบประกาศฝั่งช่าง
-        setInterval(() => {
-            if(currentRole === 'tech') {
-                const msg = localStorage.getItem('broadcastMsg');
-                if(msg) {
-                    document.getElementById('techBroadcastBanner').classList.remove('hidden');
-                    document.getElementById('techBroadcastText').innerText = msg;
-                }
-            }
-        }, 2000);
-    </script>
+}
+
+
+/* =========================================================
+   REPORT
+========================================================= */
+
+function renderReports(){
+
+  if(!currentUser.admin) return;
+
+  const jobs=db.jobs;
+
+  const complete =
+    jobs.filter(j=>j.status==="complete").length;
+
+  const rate =
+    jobs.length
+    ? Math.round(complete/jobs.length*100)
+    : 0;
+
+  document.getElementById("completionRate")
+    .textContent=rate+"%";
+
+  document.getElementById("reportJobs")
+    .textContent=jobs.length;
+
+  document.getElementById("reportWarranty")
+    .textContent=db.warranties.length;
+
+
+  const teams=[
+    "teamservice1",
+    "teamservice2",
+    "teamservice3",
+    "teamservice4",
+    "teamservice5"
+  ];
+
+
+  document.getElementById("teamReport").innerHTML =
+
+    teams.map(team=>{
+
+      const list =
+        jobs.filter(j=>j.team===team);
+
+      return `
+
+        <tr>
+
+          <td>${team}</td>
+
+          <td>${list.length}</td>
+
+          <td>
+            ${list.filter(j=>j.status==="working").length}
+          </td>
+
+          <td>
+            ${list.filter(j=>j.status==="complete").length}
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
+
+
+  document.getElementById("adminJobs")
+    .textContent=jobs.length;
+
+  document.getElementById("adminFinance")
+    .textContent=db.finance.length;
+
+}
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function statusBadge(status){
+
+  const map={
+
+    pending:
+      `<span class="badge red">รอรับงาน</span>`,
+
+    working:
+      `<span class="badge yellow">กำลังทำ</span>`,
+
+    complete:
+      `<span class="badge green">เสร็จแล้ว</span>`
+
+  };
+
+  return map[status] || "";
+
+}
+
+
+function closeModal(id){
+
+  document
+    .getElementById(id)
+    .classList.remove("show");
+
+}
+
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function renderAll(){
+
+  renderDashboard();
+
+  renderJobs();
+
+  renderMaterials();
+
+  renderFinance();
+
+  renderMessages();
+
+  renderWarranty();
+
+  renderReports();
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadDB();
+
+checkLogin();
+
+</script>
+
 </body>
 </html>
